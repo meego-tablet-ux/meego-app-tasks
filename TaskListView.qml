@@ -393,20 +393,18 @@ Item {
         saveButtonActive: newrow.textinput.text != ""
         onClickedCancel: {
             // clean up the added tasks
-            container.model.viewModel.rollbackAddedTasks();
+            //container.model.viewModel.rollbackAddedTasks();
             container.mode = 0;
             container.selectedIds = [];
         }
         onClickedSave: {
             // actually save the tasks            
-            //container.model.addNewTask(view.model.listId, textinput.text);
             view.model.addTaskAlt(view.model.listId, newrow.textinput.text,
                                   false, newrow.selectedDueDate,newrow.selectedDate);
 
             newrow.selectedDueDate = false;
 
             //area.contentHeight = getMaxContentHeight();
-            ensureEnoughSpace();
             container.model.viewModel.commitAddedTasks();
             container.selectedIds = [];
         }
