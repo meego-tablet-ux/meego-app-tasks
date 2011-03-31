@@ -82,6 +82,7 @@ Item {
         CreateNewTaskRow {
             id: newrow
             width: parent.width
+            anchors.left: parent.left
             height: addNewRow?container.rowHeight: 0
             visible: addNewRow
             anchors.top: view.bottom

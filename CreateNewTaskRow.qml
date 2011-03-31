@@ -33,29 +33,16 @@ Item {
         source: "image://theme/tasks/ln_grey_l"
     }
 
-    BorderImage {
-        id: editor
-        source: "image://theme/tasks/frm_textbox_l"
+    TextEntry {
+        id: textinput
+        anchors.left: parent.left
         anchors.right: dropdownbox.left
-        anchors.rightMargin: 10
-        height: row.height - 2* editorVerticalMargin
-        border.left: 10
-        border.top: 10
-        border.right: 10
-        border.bottom: 10
-        y: editorVerticalMargin
-
-        TextEntry {
-            id: textinput
-            x: 25
-            anchors.left: editor.left
-            anchors.right: parent.right
-            height: row.height - 10
-            anchors.verticalCenter: parent.verticalCenter
-            defaultText: labelCreateNewTask
-            onTextChanged: requestForEditing();
-        }
+        height: row.height - 10
+        anchors.verticalCenter: parent.verticalCenter
+        defaultText: labelCreateNewTask
+        onTextChanged: requestForEditing();
     }
+
 
     DatePickerDialog {
         id: datePicker
