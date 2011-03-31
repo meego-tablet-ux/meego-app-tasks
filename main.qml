@@ -882,25 +882,23 @@ Window {
             }
             ContextMenu {
                 id: customListPageContextMenu
-                model: [labelViewDetail,labelEditTask,labelSelectMultiple, labelDeleteTask]
+                model: {
+                    if(customlistModel.count > 1) {
+                        return [labelViewDetail,labelEditTask, labelDeleteTask,labelSelectMultiple];
+                    } else {
+                        return [labelViewDetail,labelEditTask, labelDeleteTask];
+                    }
+                }
+
                 menuWidth: 400
                 property variant mousePos
                 onTriggered: {
-                    if (index == 0)
-                    {
-                        // view detail
+                    if (index == 0) { // view detail
                         showTaskDetailWindow(taskListView,mousePos.x, mousePos.y,payload);
-                    }
-                    else if (index == 1)
-                    {
-                        // edit task
+                    } else if (index == 1) { // edit task
                         showTaskDetailWindow(taskListView,mousePos.x, mousePos.y,payload);
                         taskDetailLoader.item.editing = true;
-                    } else if (index ==2) {
-                        // multiple selection mode
-                        taskListView.mode = 2;
-                    } else if (index == 3) {
-                        // delete task
+                    } else if (index ==2) {  // delete task
                         if(qmlSettings.get("task_auto_delete")){
                             editorList.removeTask(payload.mTaskId);
                         } else {
@@ -908,19 +906,11 @@ Window {
                             dialogLoader.item.parent = customlistPage.content
                             dialogLoader.item.taskId = payload.mTaskId
                         }
+                    } else if (index == 3) { // multiple selection mode
+                        taskListView.mode = 2;
                     }
-
                 }
             }
-
         }
     }
-
-    //Screen roration
-    //    filterModel: ["Rotate"]
-    //    filterPayload: ["Rotate"]
-    //    onFilterTriggered: {
-    //        if(payload == "Rotate")
-    //            scene.orientation = (scene.orientation +1) % 4;
-    //    }
 }
