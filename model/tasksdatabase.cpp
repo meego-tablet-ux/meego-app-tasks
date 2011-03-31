@@ -371,6 +371,10 @@ void TasksDatabase::editTask(int taskId, int listId, const QString &task, const 
                              TasksListModel::ReminderType reminderType, const QDate &reminderDate,
                              const QStringList &urls, const QStringList &attachments)
 {
+    Q_UNUSED(reminderType);
+    Q_UNUSED(reminderDate);
+    Q_UNUSED(urls);
+    Q_UNUSED(attachments);
     //qDebug() << "LIST ID " << listId;
     //if (!hasDueDate)
     //        dueDate = QDate();

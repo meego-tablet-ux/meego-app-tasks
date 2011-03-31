@@ -15,8 +15,8 @@ int TasksListItem::ids = TasksListItem::defaultListId;
 
 TasksListItem::TasksListItem(const QString &name, QDateTime createdDateTime)
         : m_name(name)
-        , m_incompleted(0)
         , m_createdDateTime(createdDateTime)
+        , m_incompleted(0)
 {
         m_id = ids;
         ids++;
