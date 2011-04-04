@@ -155,7 +155,7 @@ Item {
                 text: titleText(index)
                 horizontalAlignment: Text.AlignLeft
                 verticalAlignment: Text.AlignVCenter
-                font.bold: true
+                //font.bold: true
                 font.pixelSize: theme_fontPixelSizeLarge
                 elide: Text.ElideRight
             }
@@ -318,6 +318,16 @@ Item {
                     to: 0
                 }
             }
+
+            Image {
+                id: vDivider
+                source: "image://theme/tasks/ln_grey_p"
+                height: parent.height
+                width: 2
+                anchors.left: box.right
+                anchors.leftMargin: 20
+            }
+
             Image {
                 id: overdueIcon
                 source: "image://theme/tasks/icn_overdue_red"

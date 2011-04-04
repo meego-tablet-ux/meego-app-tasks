@@ -149,7 +149,7 @@ Item {
                 height: titleFlick.height
                 wrapMode: TextEdit.Wrap
                 font.pixelSize: theme_fontPixelSizeMedium
-                font.bold: true
+                //font.bold: true
                 font.strikeout: checkbox.checked
                 readOnly: !editing
                 onCursorRectangleChanged: titleFlick.ensureVisible(cursorRectangle)
@@ -185,7 +185,7 @@ Item {
                     id: list
                     text: listNames[task.mListId]
                     color:theme_fontColorNormal
-                    font.bold: true
+                    //font.bold: true
                     anchors.left: listLabel.right
                     anchors.leftMargin: 2
                     anchors.verticalCenter: listCombobox.verticalCenter
@@ -245,7 +245,7 @@ Item {
                     id: duedate
                     text: duedateSelector.on? getFormattedDate(duedatePicker.date): labelSomeday
                     color:theme_fontColorNormal
-                    font.bold: true
+                    //font.bold: true
                     anchors.left: duedateLabel.right
                     anchors.leftMargin: 2
                     anchors.verticalCenter: duedateSelector.verticalCenter

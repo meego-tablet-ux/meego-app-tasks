@@ -274,7 +274,7 @@ Window {
                 id: textinput
                 width: dialog.width - 10
                 height: 50
-                textInput.font.bold: true
+                //textInput.font.bold: true
                 parent: dialog
                 anchors.centerIn: parent
             }
@@ -341,7 +341,7 @@ Window {
                     text:  labelAllDueTasks
                     horizontalAlignment: Text.AlignLeft
                     verticalAlignment: Text.AlignVCenter
-                    font.bold: true
+                    //font.bold: true
                     font.pixelSize: theme_fontPixelSizeLarge
                     elide: Text.ElideRight
                     color: theme_fontColorNormal
@@ -429,7 +429,7 @@ Window {
                         text:  listName
                         horizontalAlignment: Text.AlignLeft
                         verticalAlignment: Text.AlignVCenter
-                        font.bold: true
+                        //font.bold: true
                         font.pixelSize: theme_fontPixelSizeLarge
                         elide: Text.ElideRight
                         color: theme_fontColorNormal
@@ -673,7 +673,7 @@ Window {
                 id: textinput
                 width: dialog.width - 10
                 height: 50
-                textInput.font.bold: true
+                //textInput.font.bold: true
                 parent: dialog
                 anchors.centerIn: parent
             }

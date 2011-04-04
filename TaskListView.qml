@@ -292,6 +292,16 @@ Item {
                         container.checkedAtRow(index, dinstance,!checked);
                 }
             }
+
+            Image {
+                id: vDivider
+                source: "image://theme/tasks/ln_grey_p"
+                height: parent.height
+                width: 2
+                anchors.left: box.right
+                anchors.leftMargin: 20
+            }
+
             Image {
                 id: overdueIcon
                 source: "image://theme/tasks/icn_overdue_red"

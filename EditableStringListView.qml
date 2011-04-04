@@ -47,7 +47,7 @@ Item {
             verticalAlignment: Text.AlignVCenter
             anchors.left: parent.left
             anchors.leftMargin: 10
-            text: qsTr("+ Add New Item")
+            text: qsTr("+ Add new item")
         }
         MouseArea {
             anchors.fill: parent

@@ -73,7 +73,7 @@ Item {
                     anchors.horizontalCenter: parent.horizontalCenter
                     id: title
                     text: qsTr("Title text")
-                    font.weight: Font.Bold
+                    //font.weight: Font.Bold
                     font.pixelSize: theme_fontPixelSizeLarge
 
                     height: 32
@@ -96,7 +96,7 @@ Item {
                         id: checkboxTextArea
                         anchors.horizontalCenter: parent.horizontalCenter
                         text: checkBoxText
-                        font.weight: Font.Bold
+                        //font.weight: Font.Bold
                         font.pixelSize: theme_fontPixelSizeLarge
 
                         height: 28
