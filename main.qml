@@ -816,6 +816,7 @@ Window {
                         duedateData.hasDuedate = false;
                         duedateData.dueDate = new Date();
                     }
+                    checked: true
                 }
                 Action {
                     id: dueTodayAction

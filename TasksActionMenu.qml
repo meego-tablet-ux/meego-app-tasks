@@ -20,10 +20,13 @@ Item {
 
     function executeActionAtIndex(index) {
         if (index >= 0 && index < model.length) {
-           // if (privatePart.clickedIndex != index) {
-           //     privatePart.clickedIndex = index;
-                model[index].triggered();
-           // }
+            for(var i=0;i<model.length;i++) {
+                if(i == index) {
+                    model[i].checked = true;
+                } else {
+                    model[i].checked = false;
+                }
+            }
         }
     }
     signal clickedAt(int index, variant payload,int mouseX, int mouseY)
@@ -41,7 +44,7 @@ Item {
             height: menu.menuEntryHeight
             property bool selected: modelData.checked
 
-            color: selected ? "#281832": "transparent"
+            color: "transparent"
             Image {
                 id: icon
                 source: modelData.iconSource

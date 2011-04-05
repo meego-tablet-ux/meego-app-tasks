@@ -59,6 +59,7 @@ BorderImage {
         width: 200
         height: 66
         anchors.verticalCenter: parent.verticalCenter
+        anchors.left: deleteBt.right
         anchors.leftMargin: 5
         onClicked: {
             bar.clickedCancel();
@@ -148,11 +149,11 @@ BorderImage {
             }
             PropertyChanges {
                 target: cancelBt
-                visible: false
+                visible: true
             }
             PropertyChanges {
                 target: okBt
-                visible: true
+                visible: false
 
             }
             AnchorChanges {

@@ -323,7 +323,7 @@ Item {
                 id: vDivider
                 source: "image://theme/tasks/ln_grey_p"
                 height: parent.height
-                width: 2
+                width: 1
                 anchors.left: box.right
                 anchors.leftMargin: 20
             }

@@ -62,7 +62,9 @@ Item {
         width: container.width
         height: container.height
         contentWidth: container.width
-        contentHeight: view.height + titleHeight + newrow.extraHeight + (container.height /2);
+        contentHeight: view.height + titleHeight + newrow.height + newrow.extraHeight;
+        interactive:  contentHeight > height
+
         clip: true
         ListView {
             id: view
@@ -297,7 +299,7 @@ Item {
                 id: vDivider
                 source: "image://theme/tasks/ln_grey_p"
                 height: parent.height
-                width: 2
+                width: 1
                 anchors.left: box.right
                 anchors.leftMargin: 20
             }
@@ -394,6 +396,27 @@ Item {
         }
     }
 
+    ModalDialog {
+        id: delConfirmDialog
+        dialogWidth: 300
+        dialogHeight: 150
+        dialogTitle: qsTr("Are you sure you want to delete these %1 tasks?").arg(container.selectedIds.length);
+        opacity: 0
+        leftButtonText: qsTr("Yes")
+        rightButtonText: qsTr("No")
+        bgSourceUpLeft:"image://theme/tasks/btn_blue"
+        bgSourceDnLeft:"image://theme/tasks/btn_blue"
+        onDialogClicked: {
+            if(button ==1) {
+                container.model.viewModel.removeTasks(selectedIds);
+                container.selectedIds = [];
+                container.mode = 0;
+            }
+            delConfirmDialog.opacity = 0;
+        }
+    }
+
+
     BottomBar {
         id: bottombar
         width: parent.width
@@ -425,8 +448,8 @@ Item {
            picker.visible = true;
         }
         onClickedDelete: {
-             container.model.viewModel.removeTasks(selectedIds);
-             container.selectedIds = [];
+            delConfirmDialog.opacity = 1;
+
         }
         onClickedOk: {
             container.model.viewModel.rollbackAddedTasks();

@@ -7,7 +7,8 @@
  */
 
 import Qt 4.7
-import MeeGo.Labs.Components 0.1
+import MeeGo.Components 0.1 as Ux
+import MeeGo.Labs.Components 0.1 as Labs
 
 Item {
     id: row
@@ -33,9 +34,29 @@ Item {
         source: "image://theme/tasks/ln_grey_l"
     }
 
-    TextEntry {
-        id: textinput
+    Checkbox {
+        id: checkbox
         anchors.left: parent.left
+        anchors.leftMargin: (row.height - width)/2
+        anchors.top:  parent.top
+        anchors.topMargin: (row.height - height)/2
+        enabled: false
+    }
+
+    Image {
+        id: vDivider
+        source: "image://theme/tasks/ln_grey_p"
+        height: parent.height
+        width: 1
+        anchors.left: checkbox.right
+        anchors.leftMargin: 20
+    }
+
+    Labs.TextEntry {
+        id: textinput
+        //anchors.left: parent.left
+        anchors.left: checkbox.right
+        anchors.leftMargin: row.height / 2
         anchors.right: dropdownbox.left
         height: row.height - 10
         anchors.verticalCenter: parent.verticalCenter
@@ -44,12 +65,14 @@ Item {
     }
 
 
-    DatePickerDialog {
+    Ux.DatePicker {
         id: datePicker
-        onTriggered: {
-            selectedDate = date;
+        onDateSelected: {
+            row.selectedDate = date;
         }
     }
+
+
 
     DropdownBox {
         id: dropdownbox

@@ -10,18 +10,21 @@ import Qt 4.7
 Image {
     id: box
     property bool checked: false
+    property bool enabled: true
 
     signal clicked(bool checked)
 
     smooth: true
-//    source: "image://theme/tasks/btn_checkbox_off"
     MouseArea {
         anchors.fill: parent
         onClicked: {
-        //    parent.checked= !parent.checked;
-            box.clicked(box.checked);
+            if(box.enabled) {
+                box.clicked(box.checked);
+            }
         }
     }
+
+    opacity: enabled ? 1 : 0.25
 
     states: [
         State {
@@ -41,5 +44,4 @@ Image {
             }
         }
     ]
-
 }
