@@ -126,6 +126,8 @@ Item {
                         onClicked: {
                             container.dialogClicked (1);
                         }
+                        bgSourceUp:"image://theme/btn_blue_up"
+                        bgSourceDn:"image://theme/btn_blue_dn"
                     }
 
                     Button {

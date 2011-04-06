@@ -13,7 +13,7 @@ import MeeGo.App.Tasks 0.1
 
 Item {
     id: container
-    width: 640
+    width: 300
     height: adjustHeight()
     property int taskId
 
@@ -24,6 +24,7 @@ Item {
     property bool editing: false
     property int buttonHeight: 40
     property int checkboxWidth: 20
+    property int moveY: 0
 
     property int maxHeight: 900
     property variant  task
@@ -61,37 +62,37 @@ Item {
         task.mTaskId = taskId;
         task.mListId = container.task.mListId;
     }
+
     MouseArea {
         anchors.fill: parent
     }
+    clip: false
 
-    BorderImage {
-        id: top
-        source: "image://theme/tasks/frm_dropdown_open_bottom"
-        width:container.width
-        border.left: 10
-        border.top: 0
-        border.right: 10
-        border.bottom: 0
-        anchors.top: container.top
-        rotation: 180
+    Image {
+        source: "image://theme/popupbox_arrow_left"
+        x: -1 * width;
+        y: moveY
     }
 
-    BorderImage {
-        id: body
-        source: "image://theme/tasks/frm_dropdown_open_middle"
-        anchors.fill: centerArea
-        border.left: 10
-        border.top: 10
-        border.right: 10
-        border.bottom: 10
+    Image {
+        source: "image://theme/popupbox_2"
+        anchors.fill: parent
+    }
+
+    Rectangle { //this is a terrible hack because I don't know any easier way to make this into a contextual menu without
+        z: -1 //breaking everything else!
+        color: "black"
+        width: 1920 *2
+        height: 1080* 2
+        x: -1920
+        y: -1080
+        opacity: .4
     }
 
     Item {
         id: centerArea
         width:container.width
-        height: container.height - top.height - bottom.height
-        anchors.top:top.bottom
+        height: container.height
         clip: true
         Checkbox {
             id: checkbox
@@ -492,14 +493,4 @@ Item {
 
     }
 
-    BorderImage {
-        id: bottom
-        source: "image://theme/tasks/frm_dropdown_open_bottom"
-        width:container.width
-        border.left: 10
-        border.top: 0
-        border.right: 10
-        border.bottom: 0
-        anchors.top: centerArea.bottom
-    }
 }

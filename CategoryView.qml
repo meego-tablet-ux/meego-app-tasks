@@ -104,6 +104,7 @@ Item {
         height: container.height
         contentWidth: container.width
         contentHeight: views.height
+        interactive: contentHeight > height
         clip: true
         Item {
             id: views
@@ -232,6 +233,11 @@ Item {
             property int mTaskId: taskId
             property int mListId: listId
             property string mListName: listName;
+
+            Rectangle {
+                color: "white"
+                anchors.fill: parent
+            }
 
             Text {
                 id: titleText

@@ -27,6 +27,11 @@ Item {
     signal confirmedInput();
     signal requestForEditing();
 
+    Rectangle {
+        color: "white"
+        anchors.fill: parent
+    }
+
     Image {
         id: separator
         width: parent.width

@@ -7,10 +7,11 @@
  */
 
 import Qt 4.7
-import MeeGo.Labs.Components 0.1
+//import MeeGo.Labs.Components 0.1
+import MeeGo.Components 0.1
 BorderImage {
     id: bar
-    source: "image://theme/tasks/bg_bottombar_l"
+    source: "image://meegotheme/widgets/common/action-bar/action-bar-background"
     width: 1024
     height:80
     border.left: 20
@@ -37,11 +38,17 @@ BorderImage {
     signal clickedCancel()
     signal clickedOk()
 
+    Image {
+        source: "image://meegotheme/widgets/common/action-bar/action-bar-shadow"
+        anchors.bottom: bar.top
+        width: parent.width
+    }
+
     TasksButton {
         id: saveBt
         title:labelSave
-        upImageSource:"image://theme/tasks/btn_blue"
-        dnImageSource:"image://theme/tasks/btn_blue"
+        upImageSource:"image://theme/btn_blue_up"
+        dnImageSource:"image://theme/btn_blue_dn"
         width: 200
         height: 66
         anchors.verticalCenter: parent.verticalCenter
@@ -68,13 +75,14 @@ BorderImage {
     TasksButton {
         id: moveBt
         title:labelMove.arg(model.length)
-        upImageSource:"image://theme/tasks/btn_blue"
-        dnImageSource:"image://theme/tasks/btn_blue"
+        upImageSource:"image://theme/btn_blue_up"
+        dnImageSource:"image://theme/btn_blue_dn"
         width: 200
         height: 66
         anchors.verticalCenter: parent.verticalCenter
         anchors.right: deleteBt.left
         anchors.rightMargin: 5
+        active: model.length > 0
         onClicked: {
             bar.clickedMove();
         }
@@ -82,13 +90,14 @@ BorderImage {
     TasksButton {
         id: deleteBt
         title: labelDelete.arg(model.length)
-        upImageSource:"image://theme/tasks/btn_blue"
-        dnImageSource:"image://theme/tasks/btn_blue"
+        upImageSource:"image://theme/btn_blue_up"
+        dnImageSource:"image://theme/btn_blue_dn"
         width: 200
         height: 66
         anchors.verticalCenter: parent.verticalCenter
         anchors.horizontalCenter: parent.horizontalCenter
         anchors.leftMargin: 5
+        active: model.length > 0
         onClicked: {
             bar.clickedDelete();
         }
@@ -96,8 +105,8 @@ BorderImage {
     TasksButton {
         id: okBt
         title: labelOk
-        upImageSource:"image://theme/tasks/btn_blue"
-        dnImageSource:"image://theme/tasks/btn_blue"
+        upImageSource:"image://theme/btn_blue_up"
+        dnImageSource:"image://theme/btn_blue_dn"
         width: 200
         height: 66
         anchors.verticalCenter: parent.verticalCenter

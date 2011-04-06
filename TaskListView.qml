@@ -62,7 +62,7 @@ Item {
         width: container.width
         height: container.height
         contentWidth: container.width
-        contentHeight: view.height + titleHeight + newrow.height + newrow.extraHeight;
+        contentHeight: view.height + titleHeight + newrow.height + (container.height /2);
         interactive:  contentHeight > height
 
         clip: true
@@ -187,6 +187,11 @@ Item {
 
             property bool isMultipleDragActive: false
 
+            Rectangle {
+                color: "white"
+                anchors.fill: parent
+            }
+
             Text {
                 id: titleText
                 text: mTask
@@ -210,7 +215,7 @@ Item {
                 horizontalAlignment: Text.AlignLeft
                 verticalAlignment: Text.AlignVCenter
                 color:theme_fontColorNormal
-                visible: mHasDueDate && !isMultipleDragActive
+                visible: !isMultipleDragActive
             }
 
             //showed when dragging several tasks

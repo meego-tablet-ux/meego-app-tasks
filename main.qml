@@ -57,8 +57,9 @@ Window {
         applicationPage = landingScreenPageComponent
     }
     function getFormattedDate(date) {
-        if (!date.getDate)
-            return "";
+        if (!date.getDate()) {
+            return labelSomeday;
+        }
         var now = new Date();
         if (now.getDate() == date.getDate() &&
                 now.getMonth() == date.getMonth() &&
@@ -90,10 +91,14 @@ Window {
             taskDetailLoader.sourceComponent = taskDetailComponent;
         }
         var map = item.mapToItem(scene, x, y);
-        taskDetailLoader.item.x = getTaskDetailWindowX();
+        //taskDetailLoader.item.x = getTaskDetailWindowX();
+        taskDetailLoader.item.x = map.x;
         var ty = map.y;
-        if ( ty + taskDetailLoader.item.height > scene.height)
-            ty = scene.height - taskDetailLoader.item.height
+        if ( ty + taskDetailLoader.item.height > scene.height) {
+            ty = scene.height - taskDetailLoader.item.height;
+            taskDetailLoader.item.moveY = map.y - ty;
+        }
+
         taskDetailLoader.item.y = ty;
         taskDetailLoader.item.task = payload;
         taskDetailLoader.item.listNames = listsGroupItem.getAllListsNames();
@@ -236,8 +241,6 @@ Window {
     Component {
         id: taskDetailComponent
         TasksDetailWindow {
-            width: 300
-            //height:400
             maxHeight: content.height
             onHeightChanged: {
                 if (!taskDetailLoader.item)
@@ -263,18 +266,22 @@ Window {
 
     Component {
         id: newListModalDialogComponent
-        TasksModalDialog{
+        ModalDialog{
             id: newListDialog
-            leftButtonText: labelOk
+            leftButtonText: (textinput.text.length > 0) ? labelOk : "" //this is done because there is no way in the ModalDialog to disable the OK button if the user didn't enter text
             rightButtonText:labelCancel
             dialogTitle: labelNewList
+            bgSourceUpLeft:"image://theme/btn_blue_up"
+            bgSourceDnLeft:"image://theme/btn_blue_dn"
             property alias textinput: textinput.textInput
+            dialogWidth: 300
+            dialogHeight: 175
 
-            TasksTextInput {
+            TextEntry {
                 id: textinput
-                width: dialog.width - 10
+                width: newListDialog.dialogWidth
                 height: 50
-                //textInput.font.bold: true
+                defaultText: qsTr("List name")
                 parent: dialog
                 anchors.centerIn: parent
             }
@@ -314,90 +321,16 @@ Window {
                 }//ontriggered
             }//action menu
 
-            Item{
-                id: allDueTasksItem
-                parent: landingScreenPage.content
-                width: parent.width
-                height: rowHeight
-                Image {
-                    id: icon
-                    source: "image://theme/tasks/icn_header_tasks"
-                    anchors.verticalCenter: parent.verticalCenter
-                    anchors.left:parent.left
-                    anchors.leftMargin: horizontalMargin
-                    height:parent.height - 2* verticalMargin
-                    width: height
-                    smooth:true
-                    fillMode:Image.PreserveAspectFit
-                }
 
-                Text {
-                    id: text
-                    anchors.left: parent.left
-                    anchors.leftMargin: 2*horizontalMargin + parent.height - 2* verticalMargin
-                    height: parent.height
-                    anchors.right: icompletedCount.left
-                    anchors.rightMargin:horizontalMargin
-                    text:  labelAllDueTasks
-                    horizontalAlignment: Text.AlignLeft
-                    verticalAlignment: Text.AlignVCenter
-                    //font.bold: true
-                    font.pixelSize: theme_fontPixelSizeLarge
-                    elide: Text.ElideRight
-                    color: theme_fontColorNormal
-                }
-
-                Image {
-                    id: separator_top
-                    width: parent.width
-                    anchors.top: parent.bottom
-                    source: "image://theme/tasks/ln_grey_l"
-                }
-                Rectangle {
-                    id: icompletedCount
-                    width: height
-                    height: parent.height - 2* verticalMargin
-                    radius: width/4
-                    color:"lightgray"
-                    anchors.verticalCenter: parent.verticalCenter
-                    anchors.right: goArrow.left
-                    anchors.rightMargin: horizontalMargin
-                    visible: !(icountText.text=="")
-                    Text {
-                        id: icountText
-                        anchors.fill: parent
-                        verticalAlignment: Text.AlignVCenter
-                        horizontalAlignment: Text.AlignHCenter
-                        text:overdueModel.icount + upcomingModel.icount + somedayModel.icount
-                        font.pixelSize: theme_fontPixelSizeSmall
-                        color: theme_fontColorNormal
-                    }
-
-                }
-
-                Image {
-                    id: goArrow
-                    anchors.right:parent.right
-                    anchors.rightMargin: horizontalMargin
-                    anchors.verticalCenter:parent.verticalCenter
-                    source: "image://theme/media/icn_forward_up"
-                }
-                MouseArea {
-                    anchors.fill:parent
-                    onClicked: {
-                        landingScreenPage.addApplicationPage(allDueTasksPageComponent)
-                    }
-                }
-            }
             ListView {
                 id: listview
                 parent: landingScreenPage.content
-                anchors.top: allDueTasksItem.bottom
-                width:parent.width
-                height:parent.height - allDueTasksItem.height - horizontalMargin
+                anchors.fill:  landingScreenPage.content
+                //width:parent.width
+                //height:parent.height - allDueTasksItem.height - horizontalMargin
                 model: allListsModel
                 clip:true
-                interactive:  contentHeight > listview.height
+                interactive:  (contentHeight + allDueTasksItem.height) > listview.height
 //                footer: count == 1 ? footerComponent : undefined
                 delegate: Item{
                     id: dinstance
@@ -407,9 +340,21 @@ Window {
                     property string mListId: listId
                     property string mListName: listName
 
+                    Rectangle {
+                        color: "white"
+                        anchors.fill: parent
+                    }
+
+                    Image {
+                        id: separator
+                        width: parent.width
+                        anchors.bottom: parent.bottom
+                        source: "image://theme/tasks/ln_grey_l"
+                    }
+
                     Image {
                         id: icon
-                        source: listId == 0? "image://theme/tasks/icn_defaultlist_dn":""
+                        source: listId == 0? "image://theme/tasks/icn_defaultlist":""
                         anchors.verticalCenter: parent.verticalCenter
                         anchors.left:parent.left
                         anchors.leftMargin: horizontalMargin
@@ -466,7 +411,7 @@ Window {
                         anchors.right:parent.right
                         anchors.rightMargin: horizontalMargin
                         anchors.verticalCenter:parent.verticalCenter
-                        source: "image://theme/media/icn_forward_up"
+                        source: "image://theme/icn_forward_dn"
                     }
                     MouseArea {
                         anchors.fill:parent
@@ -481,6 +426,95 @@ Window {
                                 landingScreenContextMenu.payload = dinstance;
                                 landingScreenContextMenu.displayContextMenu(map.x,map.y)
                             }
+                        }
+                    }
+
+                }
+
+                header: Item{
+                    id: allDueTasksItem
+                    //parent: landingScreenPage.content
+                    width: parent.width
+                    height: rowHeight
+                    Image {
+                        id: icon
+                        source: "image://theme/tasks/icn_header_tasks"
+                        anchors.verticalCenter: parent.verticalCenter
+                        anchors.left:parent.left
+                        anchors.leftMargin: horizontalMargin
+                        height:parent.height - 2* verticalMargin
+                        width: height
+                        smooth:true
+                        fillMode:Image.PreserveAspectFit
+                    }
+
+                    Rectangle {
+                        color: "white"
+                        anchors.fill: parent
+                    }
+
+                    Image {
+                        id: separator
+                        width: parent.width
+                        anchors.bottom: parent.bottom
+                        source: "image://theme/tasks/ln_grey_l"
+                    }
+
+                    Text {
+                        id: text
+                        anchors.left: parent.left
+                        anchors.leftMargin: 2*horizontalMargin + parent.height - 2* verticalMargin
+                        height: parent.height
+                        anchors.right: icompletedCount.left
+                        anchors.rightMargin:horizontalMargin
+                        text:  labelAllDueTasks
+                        horizontalAlignment: Text.AlignLeft
+                        verticalAlignment: Text.AlignVCenter
+                        //font.bold: true
+                        font.pixelSize: theme_fontPixelSizeLarge
+                        elide: Text.ElideRight
+                        color: theme_fontColorNormal
+                    }
+
+                    Image {
+                        id: separator_top
+                        width: parent.width
+                        anchors.top: parent.bottom
+                        source: "image://theme/tasks/ln_grey_l"
+                    }
+                    Rectangle {
+                        id: icompletedCount
+                        width: height
+                        height: parent.height - 2* verticalMargin
+                        radius: width/4
+                        color:"lightgray"
+                        anchors.verticalCenter: parent.verticalCenter
+                        anchors.right: goArrow.left
+                        anchors.rightMargin: horizontalMargin
+                        visible: !(icountText.text=="")
+                        Text {
+                            id: icountText
+                            anchors.fill: parent
+                            verticalAlignment: Text.AlignVCenter
+                            horizontalAlignment: Text.AlignHCenter
+                            text:overdueModel.icount + upcomingModel.icount + somedayModel.icount
+                            font.pixelSize: theme_fontPixelSizeSmall
+                            color: theme_fontColorNormal
+                        }
+
+                    }
+
+                    Image {
+                        id: goArrow
+                        anchors.right:parent.right
+                        anchors.rightMargin: horizontalMargin
+                        anchors.verticalCenter:parent.verticalCenter
+                        source: "image://theme/icn_forward_dn"
+                    }
+                    MouseArea {
+                        anchors.fill:parent
+                        onClicked: {
+                            landingScreenPage.addApplicationPage(allDueTasksPageComponent)
                         }
                     }
                 }
@@ -520,10 +554,13 @@ Window {
                     if (index == 0)
                     {
                         // rename
-                        scene.showModalDialog(renameListModalDialogComponent);
+                        /*scene.showModalDialog(renameListModalDialogComponent);
                         dialogLoader.item.parent = landingScreenPage.content
                         dialogLoader.item.listId = payload.mListId;
-                        dialogLoader.item.textinput.text = payload.mListName;
+                        dialogLoader.item.textinput.text = payload.mListName;*/
+                        renameDialog.listId = payload.mListId;
+                        renameDialog.textinput = payload.mListName;
+                        renameDialog.opacity=1;
                     }
                     else if (index == 1)
                     {
@@ -659,31 +696,33 @@ Window {
             }
         }
     }
-    Component {
-        id: renameListModalDialogComponent
-        TasksModalDialog{
-            id: newListDialog
-            leftButtonText: labelOk
-            rightButtonText:labelCancel
-            dialogTitle: labelRenameList
-            property alias textinput: textinput.textInput
-            property int listId: -1
 
-            TasksTextInput {
-                id: textinput
-                width: dialog.width - 10
-                height: 50
-                //textInput.font.bold: true
-                parent: dialog
-                anchors.centerIn: parent
-            }
 
-            onDialogClicked: {
-                if (button == 1 && textinput.text){
-                    allListsModel.renameList( listId, textinput.text);
-                }
-                dialogLoader.sourceComponent = undefined;
+    ModalDialog{
+        id: renameDialog
+        leftButtonText: (userTextInput.text.length > 0) ? labelOk : "" //this is done because there is no way in the ModalDialog to disable the OK button if the user didn't enter text
+        rightButtonText:labelCancel
+        dialogTitle: labelRenameList
+        bgSourceUpLeft:"image://theme/btn_blue_up"
+        bgSourceDnLeft:"image://theme/btn_blue_dn"
+        property alias textinput: userTextInput.text
+        property int listId: -1
+        dialogWidth: 300
+        dialogHeight: 175
+        opacity: 0
+
+        TextEntry {
+            id: userTextInput
+            width: renameDialog.dialogWidth - 10
+            height: 50
+            anchors.centerIn: parent
+        }
+
+        onDialogClicked: {
+            if (button == 1 && userTextInput.text){
+                allListsModel.renameList( listId, userTextInput.text);
             }
+            renameDialog.opacity =0;
         }
     }
 
@@ -763,10 +802,13 @@ Window {
             function addTaskFun() {taskListView.mode =1;}
             function selectMultiFun() {taskListView.mode = 2;}
             function renameListFun() {
-                scene.showModalDialog(renameListModalDialogComponent);
+                /*scene.showModalDialog(renameListModalDialogComponent);
                 dialogLoader.item.parent = customlistPage.content;
                 dialogLoader.item.listId = customlistModel.listId;
-                dialogLoader.item.textinput.text = customlistModel.listName;
+                dialogLoader.item.textinput.text = customlistModel.listName;*/
+                renameDialog.listId = customlistModel.listId;
+                renameDialog.textinput = customlistModel.listName;
+                renameDialog.opacity=1;
             }
             function deleteListFun() {
                 scene.showModalDialog(deleteListModalDialogComponent);
