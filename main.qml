@@ -520,7 +520,7 @@ Window {
                 }
 
                 //footer
-                Text {
+                footer: Text {
                     id: footerText
                     y: listview.count * rowHeight + 15
                     width: listview.width
@@ -533,18 +533,6 @@ Window {
                     font.pixelSize: theme_fontPixelSizeLarge
                 }
             }
-
-
-
-//            Component {
-//                id: footerComponent
-//                Text {
-//                    id: footerText
-//                    text: qsTr("You can create a new list using the action menu")
-//                    color: theme_fontColorNormal
-//                    font.pixelSize: theme_fontPixelSizeLarge
-//                }
-//            }
 
             ContextMenu {
                 id: landingScreenContextMenu

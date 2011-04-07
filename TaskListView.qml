@@ -187,10 +187,16 @@ Item {
 
             property bool isMultipleDragActive: false
 
-            Rectangle {
+            Rectangle { //the "wrong" way to make the background
                 color: "white"
                 anchors.fill: parent
             }
+
+            /*Image { //The "proper" way that makes it look ugly
+                id: backimage
+                source: "image://meegotheme/widgets/common/list/list-single-inactive"
+                anchors.fill: parent
+            }*/
 
             Text {
                 id: titleText
@@ -405,7 +411,15 @@ Item {
         id: delConfirmDialog
         dialogWidth: 300
         dialogHeight: 150
-        dialogTitle: qsTr("Are you sure you want to delete these %1 tasks?").arg(container.selectedIds.length);
+        dialogTitle: {
+            if(container.selectedIds.length > 1) {
+                return qsTr("Are you sure you want to delete these %1 tasks?").arg(container.selectedIds.length);
+            }
+            else {
+                return qsTr("Are you sure you want to delete this task?");
+            }
+        }
+
         opacity: 0
         leftButtonText: qsTr("Yes")
         rightButtonText: qsTr("No")
