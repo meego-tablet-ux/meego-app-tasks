@@ -456,10 +456,11 @@ Item {
                                   false, newrow.selectedDueDate,newrow.selectedDate);
 
             newrow.selectedDueDate = false;
-
-            //area.contentHeight = getMaxContentHeight();
             container.model.viewModel.commitAddedTasks();
             container.selectedIds = [];
+            newrow.reset();
+            container.mode = 0;
+
         }
         onClickedMove: {
            // container.model.viewModel.moveTasksToList(selectedIds, 0);

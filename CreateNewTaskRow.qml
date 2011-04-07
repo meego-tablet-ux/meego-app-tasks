@@ -27,6 +27,11 @@ Item {
     signal confirmedInput();
     signal requestForEditing();
 
+    function reset() {
+        textinput.text = "";
+        textinput.focus = false;
+    }
+
     Rectangle {
         color: "white"
         anchors.fill: parent
