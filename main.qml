@@ -721,6 +721,7 @@ Window {
         onDialogClicked: {
             if (button == 1 && userTextInput.text){
                 allListsModel.renameList( listId, userTextInput.text);
+                customlistModel.listName = userTextInput.text;
             }
             renameDialog.opacity =0;
         }
