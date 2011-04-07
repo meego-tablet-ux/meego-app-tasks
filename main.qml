@@ -326,12 +326,9 @@ Window {
                 id: listview
                 parent: landingScreenPage.content
                 anchors.fill:  landingScreenPage.content
-                //width:parent.width
-                //height:parent.height - allDueTasksItem.height - horizontalMargin
                 model: allListsModel
                 clip:true
-                interactive:  (contentHeight + allDueTasksItem.height) > listview.height
-//                footer: count == 1 ? footerComponent : undefined
+                interactive: (contentHeight + rowHeight) > listview.height
                 delegate: Item{
                     id: dinstance
                     width: parent.width
@@ -790,10 +787,6 @@ Window {
             function addTaskFun() {taskListView.mode =1;}
             function selectMultiFun() {taskListView.mode = 2;}
             function renameListFun() {
-                /*scene.showModalDialog(renameListModalDialogComponent);
-                dialogLoader.item.parent = customlistPage.content;
-                dialogLoader.item.listId = customlistModel.listId;
-                dialogLoader.item.textinput.text = customlistModel.listName;*/
                 renameDialog.listId = customlistModel.listId;
                 renameDialog.textinput = customlistModel.listName;
                 renameDialog.opacity=1;
@@ -804,7 +797,7 @@ Window {
                 dialogLoader.item.listId = customlistModel.listId;
                 dialogLoader.item.pageBack = true;
             }
-            function deleteCompFun() {customlistModel.removeCompletedTasksInList(customlistModel.listId);}
+            function deleteCompFun() {confirmDelComTasksDialog.opacity = 1;}
 
             function onContextMenuClicked(index) {
                 var runMe = [addTaskFun];
@@ -830,6 +823,23 @@ Window {
                     customlistPage.closeMenu();
                 }//ontriggered
             }//action menu
+
+
+            ModalDialog {
+                id: confirmDelComTasksDialog
+                dialogTitle: qsTr("Are you sure you want to delete the completed tasks?")
+                leftButtonText: qsTr("Yes")
+                rightButtonText: qsTr("No")
+                bgSourceUpLeft:"image://theme/btn_blue_up"
+                bgSourceDnLeft:"image://theme/btn_blue_dn"
+                opacity: 0
+                onDialogClicked: {
+                    if(button ==1) {
+                        customlistModel.removeCompletedTasksInList(customlistModel.listId);
+                    }
+                    confirmDelComTasksDialog.opacity = 0;
+                }
+            }
 
             TaskListView {
                 id: taskListView

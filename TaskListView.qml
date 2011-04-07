@@ -392,8 +392,6 @@ Item {
                                 view.model.showHiddenTasksOldPositions(view.model.listId);
                             else
                                 view.model.showHiddenTasks(view.model.listId, start+1);
-
-//                            selectedIds = selectedIds.concat(mTaskId);
                             isMultipleDragActive = false;
                             isPositionChanged = false;
                         }
@@ -406,6 +404,8 @@ Item {
 
         }
     }
+
+
 
     ModalDialog {
         id: delConfirmDialog
