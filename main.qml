@@ -539,10 +539,6 @@ Window {
                     if (index == 0)
                     {
                         // rename
-                        /*scene.showModalDialog(renameListModalDialogComponent);
-                        dialogLoader.item.parent = landingScreenPage.content
-                        dialogLoader.item.listId = payload.mListId;
-                        dialogLoader.item.textinput.text = payload.mListName;*/
                         renameDialog.listId = payload.mListId;
                         renameDialog.textinput = payload.mListName;
                         renameDialog.opacity=1;
@@ -571,6 +567,10 @@ Window {
                 overdueModel.filter = needle;
                 upcomingModel.filter = needle;
                 somedayModel.filter = needle;
+            }
+
+            onClose: {
+                taskDetailLoader.sourceComponent = undefined;
             }
 
             menuContent: ActionMenu {
@@ -768,6 +768,10 @@ Window {
             onSearch: {
                 customlistModel.filter = needle;
 
+            }
+
+            onClose: {
+                taskDetailLoader.sourceComponent = undefined;
             }
 
             function makeActionMenuModel() {
