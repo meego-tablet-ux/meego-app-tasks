@@ -7,7 +7,7 @@
  */
 
 import Qt 4.7
-//import MeeGo.Labs.Components 0.1
+import MeeGo.Labs.Components 0.1 as Labs
 import MeeGo.Components 0.1
 BorderImage {
     id: bar
@@ -44,75 +44,56 @@ BorderImage {
         width: parent.width
     }
 
-    TasksButton {
-        id: saveBt
-        title:labelSave
-        upImageSource:"image://theme/btn_blue_up"
-        dnImageSource:"image://theme/btn_blue_dn"
-        width: 200
-        height: 66
-        anchors.verticalCenter: parent.verticalCenter
-        anchors.right: parent.horizontalCenter
-        anchors.rightMargin: 5
-        onClicked: {
-            bar.clickedSave();
-        }
-    }
-    TasksButton {
-        id: cancelBt
-        title: labelCancel
-        upImageSource:"image://theme/tasks/btn_grey"
-        dnImageSource:"image://theme/tasks/btn_grey"
-        width: 200
-        height: 66
-        anchors.verticalCenter: parent.verticalCenter
-        anchors.left: deleteBt.right
-        anchors.leftMargin: 5
-        onClicked: {
-            bar.clickedCancel();
-        }
-    }
-    TasksButton {
-        id: moveBt
-        title:labelMove.arg(model.length)
-        upImageSource:"image://theme/btn_blue_up"
-        dnImageSource:"image://theme/btn_blue_dn"
-        width: 200
-        height: 66
-        anchors.verticalCenter: parent.verticalCenter
-        anchors.right: deleteBt.left
-        anchors.rightMargin: 5
-        active: model.length > 0
-        onClicked: {
-            bar.clickedMove();
-        }
-    }
-    TasksButton {
-        id: deleteBt
-        title: labelDelete.arg(model.length)
-        upImageSource:"image://theme/btn_blue_up"
-        dnImageSource:"image://theme/btn_blue_dn"
-        width: 200
+    Row {
         height: 66
         anchors.verticalCenter: parent.verticalCenter
         anchors.horizontalCenter: parent.horizontalCenter
-        anchors.leftMargin: 5
-        active: model.length > 0
-        onClicked: {
-            bar.clickedDelete();
+        spacing: 10
+        Button {
+            id: saveBt
+            text:labelSave
+            bgSourceUp:"image://theme/btn_blue_up"
+            bgSourceDn:"image://theme/btn_blue_dn"
+            onClicked: {
+                bar.clickedSave();
+            }
         }
-    }
-    TasksButton {
-        id: okBt
-        title: labelOk
-        upImageSource:"image://theme/btn_blue_up"
-        dnImageSource:"image://theme/btn_blue_dn"
-        width: 200
-        height: 66
-        anchors.verticalCenter: parent.verticalCenter
-        anchors.leftMargin: 5
-        onClicked: {
-            bar.clickedOk();
+
+        Button {
+            id: moveBt
+            text:labelMove.arg(model.length)
+            bgSourceUp:"image://theme/btn_blue_up"
+            bgSourceDn:"image://theme/btn_blue_dn"
+            active: model.length > 0
+            onClicked: {
+                bar.clickedMove();
+            }
+        }
+        Button {
+            id: deleteBt
+            text: labelDelete.arg(model.length)
+            bgSourceUp:"image://theme/btn_blue_up"
+            bgSourceDn:"image://theme/btn_blue_dn"
+            active: model.length > 0
+            onClicked: {
+                bar.clickedDelete();
+            }
+        }
+        Button {
+            id: okBt
+            text: labelOk
+            bgSourceUp:"image://theme/btn_blue_up"
+            bgSourceDn:"image://theme/btn_blue_dn"
+            onClicked: {
+                bar.clickedOk();
+            }
+        }
+        Button {
+            id: cancelBt
+            text: labelCancel
+            onClicked: {
+                bar.clickedCancel();
+            }
         }
     }
 
@@ -136,10 +117,7 @@ BorderImage {
                 target: okBt
                 visible:false
             }
-            AnchorChanges {
-                target: cancelBt
-                anchors.left: parent.horizontalCenter
-            }
+
             PropertyChanges {
                 target: cancelBt
                 visible: true
@@ -168,10 +146,6 @@ BorderImage {
                 target: okBt
                 visible: false
 
-            }
-            AnchorChanges {
-                target: okBt
-                anchors.left: deleteBt.right
             }
         }
 
