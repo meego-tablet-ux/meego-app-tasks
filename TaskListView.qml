@@ -454,13 +454,10 @@ Item {
             // actually save the tasks            
             view.model.addTaskAlt(view.model.listId, newrow.textinput.text,
                                   false, newrow.selectedDueDate,newrow.selectedDate);
-
-            newrow.selectedDueDate = false;
             container.model.viewModel.commitAddedTasks();
             container.selectedIds = [];
             newrow.reset();
             container.mode = 0;
-
         }
         onClickedMove: {
            // container.model.viewModel.moveTasksToList(selectedIds, 0);

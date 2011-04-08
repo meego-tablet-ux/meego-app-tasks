@@ -23,6 +23,7 @@ Item {
     property alias actions: actions.model
     property bool selectedDueDate: false
     property date selectedDate
+    property date nullDate //used for resetting the selected date
 
     signal confirmedInput();
     signal requestForEditing();
@@ -30,6 +31,8 @@ Item {
     function reset() {
         textinput.text = "";
         textinput.focus = false;
+        selectedDueDate = false;
+        selectedDate = nullDate;
     }
 
     Rectangle {
@@ -71,7 +74,7 @@ Item {
         height: row.height - 10
         anchors.verticalCenter: parent.verticalCenter
         defaultText: labelCreateNewTask
-        onTextChanged: requestForEditing();
+        onTextChanged:requestForEditing();
     }
 
 
@@ -116,6 +119,7 @@ Item {
                     }
                 } else {
                     selectedDueDate = false;
+                    selectedDate = nullDate;
                 }
             }
         }
