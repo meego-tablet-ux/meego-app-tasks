@@ -140,6 +140,10 @@ BorderImage {
                 target: cancelBt
                 anchors.left: parent.horizontalCenter
             }
+            PropertyChanges {
+                target: cancelBt
+                visible: true
+            }
         },
         State {
             name: "movedeletecacel"
