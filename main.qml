@@ -9,6 +9,7 @@
 import Qt 4.7
 import MeeGo.Labs.Components 0.1
 import MeeGo.App.Tasks 0.1
+import MeeGo.Components 0.1 as UX
 
 Window {
     id: scene
@@ -738,19 +739,33 @@ Window {
 
     Component {
         id: deleteTaskModalDialogComponent
-        TasksModalDialog{
+        ModalDialog{
             id: newTaskDialog
             leftButtonText: labelDelete
             rightButtonText:labelCancel
             dialogTitle: labelDeleteSingleTask
+            bgSourceUpLeft:"image://theme/btn_red_up"
+            bgSourceDnLeft:"image://theme/btn_red_dn"
             property int taskId: -1
 
-            checkBoxVisible: true
-            checkBoxText: qsTr("Don't ask to confirm deleting tasks.")
+            Row {
+                height: 30
+                anchors.centerIn: parent
+                spacing: 10
+                UX.CheckBox {
+                    id:checkBox
+                }
+
+                Text {
+                    id: checkboxTextArea
+                    text: qsTr("Don't ask to confirm deleting tasks.")
+                    font.pixelSize: theme_fontPixelSizeLarge
+                }
+            }
 
             onDialogClicked: {
                 if (button == 1){
-                    if(checkBoxChecked)
+                    if(checkBox.isChecked)
                         qmlSettings.set("task_auto_delete", true);
                     editorList.removeTask(taskId);
                 }

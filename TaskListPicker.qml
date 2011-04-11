@@ -119,32 +119,4 @@ Item {
             createDialog.opacity = 0;
         }
     }
-
-    /*Item {
-        id: stupidHack
-        function getAllListsNames() {
-            var t = [];
-            for (var i = 0; i< listsGroupItem.children.length -1 ; i++) {
-                t = t.concat([listsGroupItem.children[i].list]);
-                //t = t.concat([listsGroupItem.children[i].listId]);
-                console.debug(listsGroupItem.children[i].list + "====" + listsGroupItem.children[i].theListID);
-
-            }
-            return t;
-        }
-
-        Repeater {
-            id: listsRepeater
-            model:viewmodel
-
-            delegate:Item {
-                property string list :listName
-                property string theListID: listId
-
-            }
-        }
-    }*/
-
-
-
 }
