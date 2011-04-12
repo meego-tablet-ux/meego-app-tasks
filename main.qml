@@ -85,30 +85,11 @@ Window {
             return true;
         return false;
     }
-    function showTaskDetailWindow(item,x, y, payload) {
-        saveChanges();
-        // makeTaskItem(payload);
-        if (!taskDetailLoader.item) {
-            taskDetailLoader.sourceComponent = taskDetailComponent;
-        }
-        var map = item.mapToItem(scene, x, y);
-        //taskDetailLoader.item.x = getTaskDetailWindowX();
-        taskDetailLoader.item.x = map.x;
-        var ty = map.y;
-        if ( ty + taskDetailLoader.item.height > scene.height) {
-            ty = scene.height - taskDetailLoader.item.height;
-            taskDetailLoader.item.moveY = map.y - ty;
-        }
 
-        taskDetailLoader.item.y = ty;
-        taskDetailLoader.item.task = payload;
-        taskDetailLoader.item.listNames = listsGroupItem.getAllListsNames();
-        taskDetailLoader.item.updateValues();
-    }
     function saveChanges(){
         if (taskDetailLoader.item && taskDetailLoader.item.editing)
         {
-            taskDetailLoader.item.retrieveData(taskDetailToSave);
+            var taskDetailToSave = taskDetailContextMenu.setTask;
             console.log("==================save information==============");
             console.log("id: " +taskDetailToSave.mTaskId);
             console.log("name: " +taskDetailToSave.mTask);
@@ -136,15 +117,9 @@ Window {
         }
     }
 
-    function getTaskDetailWindowX() {
-        return content.width - 350
-    }
 
     function addNewTask(listId, taskName) {
         if (taskName){
-            // editorList.addTask(listId, taskName, "new added task comment",
-            //                    false,duedateData.hasDuedate, duedateData.dueDate,
-            //                    0, new Date(), [], []);
             editorList.addTaskAlt(listId, taskName, false, duedateData.hasDuedate, duedateData.dueDate);
         }
     }
@@ -239,29 +214,45 @@ Window {
         }
     }
 
-    Component {
-        id: taskDetailComponent
-        TasksDetailWindow {
-            maxHeight: content.height
-            onHeightChanged: {
-                if (!taskDetailLoader.item)
-                    return;
-                var ty = taskDetailLoader.item.y;
-                if ( ty + taskDetailLoader.item.height > content.height)
-                    ty = scene.height - taskDetailLoader.item.height
-                taskDetailLoader.item.y = ty;
-            }
+    AbstractContext {
+        id: taskDetailContextMenu
+        property variant setTask;
+        property variant setListnames;
+        property bool setEditing;
 
+        content: TasksDetailMenu {
+            id: theDetailMenu
+            task: taskDetailContextMenu.setTask;
+            listNames: taskDetailContextMenu.setListnames;
+            editing:taskDetailContextMenu.setEditing;
             onClose: {
-                taskDetailLoader.sourceComponent = undefined;
+                taskDetailContextMenu.visible = false;
             }
             onSave: {
                 saveChanges();
             }
-            onDeleteTask: {
-                editorList.removeTask(taskId);
-                taskDetailLoader.sourceComponent = undefined;
+            onDeleteTask:  {
+                // delete task
+                if(qmlSettings.get("task_auto_delete")){
+                    editorList.removeTask(payload.mTaskId);
+                } else {
+                    scene.showModalDialog(deleteTaskModalDialogComponent);
+                    dialogLoader.item.parent = allDueTasksPage.content
+                    dialogLoader.item.taskId = payload.mTaskId
+                }
+
+                editorList.removeTask(theDetailMenu.task.taskId);
+                taskDetailContextMenu.visible = false;
             }
+        }
+
+        function displayContextMenu (mouseX, mouseY, taskData, edit) {
+            taskDetailContextMenu.mouseX = mouseX;
+            taskDetailContextMenu.mouseY = mouseY;
+            taskDetailContextMenu.setTask = taskData;
+            taskDetailContextMenu.setListnames = listsGroupItem.getAllListsNames();
+            taskDetailContextMenu.setEditing = edit;
+            visible = true;
         }
     }
 
@@ -627,7 +618,7 @@ Window {
                 rowHeight: scene.rowHeight
 
                 onClickedAtRow: {
-                    showTaskDetailWindow(alldueTasksList,x, y,payload);
+                    taskDetailContextMenu.displayContextMenu(x,y,payload,false);
                 }
                 onCheckedAtRow: {
                     editorList.setCompleted(payload.mTaskId,checked);
@@ -654,13 +645,12 @@ Window {
                     if (index == 0)
                     {
                         // view detail
-                        showTaskDetailWindow(alldueTasksList,mousePos.x, mousePos.y,payload);
+                        taskDetailContextMenu.displayContextMenu(mousePos.x,mousePos.y,playload,false);
                     }
                     else if (index == 1)
                     {
                         // edit task
-                        showTaskDetailWindow(alldueTasksList,mousePos.x, mousePos.y,payload);
-                        taskDetailLoader.item.editing = true;
+                        taskDetailContextMenu.displayContextMenu(mousePos.x,mousePos.y,playload,true);
                     }
                     else if (index == 2) {
                         // view in list
@@ -928,7 +918,7 @@ Window {
 
                 onClickedAtRow: {
                     if (taskListView.mode == 0)
-                        showTaskDetailWindow(taskListView,x, y,payload);
+                        taskDetailContextMenu.displayContextMenu(x, y,payload,false);
                 }
                 onCheckedAtRow: {
                     editorList.setCompleted(payload.mTaskId,checked);
@@ -955,10 +945,9 @@ Window {
                 property variant mousePos
                 onTriggered: {
                     if (index == 0) { // view detail
-                        showTaskDetailWindow(taskListView,mousePos.x, mousePos.y,payload);
+                        taskDetailContextMenu.displayContextMenu(mousePos.x, mousePos.y,payload,false);
                     } else if (index == 1) { // edit task
-                        showTaskDetailWindow(taskListView,mousePos.x, mousePos.y,payload);
-                        taskDetailLoader.item.editing = true;
+                        taskDetailContextMenu.displayContextMenu(mousePos.x, mousePos.y,payload,true);
                     } else if (index ==2) {  // delete task
                         if(qmlSettings.get("task_auto_delete")){
                             editorList.removeTask(payload.mTaskId);
