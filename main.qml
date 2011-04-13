@@ -52,7 +52,6 @@ Window {
         application: "Tasks"
     }
 
-    //    orientation:1
     title: labelTasks
     Component.onCompleted: {
         applicationPage = landingScreenPageComponent
@@ -87,34 +86,31 @@ Window {
     }
 
     function saveChanges(){
-        if (taskDetailLoader.item && taskDetailLoader.item.editing)
-        {
-            var taskDetailToSave = taskDetailContextMenu.setTask;
-            console.log("==================save information==============");
-            console.log("id: " +taskDetailToSave.mTaskId);
-            console.log("name: " +taskDetailToSave.mTask);
-            console.log("notes: " +taskDetailToSave.mNotes);
-            console.log("hasDueDate: " +taskDetailToSave.mHasDueDate);
-            console.log("dueDate: " +taskDetailToSave.mDueDate);
-            console.log("reminderType: " +taskDetailToSave.mReminderType);
-            console.log("reminderDate: " +taskDetailToSave.mReminderDate);
-            console.log("listId: "+ taskDetailToSave.mListId);
-            console.log("================end save information=================");
+        var taskDetailToSave = taskDetailContextMenu.setTask;
+        console.log("==================save information==============");
+        console.log("id: " +taskDetailToSave.mTaskId);
+        console.log("name: " +taskDetailToSave.mTask);
+        console.log("notes: " +taskDetailToSave.mNotes);
+        console.log("hasDueDate: " +taskDetailToSave.mHasDueDate);
+        console.log("dueDate: " +taskDetailToSave.mDueDate);
+        console.log("reminderType: " +taskDetailToSave.mReminderType);
+        console.log("reminderDate: " +taskDetailToSave.mReminderDate);
+        console.log("listId: "+ taskDetailToSave.mListId);
+        console.log("================end save information=================");
 
-            // add the taskDetailToSave.mListId at the expected place.
-            editorList.editTask(taskDetailToSave.mTaskId,
-                                taskDetailToSave.mListId,
-                                taskDetailToSave.mTask,
-                                taskDetailToSave.mNotes,
-                                taskDetailToSave.mHasDueDate,
-                                taskDetailToSave.mDueDate,
-                                taskDetailToSave.mReminderType,
-                                taskDetailToSave.mReminderDate,
-                                taskDetailToSave.mUrls,
-                                taskDetailToSave.mAttachments);
-            taskDetailLoader.item.editing = false;
-            console.log("================end save changes =================");
-        }
+        // add the taskDetailToSave.mListId at the expected place.
+        editorList.editTask(taskDetailToSave.mTaskId,
+                            taskDetailToSave.mListId,
+                            taskDetailToSave.mTask,
+                            taskDetailToSave.mNotes,
+                            taskDetailToSave.mHasDueDate,
+                            taskDetailToSave.mDueDate,
+                            taskDetailToSave.mReminderType,
+                            taskDetailToSave.mReminderDate,
+                            taskDetailToSave.mUrls,
+                            taskDetailToSave.mAttachments);
+        taskDetailLoader.item.editing = false;
+        console.log("================end save changes =================");
     }
 
 
@@ -229,19 +225,19 @@ Window {
                 taskDetailContextMenu.visible = false;
             }
             onSave: {
+                taskDetailContextMenu.setTask = taskToSave;
+                console.debug("TTTTTTTTTTTTTTTTTTTTTTEEEEEEEEEEEEEEEEEEEEEEEE: " + taskDetailContextMenu.setTask.mTask);
+                console.debug("TTTTTTTTTTTTTTTTTTTTTTEEEEEEEEEEEEEEEEEEEEEEEE: " + taskDetailContextMenu.setTask.mListId);
                 saveChanges();
             }
             onDeleteTask:  {
                 // delete task
                 if(qmlSettings.get("task_auto_delete")){
-                    editorList.removeTask(payload.mTaskId);
+                    editorList.removeTask(taskId);
                 } else {
                     scene.showModalDialog(deleteTaskModalDialogComponent);
-                    dialogLoader.item.parent = allDueTasksPage.content
-                    dialogLoader.item.taskId = payload.mTaskId
+                    dialogLoader.item.taskId = taskId
                 }
-
-                editorList.removeTask(theDetailMenu.task.taskId);
                 taskDetailContextMenu.visible = false;
             }
         }
@@ -252,6 +248,7 @@ Window {
             taskDetailContextMenu.setTask = taskData;
             taskDetailContextMenu.setListnames = listsGroupItem.getAllListsNames();
             taskDetailContextMenu.setEditing = edit;
+
             visible = true;
         }
     }
@@ -618,7 +615,8 @@ Window {
                 rowHeight: scene.rowHeight
 
                 onClickedAtRow: {
-                    taskDetailContextMenu.displayContextMenu(x,y,payload,false);
+                    var map = alldueTasksList.mapToItem(allDueTasksPage, x, y);
+                    taskDetailContextMenu.displayContextMenu(map.x,map.y,payload,false);
                 }
                 onCheckedAtRow: {
                     editorList.setCompleted(payload.mTaskId,checked);
@@ -645,12 +643,12 @@ Window {
                     if (index == 0)
                     {
                         // view detail
-                        taskDetailContextMenu.displayContextMenu(mousePos.x,mousePos.y,playload,false);
+                        taskDetailContextMenu.displayContextMenu(mousePos.x,mousePos.y,payload,false);
                     }
                     else if (index == 1)
                     {
                         // edit task
-                        taskDetailContextMenu.displayContextMenu(mousePos.x,mousePos.y,playload,true);
+                        taskDetailContextMenu.displayContextMenu(mousePos.x,mousePos.y,payload,true);
                     }
                     else if (index == 2) {
                         // view in list
@@ -712,8 +710,6 @@ Window {
             dialogTitle: labelDeleteListDialog
             property bool pageBack: false
             property int listId: -1
-
-
 
             onDialogClicked: {
                 if (button == 1){
@@ -917,8 +913,11 @@ Window {
                 }
 
                 onClickedAtRow: {
-                    if (taskListView.mode == 0)
-                        taskDetailContextMenu.displayContextMenu(x, y,payload,false);
+                    if (taskListView.mode == 0) {
+                        var map = taskListView.mapToItem(customlistPage, x, y);
+                        taskDetailContextMenu.displayContextMenu(map.x, map.y,payload,false);
+                    }
+
                 }
                 onCheckedAtRow: {
                     editorList.setCompleted(payload.mTaskId,checked);

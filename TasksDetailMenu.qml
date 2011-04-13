@@ -19,12 +19,16 @@ Column {
 
     spacing: vSpacing
 
-    function setDataFromTask(){
+    function setInputFromTask(){
 
     }
 
     function saveTaskFromInput() {
-
+        task.mTask = taskName.text;
+        if( task.mHasDueDate = duedateSelector.on) { //the single = is on purpose
+            task.mDueDate = datePicker.selectedDate;
+        }
+        task.mNotes = notesData.text;
     }
 
     Row {
@@ -34,7 +38,7 @@ Column {
             id: compCheckbox
             anchors.verticalCenter: nameRow.verticalCenter
             onClicked: {
-                editorList.setCompleted(taskId, !checked);
+                editorList.setCompleted(task.mTaskId, isChecked);
             }
             isChecked: task?task.mCompleted:false
         }
@@ -156,7 +160,7 @@ Column {
         UX.TextEntry {
             id: notesData
             readOnly: !detailMenu.editing
-            defaultText: qsTr("Insert notes here")
+            defaultText: detailMenu.editing ?  qsTr("Add a note here")  : ""
             text:  task.mNotes;
             font.pixelSize: theme_fontPixelSizeLarge
         }
@@ -168,8 +172,7 @@ Column {
         bgSourceUp:"image://theme/btn_red_up"
         bgSourceDn:"image://theme/btn_red_dn"
         onClicked: {
-            console.debug("----------------------------------------------------Task ID: " + task.mTaskId);
-            detailMenu.deleteTask(task.m_id);
+            detailMenu.deleteTask(task.mTaskId);
         }
     }
 
@@ -202,6 +205,7 @@ Column {
             bgSourceDn:"image://theme/btn_blue_dn"
             visible: editing
             onClicked: {
+                saveTaskFromInput();
                 detailMenu.save(task);
                 detailMenu.editing = false;
             }
@@ -213,5 +217,9 @@ Column {
                 detailMenu.close();
             }
         }
+    }
+
+    Component.onCompleted: {
+        setInputFromTask();
     }
 }
