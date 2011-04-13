@@ -226,8 +226,6 @@ Window {
             }
             onSave: {
                 taskDetailContextMenu.setTask = taskToSave;
-                console.debug("TTTTTTTTTTTTTTTTTTTTTTEEEEEEEEEEEEEEEEEEEEEEEE: " + taskDetailContextMenu.setTask.mTask);
-                console.debug("TTTTTTTTTTTTTTTTTTTTTTEEEEEEEEEEEEEEEEEEEEEEEE: " + taskDetailContextMenu.setTask.mListId);
                 saveChanges();
             }
             onDeleteTask:  {
