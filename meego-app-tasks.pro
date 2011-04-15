@@ -5,9 +5,13 @@ qmlfiles.path += $$INSTALL_ROOT/usr/share/$$TARGET
 
 INSTALLS += qmlfiles
 
-TRANSLATIONS += *.qml
+QML_FILES = *.qml
+LIB_SOURCES += src/*.cpp
+LIB_HEADERS += src/*.h
 VERSION = 0.2.3
 PROJECT_NAME = meego-app-tasks
+
+TRANSLATIONS += $${QML_FILES} $${LIB_SOURCES} $${LIB_HEADERS}
 
 dist.commands += rm -fR $${PROJECT_NAME}-$${VERSION} &&
 dist.commands += [ ! -e .git/refs/tags/v$${VERSION} ] || git tag -d v$${VERSION} &&
@@ -18,5 +22,5 @@ dist.commands += lupdate $${TRANSLATIONS} -ts $${PROJECT_NAME}-$${VERSION}/ts/$$
 dist.commands += tar jcpvf $${PROJECT_NAME}-$${VERSION}.tar.bz2 $${PROJECT_NAME}-$${VERSION}
 QMAKE_EXTRA_TARGETS += dist
 
-QML_FILES = *.qml
+
 OTHER_FILES += $${QML_FILES}
