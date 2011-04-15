@@ -898,8 +898,8 @@ Window {
                     }
                 }
 
-                duedateActions: [dueSomedayAction, dueTodayAction, dueTomorrowAction,
-                    dueNextWeekAction, dueCustomDateAction]
+                /*duedateActions: [dueSomedayAction, dueTodayAction, dueTomorrowAction,
+                    dueNextWeekAction, dueCustomDateAction]*/
                 model: CategoryItem {
                     id: categoryitem
                     viewModel:customlistModel

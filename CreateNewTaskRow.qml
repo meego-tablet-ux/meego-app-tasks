@@ -18,12 +18,15 @@ Item {
     property int textLeftMargin: 20
     property bool editing: false
     property int editorVerticalMargin: 15
-    property alias extraHeight: dropdownbox.contentHeight
+    property int extraHeight: 200
     property alias textinput: textinput
-    property alias actions: actions.model
+    //property alias actions: actions.model
     property bool selectedDueDate: false
     property date selectedDate
     property date nullDate //used for resetting the selected date
+    property variant checkMark: qsTr("* ");
+    property variant timeSelectModel: [ checkMark +labelSomeday, labelToday, labelTomorrow,
+        labelNextWeek, labelSetDueDate];
 
     signal confirmedInput();
     signal requestForEditing();
@@ -33,6 +36,8 @@ Item {
         textinput.focus = false;
         selectedDueDate = false;
         selectedDate = nullDate;
+        timeSelectModel = [ checkMark +labelSomeday, labelToday, labelTomorrow,
+                           labelNextWeek, labelSetDueDate];
     }
 
     Rectangle {
@@ -70,7 +75,7 @@ Item {
         //anchors.left: parent.left
         anchors.left: checkbox.right
         anchors.leftMargin: row.height / 2
-        anchors.right: dropdownbox.left
+        anchors.right: icon.left
         height: row.height - 10
         anchors.verticalCenter: parent.verticalCenter
         defaultText: labelCreateNewTask
@@ -85,43 +90,62 @@ Item {
         }
     }
 
-
-
-    DropdownBox {
-        id: dropdownbox
+    Image {
+        id: icon
+        source: "image://theme/tasks/frm_dropdown"
         anchors.right: parent.right
         anchors.rightMargin: 20
         anchors.verticalCenter: parent.verticalCenter
-        contentHeight: actions.height
-        TasksActionMenu{
-            id: actions
-            interactive: false
-            width: dropdownbox.contentWidth - 40
-            parent: dropdownbox.content
-            anchors.centerIn: parent
-            onClickedAt: {
-                dropdownbox.open = false;
-                if(index > 0) {
-                    selectedDueDate = true;
-                    if(index == 1) {
-                        selectedDate = new Date();
-                    } else if(index == 2) {
-                        var tempDate = new Date(); //need a temp because this doesn't work otherwise
-                        tempDate.setDate(tempDate.getDate() + 1); //I don't know why
-                        selectedDate = tempDate;
-                    } else if(index == 3) {
-                        var tempDate = new Date();
-                        tempDate.setDate(tempDate.getDate() + 7);
-                        selectedDate = tempDate;
-                    }
-                    else if(index == 4) {
-                        datePicker.show(row.width/2,mouseY);
-                    }
-                } else {
-                    selectedDueDate = false;
-                    selectedDate = nullDate;
+        Image {
+            id: closedTop
+            x: 10
+            source: "image://theme/tasks/icn_calendardropdown"
+        }
+        MouseArea {
+            anchors.fill: parent
+            onClicked: {
+                var map = icon.mapToItem(null,mouseX, mouseY);
+                //landingScreenContextMenu.payload = dinstance;
+                timeMenu.displayContextMenu(map.x,map.y);
+            }
+        }
+    }
+
+    Labs.ContextMenu {
+        id: timeMenu
+        model:timeSelectModel
+        onTriggered: {
+            if(index > 0) {
+                selectedDueDate = true;
+                if(index == 1) {
+                    selectedDate = new Date();
+                } else if(index == 2) {
+                    var tempDate = new Date(); //need a temp because this doesn't work otherwise
+                    tempDate.setDate(tempDate.getDate() + 1); //I don't know why
+                    selectedDate = tempDate;
+                } else if(index == 3) {
+                    var tempDate = new Date();
+                    tempDate.setDate(tempDate.getDate() + 7);
+                    selectedDate = tempDate;
+                }
+                else if(index == 4) {
+                    datePicker.show(row.width/2,mouseY);
+                }
+            } else {
+                selectedDueDate = false;
+                selectedDate = nullDate;
+            }
+
+            var temp = timeSelectModel;
+            for(var i=0;i<timeSelectModel.length;i++) {
+                if(i == index) {
+                    temp[i] = temp[i].replace(checkMark,""); //it may already have a checkmark
+                    temp[i] = checkMark + temp[i] ;
+                }else {
+                    temp[i] = temp[i].replace(checkMark,"");
                 }
             }
+            timeSelectModel = temp;
         }
     }
 }

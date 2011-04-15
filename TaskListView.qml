@@ -21,7 +21,7 @@ Item {
     property variant rowDelegate: cellComponent
     property int textHMargin: 20
     property bool listReorderable: true
-    property alias duedateActions: newrow.actions
+    //property alias duedateActions: newrow.actions
 
 
     property variant selectedIds: []

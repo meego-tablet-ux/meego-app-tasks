@@ -19,10 +19,6 @@ Column {
 
     spacing: vSpacing
 
-    function setInputFromTask(){
-
-    }
-
     function saveTaskFromInput() {
         task.mTask = taskName.text;
         if( task.mHasDueDate = duedateSelector.on) { //the single = is on purpose
@@ -219,7 +215,4 @@ Column {
         }
     }
 
-    Component.onCompleted: {
-        setInputFromTask();
-    }
 }
