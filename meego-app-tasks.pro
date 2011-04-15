@@ -6,8 +6,8 @@ qmlfiles.path += $$INSTALL_ROOT/usr/share/$$TARGET
 INSTALLS += qmlfiles
 
 QML_FILES = *.qml
-LIB_SOURCES += src/*.cpp
-LIB_HEADERS += src/*.h
+LIB_SOURCES += model/*.cpp
+LIB_HEADERS += model/*.h
 VERSION = 0.2.3
 PROJECT_NAME = meego-app-tasks
 
