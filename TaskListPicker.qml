@@ -14,7 +14,6 @@ Item {
     id: container
     anchors.fill: parent
     visible: false
-    //color:"transparent"
 
     signal selected(variant listId)
 
@@ -59,6 +58,8 @@ Item {
                 id:  text
                 text: listName
                 anchors.centerIn: parent
+                width: parent.width
+                elide: Text.ElideMiddle
             }
             MouseArea {
                 anchors.fill: parent
@@ -83,6 +84,7 @@ Item {
                 id:  text
                 text: qsTr("Create a new list")
                 anchors.centerIn: parent
+                elide: Text.ElideMiddle
             }
             MouseArea {
                 anchors.fill: parent
