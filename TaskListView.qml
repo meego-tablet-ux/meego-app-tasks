@@ -39,12 +39,10 @@ Item {
     function getTitleText(){
         var collapsed = view.collapsed;
         var tt = model.title;
-        if (collapsed) {
-           tt =  qsTr("%1 (%2)").arg(tt).arg(view.count);
-        }
+        if (collapsed)
+           tt =  qsTr("%1 (%2)").arg(tt).arg(model.viewModel.icount);
         return tt;
     }
-
 
     function  toggleSelected(id) {
         var index = selectedIds.indexOf(id);
