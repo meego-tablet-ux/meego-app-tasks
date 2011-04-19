@@ -1,0 +1,7 @@
+*~
+Makefile
+.moc
+.obj
+meego-app-tasks.pro.user
+meego-app-tasks-*.tar.bz2
+libTasks.so
