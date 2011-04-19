@@ -37,7 +37,7 @@ Window {
     property string labelEditTask: qsTr("Edit task")
     property string labelShowInList: qsTr("Show in list")
     property string labelDeleteTask: qsTr("Delete task")
-    property string labelDeleteListDialog: qsTr("Do you want to delete this list\n and all of its tasks?")
+    property string labelDeleteListDialog: qsTr("Do you want to delete this list and all of its tasks?")
     property string labelDelete: qsTr("Delete")
     property string labelDeleteSingleTask: qsTr("Are you sure you want to delete this task?")
 
@@ -701,11 +701,13 @@ Window {
 
     Component {
         id: deleteListModalDialogComponent
-        TasksModalDialog{
+        ModalDialog{
             id: newListDialog
+            bgSourceUpLeft:"image://theme/btn_red_up"
+            bgSourceDnLeft:"image://theme/btn_red_dn"
+            dialogTitle: labelDeleteListDialog
             leftButtonText: labelDelete
             rightButtonText:labelCancel
-            dialogTitle: labelDeleteListDialog
             property bool pageBack: false
             property int listId: -1
 
