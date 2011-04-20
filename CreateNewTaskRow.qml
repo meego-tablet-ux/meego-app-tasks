@@ -7,8 +7,7 @@
  */
 
 import Qt 4.7
-import MeeGo.Components 0.1 as Ux
-import MeeGo.Labs.Components 0.1 as Labs
+import MeeGo.Components 0.1
 
 Item {
     id: row
@@ -70,9 +69,8 @@ Item {
         anchors.leftMargin: 20
     }
 
-    Labs.TextEntry {
+    TextEntry {
         id: textinput
-        //anchors.left: parent.left
         anchors.left: checkbox.right
         anchors.leftMargin: row.height / 2
         anchors.right: icon.left
@@ -83,7 +81,7 @@ Item {
     }
 
 
-    Ux.DatePicker {
+    DatePicker {
         id: datePicker
         onDateSelected: {
             row.selectedDate = date;
@@ -106,46 +104,52 @@ Item {
             onClicked: {
                 var map = icon.mapToItem(null,mouseX, mouseY);
                 //landingScreenContextMenu.payload = dinstance;
-                timeMenu.displayContextMenu(map.x,map.y);
+                timeMenu.setPosition(map.x,map.y);
+                timeMenu.show();
             }
         }
     }
 
-    Labs.ContextMenu {
+    ModalContextMenu {
         id: timeMenu
-        model:timeSelectModel
-        onTriggered: {
-            if(index > 0) {
-                selectedDueDate = true;
-                if(index == 1) {
-                    selectedDate = new Date();
-                } else if(index == 2) {
-                    var tempDate = new Date(); //need a temp because this doesn't work otherwise
-                    tempDate.setDate(tempDate.getDate() + 1); //I don't know why
-                    selectedDate = tempDate;
-                } else if(index == 3) {
-                    var tempDate = new Date();
-                    tempDate.setDate(tempDate.getDate() + 7);
-                    selectedDate = tempDate;
+        content: ActionMenu {
+            model:timeSelectModel
+            onTriggered: {
+                timeMenu.hide();
+                if(index > 0) {
+                    selectedDueDate = true;
+                    if(index == 1) {
+                        selectedDate = new Date();
+                    } else if(index == 2) {
+                        var tempDate = new Date(); //need a temp because this doesn't work otherwise
+                        tempDate.setDate(tempDate.getDate() + 1); //I don't know why
+                        selectedDate = tempDate;
+                    } else if(index == 3) {
+                        var tempDate = new Date();
+                        tempDate.setDate(tempDate.getDate() + 7);
+                        selectedDate = tempDate;
+                    }
+                    else if(index == 4) {
+                        datePicker.show();
+                    }
+                } else {
+                    selectedDueDate = false;
+                    selectedDate = nullDate;
                 }
-                else if(index == 4) {
-                    datePicker.show(row.width/2,mouseY);
+
+                var temp = timeSelectModel;
+                for(var i=0;i<timeSelectModel.length;i++) {
+                    if(i == index) {
+                        temp[i] = temp[i].replace(checkMark,""); //it may already have a checkmark
+                        temp[i] = checkMark + temp[i] ;
+                    }else {
+                        temp[i] = temp[i].replace(checkMark,"");
+                    }
                 }
-            } else {
-                selectedDueDate = false;
-                selectedDate = nullDate;
+                timeSelectModel = temp;
             }
 
-            var temp = timeSelectModel;
-            for(var i=0;i<timeSelectModel.length;i++) {
-                if(i == index) {
-                    temp[i] = temp[i].replace(checkMark,""); //it may already have a checkmark
-                    temp[i] = checkMark + temp[i] ;
-                }else {
-                    temp[i] = temp[i].replace(checkMark,"");
-                }
-            }
-            timeSelectModel = temp;
         }
+
     }
 }

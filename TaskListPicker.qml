@@ -8,7 +8,7 @@
 
 import Qt 4.7
 import MeeGo.App.Tasks 0.1
-import MeeGo.Labs.Components 0.1
+import MeeGo.Components 0.1
 
 Item {
     id: container
@@ -16,8 +16,6 @@ Item {
     visible: false
 
     signal selected(variant listId)
-
-
 
     Rectangle {
         anchors.fill:parent
@@ -60,6 +58,7 @@ Item {
                 anchors.centerIn: parent
                 width: parent.width
                 elide: Text.ElideMiddle
+                horizontalAlignment: Text.AlignHCenter
             }
             MouseArea {
                 anchors.fill: parent
@@ -89,7 +88,7 @@ Item {
             MouseArea {
                 anchors.fill: parent
                 onClicked: {
-                    createDialog.opacity = 1
+                    createDialog.show();
 
                 }
             }
@@ -100,25 +99,20 @@ Item {
     ModalDialog {
         id:createDialog
         opacity: 0
-        leftButtonText: qsTr("OK")
-        rightButtonText: qsTr("Cancel")
-        bgSourceUpLeft:"image://theme/btn_blue_up"
-        bgSourceDnLeft:"image://theme/btn_blue_dn"
-        dialogTitle:qsTr("Please name the new list")
-        dialogWidth: 300
-        dialogHeight: 200
+        showCancelButton: true
+        showAcceptButton: true
 
-        TextEntry {
+        acceptButtonText: qsTr("OK")
+        cancelButtonText: qsTr("Cancel")
+        title:qsTr("Please name the new list")
+
+        content: TextEntry {
             id: inputText
-            anchors.centerIn: parent
-            width: parent.dialogWidth
+            anchors.fill: parent
             defaultText: qsTr("List name")
         }
-        onDialogClicked : {
-            if(button == 1) {
-                viewmodel.addList(inputText.text);
-            }
-            createDialog.opacity = 0;
+        onAccepted: {
+            viewmodel.addList(inputText.text);
         }
     }
 }

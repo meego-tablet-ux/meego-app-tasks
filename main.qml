@@ -7,12 +7,12 @@
  */
 
 import Qt 4.7
-import MeeGo.Labs.Components 0.1
+import MeeGo.Labs.Components 0.1 as Labs
 import MeeGo.App.Tasks 0.1
 import MeeGo.Components 0.1 as UX
 
-Window {
-    id: scene
+Labs.Window {
+    id: window
     property string labelTasks: qsTr("Tasks")
     property string labelAllDueTasks: qsTr("All due tasks")
     property string labelOverdue: qsTr("Overdue")
@@ -197,94 +197,9 @@ Window {
         id: editorList
     }
 
-    Loader {
-        id :taskDetailLoader
-    }
-    Loader {
-        id: dialogLoader
-        onStatusChanged :{
-            if (status == Loader.Ready){
-                item.parent = scene
-                item.textinput.forceActiveFocus();
-            }
-        }
-    }
-
-    AbstractContext {
-        id: taskDetailContextMenu
-        property variant setTask;
-        property variant setListnames;
-        property bool setEditing;
-
-        content: TasksDetailMenu {
-            id: theDetailMenu
-            task: taskDetailContextMenu.setTask;
-            listNames: taskDetailContextMenu.setListnames;
-            editing:taskDetailContextMenu.setEditing;
-            onClose: {
-                taskDetailContextMenu.visible = false;
-            }
-            onSave: {
-                taskDetailContextMenu.setTask = taskToSave;
-                saveChanges();
-            }
-            onDeleteTask:  {
-                // delete task
-                if(qmlSettings.get("task_auto_delete")){
-                    editorList.removeTask(taskId);
-                } else {
-                    scene.showModalDialog(deleteTaskModalDialogComponent);
-                    dialogLoader.item.taskId = taskId
-                }
-                taskDetailContextMenu.visible = false;
-            }
-        }
-
-        function displayContextMenu (mouseX, mouseY, taskData, edit) {
-            taskDetailContextMenu.mouseX = mouseX;
-            taskDetailContextMenu.mouseY = mouseY;
-            taskDetailContextMenu.setTask = taskData;
-            taskDetailContextMenu.setListnames = listsGroupItem.getAllListsNames();
-            taskDetailContextMenu.setEditing = edit;
-
-            visible = true;
-        }
-    }
-
-    Component {
-        id: newListModalDialogComponent
-        ModalDialog{
-            id: newListDialog
-            leftButtonText: (textinput.text.length > 0) ? labelOk : "" //this is done because there is no way in the ModalDialog to disable the OK button if the user didn't enter text
-            rightButtonText:labelCancel
-            dialogTitle: labelNewList
-            bgSourceUpLeft:"image://theme/btn_blue_up"
-            bgSourceDnLeft:"image://theme/btn_blue_dn"
-            property alias textinput: textinput.textInput
-            dialogWidth: 300
-            dialogHeight: 175
-
-            TextEntry {
-                id: textinput
-                width: newListDialog.dialogWidth
-                height: 50
-                defaultText: qsTr("List name")
-                parent: dialog
-                anchors.centerIn: parent
-            }
-
-            onDialogClicked: {
-                if (button == 1 && textinput.text){
-
-                    allListsModel.addList(textinput.text)
-                }
-                dialogLoader.sourceComponent = undefined;
-            }
-        }
-    }
     Component {
         id: landingScreenPageComponent
-        ApplicationPage {
+        Labs.ApplicationPage {
             id: landingScreenPage
             anchors.fill:parent
             title: labelTasks;
@@ -293,14 +208,12 @@ Window {
                 allListsModel.filter = needle;
             }
 
-
-            menuContent: ActionMenu {
+            menuContent: UX.ActionMenu {
                 id: actions
                 model: [labelAddNewList]
                 onTriggered: {
                     if(index == 0) {
-                        scene.showModalDialog(newListModalDialogComponent);
-                        dialogLoader.item.parent = landingScreenPage.content
+                        newListDialog.show();
                     } else if(index == 1) {
 
                     }
@@ -308,6 +221,82 @@ Window {
                 }//ontriggered
             }//action menu
 
+
+            UX.ModalDialog {
+                id: newListDialog
+                content: UX.TextEntry {
+                         id: textinput;
+                         anchors.fill: parent;
+                         defaultText: qsTr("List name")
+                }
+                title: labelNewList
+                cancelButtonText: labelCancel
+                acceptButtonText: labelOk
+                showAcceptButton: textinput.text.length > 0 //this is done because there is no way in the ModalDialog to disable the OK button if the user didn't enter text
+                onAccepted: {
+                    allListsModel.addList(textinput.text);
+                    textinput.text = "";
+                }
+                onRejected: {
+                    textinput.text = "";
+                }
+            }
+
+            UX.ModalDialog{
+                id: deleteListDialog
+                acceptButtonImage:"image://theme/btn_red_up"
+                acceptButtonImagePressed:"image://theme/btn_red_dn"
+                title: labelDeleteListDialog
+                acceptButtonText: labelDelete
+                cancelButtonText:labelCancel
+                property int listId: -1
+                onAccepted: {
+                    editorList.removeList(listId);
+                }
+            }
+
+            UX.ModalDialog{
+                id: renameDialog
+                acceptButtonText: labelOk
+                cancelButtonText:labelCancel
+                title: labelRenameList
+                showAcceptButton: userTextInput.text.length > 0 //this is done because there is no way in the ModalDialog to disable the OK button if the user didn't enter text
+                property int listId: -1
+                property alias originalText: renameTextInput.text;
+                content: UX.TextEntry {
+                    id: renameTextInput;
+                    anchors.fill: parent;
+                    defaultText: qsTr("List name")
+                }
+                onAccepted: {
+                    allListsModel.renameList( listId, renameTextInput.text);
+                    customlistModel.listName = renameTextInput.text;
+                }
+            }
+
+            UX.ModalContextMenu {
+                id: landingScreenContextMenu
+                property variant payload
+                content: UX.ActionMenu {
+                    model: [labelRenameList, labelDeleteList]
+                    onTriggered: {
+                        if (index == 0)
+                        {
+                            // rename
+                            renameDialog.listId =landingScreenContextMenu.payload.mListId;
+                            renameDialog.originalText = landingScreenContextMenu.payload.mListName;
+                            renameDialog.show();
+                        }
+                        else if (index == 1)
+                        {
+                            // delete list
+                            deleteListDialog.listId = landingScreenContextMenu.payload.mListId;
+                            deleteListDialog.show();
+                        }
+                        landingScreenContextMenu.hide();
+                    }
+                }
+            }
 
             ListView {
                 id: listview
@@ -320,7 +309,6 @@ Window {
                     id: dinstance
                     width: parent.width
                     height: rowHeight
-                    //                    text: listName
                     property string mListId: listId
                     property string mListName: listName
 
@@ -408,7 +396,8 @@ Window {
                             if (listId != 0) {
                                 var map = dinstance.mapToItem(landingScreenPage, mouseX, mouseY);
                                 landingScreenContextMenu.payload = dinstance;
-                                landingScreenContextMenu.displayContextMenu(map.x,map.y)
+                                landingScreenContextMenu.setPosition(map.x,map.y);
+                                landingScreenContextMenu.show();
                             }
                         }
                     }
@@ -454,7 +443,6 @@ Window {
                         text:  labelAllDueTasks
                         horizontalAlignment: Text.AlignLeft
                         verticalAlignment: Text.AlignVCenter
-                        //font.bold: true
                         font.pixelSize: theme_fontPixelSizeLarge
                         elide: Text.ElideRight
                         color: theme_fontColorNormal
@@ -517,35 +505,12 @@ Window {
                     font.pixelSize: theme_fontPixelSizeLarge
                 }
             }
-
-            ContextMenu {
-                id: landingScreenContextMenu
-                model: [labelRenameList, labelDeleteList]
-                menuWidth: 400
-                onTriggered: {
-                    if (index == 0)
-                    {
-                        // rename
-                        renameDialog.listId = payload.mListId;
-                        renameDialog.textinput = payload.mListName;
-                        renameDialog.opacity=1;
-                    }
-                    else if (index == 1)
-                    {
-                        // delete list
-                        //editorList.removeList(payload.mListId);
-                        scene.showModalDialog(deleteListModalDialogComponent);
-                        dialogLoader.item.parent = landingScreenPage.content
-                        dialogLoader.item.listId = payload.mListId;
-                    }
-
-                }
-            }
         }
     }
+
     Component {
         id: allDueTasksPageComponent
-        ApplicationPage {
+        Labs.ApplicationPage {
             id: allDueTasksPage
             anchors.fill:parent
             title: labelAllDueTasks
@@ -560,7 +525,7 @@ Window {
                 taskDetailLoader.sourceComponent = undefined;
             }
 
-            menuContent: ActionMenu {
+            menuContent: UX.ActionMenu {
                 id: actions
                 model: [labelAllDueTasks, labelOverdue, labelUpComing, labelSomeday]
                 onTriggered: {
@@ -626,136 +591,118 @@ Window {
                     var map = alldueTasksList.mapToItem(allDueTasksPage, x, y);
                     allDueTasksPageContextMenu.payload = payload;
                     allDueTasksPageContextMenu.mousePos = map;
-                    allDueTasksPageContextMenu.displayContextMenu(map.x,map.y)
-                    taskDetailLoader.sourceComponent = undefined;
-
+                    allDueTasksPageContextMenu.setPosition(map.x,map.y)
+                    allDueTasksPageContextMenu.show();
                 }
             }
-            ContextMenu {
-                id: allDueTasksPageContextMenu
-                model: [labelViewDetail, labelEditTask, labelShowInList, labelDeleteTask]
-                menuWidth: 400
-                property variant mousePos
 
-                onTriggered: {
-                    if (index == 0)
-                    {
-                        // view detail
-                        taskDetailContextMenu.displayContextMenu(mousePos.x,mousePos.y,payload,false);
+            UX.ModalDialog {
+                id: deleteTaskDialog
+                acceptButtonText: labelDelete
+                cancelButtonText:labelCancel
+                title: labelDeleteSingleTask
+                acceptButtonImage:"image://theme/btn_red_up"
+                acceptButtonImagePressed:"image://theme/btn_red_dn"
+                property int taskId: -1
+
+                content: Row {
+                    anchors.centerIn: parent
+                    spacing: 10
+                    UX.CheckBox {
+                        id:checkBox
                     }
-                    else if (index == 1)
-                    {
-                        // edit task
-                        taskDetailContextMenu.displayContextMenu(mousePos.x,mousePos.y,payload,true);
-                    }
-                    else if (index == 2) {
-                        // view in list
-                        customlistModel.listId = payload.mListId;
-                        customlistModel.listName = payload.mListName;
-                        allDueTasksPage.close();
-                        addApplicationPage(customlistPageComponent)
-                    }else if (index == 3) {
-                        // delete task
-                        if(qmlSettings.get("task_auto_delete")){
-                            editorList.removeTask(payload.mTaskId);
-                        } else {
-                            scene.showModalDialog(deleteTaskModalDialogComponent);
-                            dialogLoader.item.parent = allDueTasksPage.content
-                            dialogLoader.item.taskId = payload.mTaskId
-                        }
+
+                    Text {
+                        id: checkboxTextArea
+                        text: qsTr("Don't ask to confirm deleting tasks.")
+                        font.pixelSize: theme_fontPixelSizeLarge
                     }
                 }
-            }
-        }
-    }
-
-
-    ModalDialog{
-        id: renameDialog
-        leftButtonText: (userTextInput.text.length > 0) ? labelOk : "" //this is done because there is no way in the ModalDialog to disable the OK button if the user didn't enter text
-        rightButtonText:labelCancel
-        dialogTitle: labelRenameList
-        bgSourceUpLeft:"image://theme/btn_blue_up"
-        bgSourceDnLeft:"image://theme/btn_blue_dn"
-        property alias textinput: userTextInput.text
-        property int listId: -1
-        dialogWidth: 300
-        dialogHeight: 175
-        opacity: 0
-
-        TextEntry {
-            id: userTextInput
-            width: renameDialog.dialogWidth - 10
-            height: 50
-            anchors.centerIn: parent
-        }
-
-        onDialogClicked: {
-            if (button == 1 && userTextInput.text){
-                allListsModel.renameList( listId, userTextInput.text);
-                customlistModel.listName = userTextInput.text;
-            }
-            renameDialog.opacity =0;
-        }
-    }
-
-    Component {
-        id: deleteListModalDialogComponent
-        ModalDialog{
-            id: newListDialog
-            bgSourceUpLeft:"image://theme/btn_red_up"
-            bgSourceDnLeft:"image://theme/btn_red_dn"
-            dialogTitle: labelDeleteListDialog
-            leftButtonText: labelDelete
-            rightButtonText:labelCancel
-            property bool pageBack: false
-            property int listId: -1
-
-            onDialogClicked: {
-                if (button == 1){
-                    editorList.removeList(listId);
-                    if(pageBack) {
-                        scene.previousApplicationPage();
-                    }
-                }
-                dialogLoader.sourceComponent = undefined;
-            }
-        }
-    }
-
-    Component {
-        id: deleteTaskModalDialogComponent
-        ModalDialog{
-            id: newTaskDialog
-            leftButtonText: labelDelete
-            rightButtonText:labelCancel
-            dialogTitle: labelDeleteSingleTask
-            bgSourceUpLeft:"image://theme/btn_red_up"
-            bgSourceDnLeft:"image://theme/btn_red_dn"
-            property int taskId: -1
-
-            Row {
-                height: 30
-                anchors.centerIn: parent
-                spacing: 10
-                UX.CheckBox {
-                    id:checkBox
-                }
-
-                Text {
-                    id: checkboxTextArea
-                    text: qsTr("Don't ask to confirm deleting tasks.")
-                    font.pixelSize: theme_fontPixelSizeLarge
-                }
-            }
-
-            onDialogClicked: {
-                if (button == 1){
+                onAccepted: {
                     if(checkBox.isChecked)
                         qmlSettings.set("task_auto_delete", true);
                     editorList.removeTask(taskId);
                 }
-                dialogLoader.sourceComponent = undefined;
+            }
+
+            UX.ModalContextMenu {
+                id: taskDetailContextMenu
+                property variant setTask;
+                property variant setListnames;
+                property bool setEditing;
+
+                content: TasksDetailMenu {
+                    id: theDetailMenu
+                    task: taskDetailContextMenu.setTask;
+                    listNames: taskDetailContextMenu.setListnames;
+                    editing:taskDetailContextMenu.setEditing;
+                    onClose: {
+                        taskDetailContextMenu.hide();
+                    }
+                    onSave: {
+                        taskDetailContextMenu.setTask = taskToSave;
+                        saveChanges();
+                    }
+                    onDeleteTask:  {
+                        // delete task
+                        if(qmlSettings.get("task_auto_delete")){
+                            editorList.removeTask(taskId);
+                        } else {
+                            scene.showModalDialog(deleteTaskModalDialogComponent);
+                            dialogLoader.item.taskId = taskId
+                        }
+                        taskDetailContextMenu.hide();
+                    }
+                }
+
+                function displayContextMenu (mouseX, mouseY, taskData, edit) {
+                    taskDetailContextMenu.setPosition(mouseX,mouseY);
+                    taskDetailContextMenu.setTask = taskData;
+                    taskDetailContextMenu.setListnames = listsGroupItem.getAllListsNames();
+                    taskDetailContextMenu.setEditing = edit;
+                    taskDetailContextMenu.show();
+                }
+            }
+
+            UX.ModalContextMenu {
+                id: allDueTasksPageContextMenu
+                property variant payload
+                property variant mousePos
+                content: UX.ActionMenu {
+                    model: [labelViewDetail, labelEditTask, labelShowInList, labelDeleteTask]
+                    onTriggered: {
+                        if (index == 0)
+                        {
+                            // view detail
+                            taskDetailContextMenu.displayContextMenu(allDueTasksPageContextMenu.mousePos.x,
+                                                                     allDueTasksPageContextMenu.mousePos.y,
+                                                                     allDueTasksPageContextMenu.payload,false);
+                        }
+                        else if (index == 1)
+                        {
+                            // edit task
+                         taskDetailContextMenu.displayContextMenu(allDueTasksPageContextMenu.mousePos.x,
+                                                                  allDueTasksPageContextMenu.mousePos.y,
+                                                                  allDueTasksPageContextMenu.payload,true);
+                        }
+                        else if (index == 2) {
+                            // view in list
+                            customlistModel.listId = allDueTasksPageContextMenu.payload.mListId;
+                            customlistModel.listName = allDueTasksPageContextMenu.payload.mListName;
+                            allDueTasksPage.close();
+                            addApplicationPage(customlistPageComponent)
+                        }else if (index == 3) {
+                            // delete task
+                            if(qmlSettings.get("task_auto_delete")){
+                                editorList.removeTask(allDueTasksPageContextMenu.payload.mTaskId);
+                            } else {
+                                deleteTaskDialog.taskId = allDueTasksPageContextMenu.payload.mTaskId;
+                                deleteTaskDialog.show();
+                            }
+                        }
+                         allDueTasksPageContextMenu.hide();
+                    }
+                }
             }
         }
     }
@@ -763,7 +710,7 @@ Window {
 
     Component {
         id: customlistPageComponent
-        ApplicationPage {
+        Labs.ApplicationPage {
             id: customlistPage
             title: labelTasks
             onSearch: {
@@ -773,6 +720,45 @@ Window {
 
             onClose: {
                 taskDetailLoader.sourceComponent = undefined;
+            }
+
+            UX.ModalContextMenu {
+                id: taskDetailContextMenu
+                property variant setTask;
+                property variant setListnames;
+                property bool setEditing;
+
+                content: TasksDetailMenu {
+                    id: theDetailMenu
+                    task: taskDetailContextMenu.setTask;
+                    listNames: taskDetailContextMenu.setListnames;
+                    editing:taskDetailContextMenu.setEditing;
+                    onClose: {
+                        taskDetailContextMenu.hide();
+                    }
+                    onSave: {
+                        taskDetailContextMenu.setTask = taskToSave;
+                        saveChanges();
+                    }
+                    onDeleteTask:  {
+                        // delete task
+                        if(qmlSettings.get("task_auto_delete")){
+                            editorList.removeTask(taskId);
+                        } else {
+                            scene.showModalDialog(deleteTaskModalDialogComponent);
+                            dialogLoader.item.taskId = taskId
+                        }
+                        taskDetailContextMenu.hide();
+                    }
+                }
+
+                function displayContextMenu (mouseX, mouseY, taskData, edit) {
+                    taskDetailContextMenu.setPosition(mouseX,mouseY);
+                    taskDetailContextMenu.setTask = taskData;
+                    taskDetailContextMenu.setListnames = listsGroupItem.getAllListsNames();
+                    taskDetailContextMenu.setEditing = edit;
+                    taskDetailContextMenu.show();
+                }
             }
 
             function makeActionMenuModel() {
@@ -820,7 +806,7 @@ Window {
                 runMe[index]();
             }
 
-            menuContent: ActionMenu {
+            menuContent: UX.ActionMenu {
                 id: actions
                 model: makeActionMenuModel()
 
@@ -831,7 +817,7 @@ Window {
             }//action menu
 
 
-            ModalDialog {
+            Labs.ModalDialog {
                 id: confirmDelComTasksDialog
                 dialogTitle: qsTr("Are you sure you want to delete the completed tasks?")
                 leftButtonText: qsTr("Yes")
@@ -854,54 +840,6 @@ Window {
                 property alias title: categoryitem.title
                 property alias viewModel: categoryitem.viewModel
 
-                // Actions for create new task drop down
-                Action {
-                    id: dueSomedayAction
-                    text:labelSomeday
-                    onTriggered : {
-                        duedateData.hasDuedate = false;
-                        duedateData.dueDate = new Date();
-                    }
-                    checked: true
-                }
-                Action {
-                    id: dueTodayAction
-                    text:labelToday
-                    onTriggered : {
-                        duedateData.hasDuedate = true;
-                        duedateData.dueDate = new Date();
-                    }
-                }
-                Action {
-                    id: dueTomorrowAction
-                    text:labelTomorrow
-                    onTriggered : {
-                        duedateData.hasDuedate = true;
-                        var date = new Date();
-                        date.setDate(date.getDate() +1);
-                        duedateData.dueDate = date;
-                    }
-                }
-                Action {
-                    id: dueNextWeekAction
-                    text:labelNextWeek
-                    onTriggered : {
-                        duedateData.hasDuedate = true;
-                        var date = new Date();
-                        date.setDate(date.getDate() +7);
-                        duedateData.dueDate = date;
-                    }
-                }
-                Action {
-                    id: dueCustomDateAction
-                    text:labelSetDueDate
-                    onTriggered : {
-                        datePicker.show();
-                    }
-                }
-
-                /*duedateActions: [dueSomedayAction, dueTodayAction, dueTomorrowAction,
-                    dueNextWeekAction, dueCustomDateAction]*/
                 model: CategoryItem {
                     id: categoryitem
                     viewModel:customlistModel
@@ -930,7 +868,7 @@ Window {
                     taskDetailLoader.sourceComponent = undefined;
                 }
             }
-            ContextMenu {
+            Labs.ContextMenu {
                 id: customListPageContextMenu
                 model: {
                     if(customlistModel.count > 1) {

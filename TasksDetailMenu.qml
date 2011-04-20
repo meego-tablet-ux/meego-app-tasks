@@ -1,5 +1,4 @@
 import QtQuick 1.0
-import MeeGo.Labs.Components 0.1 as Labs
 import MeeGo.Components 0.1 as UX
 import MeeGo.App.Tasks 0.1
 

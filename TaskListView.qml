@@ -7,7 +7,7 @@
  */
 
 import Qt 4.7
-import MeeGo.Labs.Components 0.1
+import MeeGo.Components 0.1
 import MeeGo.App.Tasks 0.1
 
 Item {
@@ -21,8 +21,6 @@ Item {
     property variant rowDelegate: cellComponent
     property int textHMargin: 20
     property bool listReorderable: true
-    //property alias duedateActions: newrow.actions
-
 
     property variant selectedIds: []
 
@@ -407,9 +405,13 @@ Item {
 
     ModalDialog {
         id: delConfirmDialog
-        dialogWidth: 300
-        dialogHeight: 150
-        dialogTitle: {
+        showCancelButton: true
+        showAcceptButton: true
+        cancelButtonText:  qsTr( "No" )
+        acceptButtonText: qsTr( "Yes" )
+        acceptButtonImage: "image://theme/btn_red_up"
+        acceptButtonImagePressed:"image://theme/btn_red_dn"
+        title: {
             if(container.selectedIds.length > 1) {
                 return qsTr("Are you sure you want to delete these %1 tasks?").arg(container.selectedIds.length);
             }
@@ -417,19 +419,10 @@ Item {
                 return qsTr("Are you sure you want to delete this task?");
             }
         }
-
-        opacity: 0
-        leftButtonText: qsTr("Yes")
-        rightButtonText: qsTr("No")
-        bgSourceUpLeft:"image://theme/tasks/btn_blue"
-        bgSourceDnLeft:"image://theme/tasks/btn_blue"
-        onDialogClicked: {
-            if(button ==1) {
-                container.model.viewModel.removeTasks(selectedIds);
-                container.selectedIds = [];
-                container.mode = 0;
-            }
-            delConfirmDialog.opacity = 0;
+        onAccepted: {
+            container.model.viewModel.removeTasks(selectedIds);
+            container.selectedIds = [];
+            container.mode = 0;
         }
     }
 
@@ -463,7 +456,7 @@ Item {
            picker.visible = true;
         }
         onClickedDelete: {
-            delConfirmDialog.opacity = 1;
+            delConfirmDialog.show();
 
         }
         onClickedOk: {
