@@ -516,7 +516,7 @@ Labs.Window {
             }
 
             onClose: {
-                taskDetailLoader.sourceComponent = undefined;
+                taskDetailContextMenu.hide();
             }
 
             menuContent: UX.ActionMenu {
@@ -568,8 +568,8 @@ Labs.Window {
                 parent: allDueTasksPage.content
                 anchors.fill:parent
                 model: [overdueCItem, upcomingCItem, somedayCItem]
-                titleHeight: scene.titleHeight
-                rowHeight: scene.rowHeight
+                titleHeight: window.titleHeight
+                rowHeight: window.rowHeight
 
                 onClickedAtRow: {
                     var map = alldueTasksList.mapToItem(allDueTasksPage, x, y);
@@ -642,8 +642,8 @@ Labs.Window {
                         if(qmlSettings.get("task_auto_delete")){
                             editorList.removeTask(taskId);
                         } else {
-                            scene.showModalDialog(deleteTaskModalDialogComponent);
-                            dialogLoader.item.taskId = taskId
+                            deleteTaskDialog.taskId = taskId
+                            deleteTaskDialog.show();
                         }
                         taskDetailContextMenu.hide();
                     }
@@ -712,7 +712,7 @@ Labs.Window {
             }
 
             onClose: {
-                taskDetailLoader.sourceComponent = undefined;
+                taskDetailContextMenu.hide();
             }
 
             UX.ModalContextMenu {
@@ -738,8 +738,8 @@ Labs.Window {
                         if(qmlSettings.get("task_auto_delete")){
                             editorList.removeTask(taskId);
                         } else {
-                            scene.showModalDialog(deleteTaskModalDialogComponent);
-                            dialogLoader.item.taskId = taskId
+                            deleteTaskDialog.taskId = taskId
+                            deleteTaskDialog.show();
                         }
                         taskDetailContextMenu.hide();
                     }
@@ -851,7 +851,7 @@ Labs.Window {
                     titleColor:"#cbcbcb"
                 }
                 onModeChanged :{
-                    taskDetailLoader.sourceComponent = undefined;
+                    taskDetailContextMenu.hide();
                 }
 
                 onClickedAtRow: {
