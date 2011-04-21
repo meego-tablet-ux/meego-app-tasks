@@ -85,8 +85,8 @@ Labs.Window {
         return false;
     }
 
-    function saveChanges(){
-        var taskDetailToSave = taskDetailContextMenu.setTask;
+    function saveChanges(saveMe){
+        var taskDetailToSave = saveMe;
         console.log("==================save information==============");
         console.log("id: " +taskDetailToSave.mTaskId);
         console.log("name: " +taskDetailToSave.mTask);
@@ -635,7 +635,7 @@ Labs.Window {
                     }
                     onSave: {
                         taskDetailContextMenu.setTask = taskToSave;
-                        saveChanges();
+                        saveChanges(taskDetailContextMenu.setTask);
                     }
                     onDeleteTask:  {
                         // delete task
@@ -731,7 +731,7 @@ Labs.Window {
                     }
                     onSave: {
                         taskDetailContextMenu.setTask = taskToSave;
-                        saveChanges();
+                        saveChanges(taskDetailContextMenu.setTask);
                     }
                     onDeleteTask:  {
                         // delete task
