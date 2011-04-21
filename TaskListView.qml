@@ -454,6 +454,7 @@ Item {
            // container.model.viewModel.moveTasksToList(selectedIds, 0);
            // container.selectedIds = [];
            picker.visible = true;
+           container.mode = 0;
         }
         onClickedDelete: {
             delConfirmDialog.show();

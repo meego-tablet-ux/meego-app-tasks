@@ -18,11 +18,17 @@ Column {
 
     spacing: vSpacing
 
+    onTaskChanged: {
+        compCheckbox.isChecked = task.mCompleted; //For whatever stupid reason, the checkbox doesn't get updated
+        //along with the other fields, so I have to manually do this!
+    }
+
     function saveTaskFromInput() {
         task.mTask = taskName.text;
         if( task.mHasDueDate = duedateSelector.on) { //the single = is on purpose
             task.mDueDate = datePicker.selectedDate;
         }
+        task.mCompleted = compCheckbox.isChecked;
         task.mNotes = notesData.text;
     }
 
@@ -35,7 +41,7 @@ Column {
             onClicked: {
                 editorList.setCompleted(task.mTaskId, isChecked);
             }
-            isChecked: task?task.mCompleted:false
+            isChecked: task.mCompleted
         }
         UX.TextEntry {
             id: taskName

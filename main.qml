@@ -632,6 +632,7 @@ Labs.Window {
                     editing:taskDetailContextMenu.setEditing;
                     onClose: {
                         taskDetailContextMenu.hide();
+                        theDetailMenu.editing = false;
                     }
                     onSave: {
                         taskDetailContextMenu.setTask = taskToSave;
@@ -728,6 +729,7 @@ Labs.Window {
                     editing:taskDetailContextMenu.setEditing;
                     onClose: {
                         taskDetailContextMenu.hide();
+                        editing = false;
                     }
                     onSave: {
                         taskDetailContextMenu.setTask = taskToSave;
