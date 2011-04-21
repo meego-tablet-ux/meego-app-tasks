@@ -76,6 +76,13 @@ Item {
         return title;
     }
 
+    function titleCollapsedText(index, collapsed) {
+        var title = model[index].title;
+        if (collapsed)
+           title =  qsTr("%1 (%2)").arg(title).arg(model[index].viewModel.count);
+        return title;
+    }
+
     function isZeroModel(index) {
         if (index >= model.length)
             return true;
@@ -131,10 +138,11 @@ Item {
         }
     }
 
-
     Component {
         id: titleComponent
         Rectangle {
+            property alias text: text.text
+
             id: titleRect
             width: container.width
             height: visible? container.titleHeight:0
@@ -145,6 +153,27 @@ Item {
                 target: container.model[index].viewModel
                 onCountChanged: {
                     titleRect.visible =  forceShowTitle ||(container.model[index].viewModel.count != 0)
+                }
+            }
+
+            onYChanged: {
+                var prevIndex = index - 1;
+                var nextIndex = index + 1;
+                if (prevIndex < 0 || nextIndex >= titles.children.length)
+                    return;
+
+                var prevIndexY = titles.children[prevIndex].y + titles.children[prevIndex].height;
+                var nextIndexY = titles.children[nextIndex].y
+
+                if (y == prevIndexY) {
+                    titles.children[prevIndex].text = titleCollapsedText(prevIndex, true);
+                } else if (y > prevIndexY && titles.children[prevIndex].text == titleCollapsedText(prevIndex, true)) {
+                    titles.children[prevIndex].text = titleCollapsedText(prevIndex, false);
+                }
+                if (y + height == nextIndexY || (y + height == container.height && titles.children[index].children.length)) {
+                    titles.children[index].text = titleCollapsedText(index, true);
+                } else {
+                    titles.children[index].text = titleCollapsedText(index, false);
                 }
             }
 
@@ -209,7 +238,6 @@ Item {
                 model: modelData.viewModel
                 delegate : cellComponent
             }
-
         }
     }
 
