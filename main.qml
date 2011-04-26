@@ -68,6 +68,19 @@ Labs.Window {
 
         return qsTr("%1 %2").arg(Qt.formatDate(date,"d") + "").arg(Qt.formatDate(date,"MMM") + "");
     }
+
+    function getFormattedDateYear(date) {
+        if (!date.getDate()) {
+            return labelSomeday;
+        }
+        var now = new Date();
+        if (now.getDate() == date.getDate() &&
+                now.getMonth() == date.getMonth() &&
+                now.getYear() == date.getYear() )
+            return labelToday
+
+        return qsTr("%1 %2 %3").arg(Qt.formatDate(date,"d") + "").arg(Qt.formatDate(date,"MMM") + "").arg(Qt.formatDate(date,"yyyy") + "");
+    }
     function isOverdue(date) {
         if (!date.getDate)
             return false;
