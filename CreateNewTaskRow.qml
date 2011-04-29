@@ -110,7 +110,7 @@ Item {
         }
     }
 
-    ModalContextMenu {
+    ContextMenu {
         id: timeMenu
         content: ActionMenu {
             model:timeSelectModel

@@ -281,7 +281,7 @@ Labs.Window {
                 }
             }
 
-            UX.ModalContextMenu {
+            UX.ContextMenu {
                 id: landingScreenContextMenu
                 property variant payload
                 content: UX.ActionMenu {
@@ -632,7 +632,7 @@ Labs.Window {
                 }
             }
 
-            UX.ModalContextMenu {
+            UX.ContextMenu {
                 id: taskDetailContextMenu
                 property variant setTask;
                 property variant setListnames;
@@ -672,7 +672,7 @@ Labs.Window {
                 }
             }
 
-            UX.ModalContextMenu {
+            UX.ContextMenu {
                 id: allDueTasksPageContextMenu
                 property variant payload
                 property variant mousePos
@@ -729,7 +729,7 @@ Labs.Window {
                 taskDetailContextMenu.hide();
             }
 
-            UX.ModalContextMenu {
+            UX.ContextMenu {
                 id: taskDetailContextMenu
                 property variant setTask;
                 property variant setListnames;
@@ -931,7 +931,7 @@ Labs.Window {
                 }
             }
 
-            UX.ModalContextMenu {
+            UX.ContextMenu {
                 id: customListPageContextMenu
                 property variant mousePos
                 property variant payload
