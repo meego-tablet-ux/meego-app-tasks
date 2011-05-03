@@ -954,7 +954,7 @@ Labs.Window {
                                                                   customListPageContextMenu.payload,true);
                          } else if (index ==2) {  // delete task
                              if(qmlSettings.get("task_auto_delete")){
-                                 editorList.removeTask(payload.mTaskId);
+                                 editorList.removeTask(customListPageContextMenu.payload.mTaskId);
                              } else {
                                  deleteTaskDialog.taskId = customListPageContextMenu.payload.mTaskId;
                                  deleteTaskDialog.show();
