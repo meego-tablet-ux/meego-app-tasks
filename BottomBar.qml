@@ -8,6 +8,7 @@
 
 import Qt 4.7
 import MeeGo.Components 0.1
+
 BorderImage {
     id: bar
     source: "image://meegotheme/widgets/common/action-bar/action-bar-background"

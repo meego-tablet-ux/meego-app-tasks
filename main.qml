@@ -7,11 +7,11 @@
  */
 
 import Qt 4.7
-import MeeGo.Labs.Components 0.1 as Labs
 import MeeGo.App.Tasks 0.1
-import MeeGo.Components 0.1 as UX
+import MeeGo.Components 0.1
+import MeeGo.Labs.Components 0.1 as Labs    //export them_* constants
 
-Labs.Window {
+Window {
     id: window
     property string labelTasks: qsTr("Tasks")
     property string labelAllDueTasks: qsTr("All due tasks")
@@ -52,10 +52,10 @@ Labs.Window {
         application: "Tasks"
     }
 
-    title: labelTasks
-    Component.onCompleted: {
-        applicationPage = landingScreenPageComponent
-    }
+    toolBarTitle: labelTasks
+
+    Component.onCompleted: switchBook(landingScreenPageComponent)
+
     function getFormattedDate(date) {
         if (!date.getDate()) {
             return labelSomeday;
@@ -204,34 +204,40 @@ Labs.Window {
         id: editorList
     }
 
+    bookMenuPayload: [ landingScreenPageComponent ]
+
+    onSearch: {
+        var currentPage = window.pageStack.currentPage.objectName;
+        if (currentPage == "landingScreenPage") {
+            allListsModel.filter = needle;
+        } else if (currentPage == "allDueTasksPage") {
+            overdueModel.filter = needle;
+            upcomingModel.filter = needle;
+            somedayModel.filter = needle;
+        } else if (currentPage == "customlistPage") {
+            customlistModel.filter = needle;
+        }
+    }
+
     Component {
         id: landingScreenPageComponent
-        Labs.ApplicationPage {
+        AppPage {
             id: landingScreenPage
             anchors.fill:parent
-            title: labelTasks;
+            pageTitle: labelTasks
+            objectName: "landingScreenPage"
 
-            onSearch: {
-                allListsModel.filter = needle;
+            actionMenuModel: [ labelAddNewList ]
+            actionMenuPayload: [ 0 ]
+
+            onActionMenuTriggered: {
+                if (!selectedItem)
+                    newListDialog.show();
             }
 
-            menuContent: UX.ActionMenu {
-                id: actions
-                model: [labelAddNewList]
-                onTriggered: {
-                    if(index == 0) {
-                        newListDialog.show();
-                    } else if(index == 1) {
-
-                    }
-                    landingScreenPage.closeMenu();
-                }//ontriggered
-            }//action menu
-
-
-            UX.ModalDialog {
+            ModalDialog {
                 id: newListDialog
-                content: UX.TextEntry {
+                content: TextEntry {
                          id: textinput;
                          anchors.fill: parent;
                          defaultText: qsTr("List name")
@@ -249,7 +255,7 @@ Labs.Window {
                 }
             }
 
-            UX.ModalDialog{
+            ModalDialog{
                 id: deleteListDialog
                 acceptButtonImage:"image://theme/btn_red_up"
                 acceptButtonImagePressed:"image://theme/btn_red_dn"
@@ -262,15 +268,15 @@ Labs.Window {
                 }
             }
 
-            UX.ModalDialog{
+            ModalDialog{
                 id: renameDialog
                 acceptButtonText: labelOk
                 cancelButtonText:labelCancel
                 title: labelRenameList
-                showAcceptButton: userTextInput.text.length > 0 //this is done because there is no way in the ModalDialog to disable the OK button if the user didn't enter text
+                showAcceptButton: renameTextInput.text.length > 0 //this is done because there is no way in the ModalDialog to disable the OK button if the user didn't enter text
                 property int listId: -1
                 property alias originalText: renameTextInput.text;
-                content: UX.TextEntry {
+                content: TextEntry {
                     id: renameTextInput;
                     anchors.fill: parent;
                     defaultText: qsTr("List name")
@@ -281,10 +287,10 @@ Labs.Window {
                 }
             }
 
-            UX.ContextMenu {
+            ContextMenu {
                 id: landingScreenContextMenu
                 property variant payload
-                content: UX.ActionMenu {
+                content: ActionMenu {
                     model: [labelRenameList, labelDeleteList]
                     onTriggered: {
                         if (index == 0)
@@ -307,8 +313,8 @@ Labs.Window {
 
             ListView {
                 id: listview
-                parent: landingScreenPage.content
-                anchors.fill:  landingScreenPage.content
+                parent: landingScreenPage
+                anchors.fill: landingScreenPage
                 model: allListsModel
                 clip:true
                 interactive: (contentHeight + rowHeight) > listview.height
@@ -397,7 +403,7 @@ Labs.Window {
                         onClicked: {
                             customlistModel.listId = listId;
                             customlistModel.listName = text.text;
-                            landingScreenPage.addApplicationPage(customlistPageComponent)
+                            window.addPage(customlistPageComponent);
                         }
                         onPressAndHold : {
                             if (listId != 0) {
@@ -492,9 +498,7 @@ Labs.Window {
                     }
                     MouseArea {
                         anchors.fill:parent
-                        onClicked: {
-                            landingScreenPage.addApplicationPage(allDueTasksPageComponent)
-                        }
+                        onClicked: window.addPage(allDueTasksPageComponent)
                     }
                 }
 
@@ -517,45 +521,34 @@ Labs.Window {
 
     Component {
         id: allDueTasksPageComponent
-        Labs.ApplicationPage {
+        AppPage {
             id: allDueTasksPage
             anchors.fill:parent
-            title: labelAllDueTasks
+            objectName: "allDueTasksPage"
+            pageTitle: labelAllDueTasks
 
-            onSearch: {
-                overdueModel.filter = needle;
-                upcomingModel.filter = needle;
-                somedayModel.filter = needle;
+//            onClose: {    //labs
+//                taskDetailContextMenu.hide();
+//            }
+
+            actionMenuModel: [ labelAllDueTasks, labelOverdue, labelUpComing, labelSomeday ]
+            actionMenuPayload: [ 0, 1, 2, 3 ]
+
+            onActionMenuTriggered: {
+                if(selectedItem == 0) {
+                    alldueTasksList.model = [overdueCItem, upcomingCItem, somedayCItem];
+                    alldueTasksList.forceShowTitle = false;
+                } else if(selectedItem == 1) {
+                    alldueTasksList.model = [overdueCItem];
+                    alldueTasksList.forceShowTitle = true;
+                } else if(selectedItem == 2) {
+                    alldueTasksList.model = [upcomingCItem];
+                    alldueTasksList.forceShowTitle = true;
+                } else if(selectedItem == 3) {
+                    alldueTasksList.model = [somedayCItem];
+                    alldueTasksList.forceShowTitle = true;
+                }
             }
-
-            onClose: {
-                taskDetailContextMenu.hide();
-            }
-
-            menuContent: UX.ActionMenu {
-                id: actions
-                model: [labelAllDueTasks, labelOverdue, labelUpComing, labelSomeday]
-                onTriggered: {
-                    if(index == 0) {
-                        alldueTasksList.model = [overdueCItem, upcomingCItem, somedayCItem];
-                        alldueTasksList.forceShowTitle = false;
-                        allDueTasksPage.closeMenu();
-                    } else if(index == 1) {
-                        alldueTasksList.model = [overdueCItem];
-                        alldueTasksList.forceShowTitle = true;
-                        allDueTasksPage.closeMenu();
-                    } else if(index == 2) {
-                        alldueTasksList.model = [upcomingCItem];
-                        alldueTasksList.forceShowTitle = true;
-                        allDueTasksPage.closeMenu();
-                    } else if(index == 3) {
-                        alldueTasksList.model = [somedayCItem];
-                        alldueTasksList.forceShowTitle = true;
-                        allDueTasksPage.closeMenu();
-                    }
-                    allDueTasksPage.closeMenu();
-                }//ontriggered
-            }//action menu
 
             // Category Items
             CategoryItem {
@@ -603,7 +596,7 @@ Labs.Window {
                 }
             }
 
-            UX.ModalDialog {
+            ModalDialog {
                 id: deleteTaskDialog
                 acceptButtonText: labelDelete
                 cancelButtonText:labelCancel
@@ -615,7 +608,7 @@ Labs.Window {
                 content: Row {
                     anchors.centerIn: parent
                     spacing: 10
-                    UX.CheckBox {
+                    CheckBox {
                         id:checkBox
                     }
 
@@ -632,7 +625,7 @@ Labs.Window {
                 }
             }
 
-            UX.ContextMenu {
+            ContextMenu {
                 id: taskDetailContextMenu
                 property variant setTask;
                 property variant setListnames;
@@ -672,11 +665,11 @@ Labs.Window {
                 }
             }
 
-            UX.ContextMenu {
+            ContextMenu {
                 id: allDueTasksPageContextMenu
                 property variant payload
                 property variant mousePos
-                content: UX.ActionMenu {
+                content: ActionMenu {
                     model: [labelViewDetail, labelEditTask, labelShowInList, labelDeleteTask]
                     onTriggered: {
                         if (index == 0)
@@ -698,7 +691,7 @@ Labs.Window {
                             customlistModel.listId = allDueTasksPageContextMenu.payload.mListId;
                             customlistModel.listName = allDueTasksPageContextMenu.payload.mListName;
                             allDueTasksPage.close();
-                            addApplicationPage(customlistPageComponent)
+                            window.addPage(customlistPageComponent);
                         }else if (index == 3) {
                             // delete task
                             if(qmlSettings.get("task_auto_delete")){
@@ -718,18 +711,16 @@ Labs.Window {
 
     Component {
         id: customlistPageComponent
-        Labs.ApplicationPage {
+        AppPage {
             id: customlistPage
-            title: labelTasks
-            onSearch: {
-                customlistModel.filter = needle;
-            }
+            objectName: "customlistPage"
+            pageTitle: labelTasks
 
-            onClose: {
-                taskDetailContextMenu.hide();
-            }
+//            onClose: {  //labs
+//                taskDetailContextMenu.hide();
+//            }
 
-            UX.ContextMenu {
+            ContextMenu {
                 id: taskDetailContextMenu
                 property variant setTask;
                 property variant setListnames;
@@ -784,6 +775,15 @@ Labs.Window {
                 return returnMe;
             }
 
+            function makeActionMenuPayload()
+            {
+                var list = makeActionMenuModel();
+                var res = [];
+                for (var i = 0; i < list.length; ++i)
+                    res[i] = i;
+                return res;
+            }
+
             function addTaskFun() {taskListView.mode =1;}
             function selectMultiFun() {taskListView.mode = 2;}
             function renameListFun() {
@@ -812,18 +812,12 @@ Labs.Window {
                 runMe[index]();
             }
 
-            menuContent: UX.ActionMenu {
-                id: actions
-                model: makeActionMenuModel()
+            actionMenuModel: makeActionMenuModel()
+            actionMenuPayload: makeActionMenuPayload()
 
-                onTriggered: {
-                    onContextMenuClicked(index)
-                    customlistPage.closeMenu();
-                }//ontriggered
-            }//action menu
+            onActionMenuTriggered: onContextMenuClicked(selectedItem)
 
-
-            UX.ModalDialog {
+            ModalDialog {
                 id: confirmDelComTasksDialog
                 title: qsTr("Are you sure you want to delete the completed tasks?")
                 acceptButtonText: qsTr("Yes")
@@ -833,15 +827,15 @@ Labs.Window {
                 }
             }
 
-            UX.ModalDialog{
+            ModalDialog{
                 id: renameDialog
                 acceptButtonText: labelOk
                 cancelButtonText:labelCancel
                 title: labelRenameList
-                showAcceptButton: userTextInput.text.length > 0 //this is done because there is no way in the ModalDialog to disable the OK button if the user didn't enter text
+                showAcceptButton: renameTextInput.text.length > 0 //this is done because there is no way in the ModalDialog to disable the OK button if the user didn't enter text
                 property int listId: -1
                 property alias originalText: renameTextInput.text;
-                content: UX.TextEntry {
+                content: TextEntry {
                     id: renameTextInput;
                     anchors.fill: parent;
                     defaultText: qsTr("List name")
@@ -888,7 +882,7 @@ Labs.Window {
                 }
             }
 
-            UX.ModalDialog {
+            ModalDialog {
                 id: deleteTaskDialog
                 acceptButtonText: labelDelete
                 cancelButtonText:labelCancel
@@ -900,7 +894,7 @@ Labs.Window {
                 content: Row {
                     anchors.centerIn: parent
                     spacing: 10
-                    UX.CheckBox {
+                    CheckBox {
                         id:checkBox
                     }
 
@@ -917,7 +911,7 @@ Labs.Window {
                 }
             }
 
-            UX.ModalDialog{
+            ModalDialog{
                 id: deleteListDialog
                 acceptButtonImage:"image://theme/btn_red_up"
                 acceptButtonImagePressed:"image://theme/btn_red_dn"
@@ -931,11 +925,11 @@ Labs.Window {
                 }
             }
 
-            UX.ContextMenu {
+            ContextMenu {
                 id: customListPageContextMenu
                 property variant mousePos
                 property variant payload
-                content: UX.ActionMenu {
+                content: ActionMenu {
                      model: {
                          if(customlistModel.count > 1) {
                              return [labelViewDetail,labelEditTask, labelDeleteTask,labelSelectMultiple];
@@ -966,7 +960,6 @@ Labs.Window {
                      }
                  }
             }
-
         }
     }
 }

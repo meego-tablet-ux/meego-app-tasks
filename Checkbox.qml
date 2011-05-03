@@ -7,6 +7,7 @@
  */
 
 import Qt 4.7
+
 Image {
     id: box
     property bool checked: false

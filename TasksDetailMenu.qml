@@ -1,5 +1,5 @@
 import QtQuick 1.0
-import MeeGo.Components 0.1 as UX
+import MeeGo.Components 0.1
 import MeeGo.App.Tasks 0.1
 
 Column {
@@ -35,7 +35,7 @@ Column {
     Row {
         id: nameRow
         spacing: hSpacing
-        UX.CheckBox {
+        CheckBox {
             id: compCheckbox
             anchors.verticalCenter: nameRow.verticalCenter
             onClicked: {
@@ -43,7 +43,7 @@ Column {
             }
             isChecked: task.mCompleted
         }
-        UX.TextEntry {
+        TextEntry {
             id: taskName
             readOnly: !detailMenu.editing
             defaultText: qsTr("Insert task name")
@@ -123,7 +123,7 @@ Column {
             font.pixelSize: theme_fontPixelSizeLarge
             anchors.verticalCenter: parent.verticalCenter
         }
-        UX.ToggleButton {
+        ToggleButton {
             id: duedateSelector
             onLabel: qsTr("Date")
             offLabel: qsTr("Someday")
@@ -131,11 +131,11 @@ Column {
             on:task.mHasDueDate;
             anchors.verticalCenter: parent.verticalCenter
         }
-        UX.Button {
+        Button {
             id: dateButton
             text: qsTr("Set due date")
             visible: editing && duedateSelector.on
-            UX.DatePicker {
+            DatePicker {
                 id:datePicker
                 selectedDate: task.mDueDate
                 onDateSelected: {
@@ -158,7 +158,7 @@ Column {
             font.pixelSize: theme_fontPixelSizeLarge
             anchors.verticalCenter: parent.verticalCenter
         }
-        UX.TextEntry {
+        TextEntry {
             id: notesData
             readOnly: !detailMenu.editing
             defaultText: detailMenu.editing ?  qsTr("Add a note here")  : ""
@@ -166,7 +166,7 @@ Column {
             font.pixelSize: theme_fontPixelSizeLarge
         }
     }
-    UX.Button {
+    Button {
         id: deleteButton
         text: qsTr("Delete task")
         anchors.horizontalCenter: parent.horizontalCenter
@@ -187,7 +187,7 @@ Column {
         id: editSaveCloseRow
         spacing: hSpacing
         anchors.horizontalCenter: parent.horizontalCenter
-        UX.Button {
+        Button {
             id: editButton
             text: qsTr("Edit")
             bgSourceUp:"image://theme/btn_blue_up"
@@ -198,7 +198,7 @@ Column {
             }
 
         }
-        UX.Button {
+        Button {
             id: saveButton
             active: taskName.text != ""
             text: qsTr("Save")
@@ -211,7 +211,7 @@ Column {
                 detailMenu.editing = false;
             }
         }
-        UX.Button {
+        Button {
             id: closeButton
             text: qsTr("Close")
             onClicked: {

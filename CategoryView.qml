@@ -8,6 +8,7 @@
 
 import Qt 4.7
 import MeeGo.App.Tasks 0.1
+
 Item {
     id: container
     width: 640
