@@ -399,22 +399,7 @@ Window {
                         anchors.verticalCenter:parent.verticalCenter
                         source: "image://theme/icn_forward_dn"
                     }
-//                    MouseArea {
-//                        anchors.fill:parent
-//                        onClicked: {
-//                            customlistModel.listId = listId;
-//                            customlistModel.listName = text.text;
-//                            window.addPage(customlistPageComponent);
-//                        }
-//                        onPressAndHold : {
-//                            if (listId != 0) {
-//                                var map = dinstance.mapToItem(landingScreenPage, mouseX, mouseY);
-//                                landingScreenContextMenu.payload = dinstance;
-//                                landingScreenContextMenu.setPosition(map.x,map.y);
-//                                landingScreenContextMenu.show();
-//                            }
-//                        }
-//                    }
+
                     GestureArea {
                         anchors.fill:parent
                         Tap {
@@ -515,10 +500,7 @@ Window {
                         anchors.verticalCenter:parent.verticalCenter
                         source: "image://theme/icn_forward_dn"
                     }
-//                    MouseArea {
-//                        anchors.fill:parent
-//                        onClicked: window.addPage(allDueTasksPageComponent)
-//                    }
+
                     GestureArea {
                         anchors.fill: parent
                         Tap {

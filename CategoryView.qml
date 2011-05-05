@@ -203,17 +203,6 @@ Item {
                 anchors.top: parent.bottom
                 source: "image://theme/tasks/ln_grey_l"
             }
-//            MouseArea {
-//                anchors.fill: parent
-//                onClicked: {
-//                     allViews.children[index].collapsed = !allViews.children[index].collapsed;
-
-//                     text.text = titleText(index);
-//                     if (!allViews.children[index].collapsed) {
-//                         ensureShowingList(index);
-//                     }
-//                }
-//            }
             GestureArea {
                 anchors.fill: parent
                 Tap {
@@ -330,20 +319,6 @@ Item {
                 visible: (view.categoryIndex == privateData.selectedCategory ) &&
                          (index == privateData.selectedRow)
             }
-
-//            MouseArea {
-//                anchors.fill: parent
-//                onClicked: {
-//                    privateData.selectedCategory = view.categoryIndex;
-//                    privateData.selectedRow = index;
-//                    var map = dinstance.mapToItem(container, mouseX, mouseY);
-//                    container.clickedAtRow(index, map.x, map.y,dinstance);
-//                }
-//                onPressAndHold: {
-//                    var map = dinstance.mapToItem(container, mouseX, mouseY);
-//                    container.pressAndHoldAtRow(index, map.x, map.y, dinstance);
-//                }
-//            }
 
             GestureArea {
                 anchors.fill: parent

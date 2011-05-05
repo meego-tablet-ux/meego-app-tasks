@@ -92,12 +92,7 @@ Column {
                     horizontalAlignment: Text.AlignHCenter
                     font.pixelSize: theme_fontPixelSizeLarge
                 }
-//                MouseArea {
-//                    anchors.fill: parent
-//                    onClicked: {
-//                        detailMenu.task.mListId = listId
-//                    }
-//                }
+
                 GestureArea {
                     anchors.fill: parent
                     Tap {

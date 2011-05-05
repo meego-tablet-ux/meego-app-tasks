@@ -17,14 +17,7 @@ Image {
     signal clicked(bool checked)
 
     smooth: true
-//    MouseArea {
-//        anchors.fill: parent
-//        onClicked: {
-//            if(box.enabled) {
-//                box.clicked(box.checked);
-//            }
-//        }
-//    }
+
     GestureArea {
         anchors.fill: parent
         Tap {

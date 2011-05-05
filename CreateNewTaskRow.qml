@@ -100,15 +100,7 @@ Item {
             x: 10
             source: "image://theme/tasks/icn_calendardropdown"
         }
-//        MouseArea {
-//            anchors.fill: parent
-//            onClicked: {
-//                var map = icon.mapToItem(null,mouseX, mouseY);
-//                //landingScreenContextMenu.payload = dinstance;
-//                timeMenu.setPosition(map.x,map.y);
-//                timeMenu.show();
-//            }
-//        }
+
         GestureArea {
             anchors.fill: parent
             Tap {

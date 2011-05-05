@@ -24,13 +24,6 @@ Item {
         opacity: 0.5
     }
 
-//    MouseArea {
-//        anchors.fill: parent
-//        onClicked: {
-//            container.visible = false;
-//        }
-//    }
-
     GestureArea {
         anchors.fill: parent
         Tap {
@@ -70,13 +63,7 @@ Item {
                 elide: Text.ElideMiddle
                 horizontalAlignment: Text.AlignHCenter
             }
-//            MouseArea {
-//                anchors.fill: parent
-//                onClicked: {
-//                    container.selected(listId);
-//                    container.visible = false;
-//                }
-//            }
+
             GestureArea {
                 anchors.fill: parent
                 Tap {
@@ -103,13 +90,7 @@ Item {
                 anchors.centerIn: parent
                 elide: Text.ElideMiddle
             }
-//            MouseArea {
-//                anchors.fill: parent
-//                onClicked: {
-//                    createDialog.show();
 
-//                }
-//            }
             GestureArea {
                 anchors.fill: parent
                 Tap {
