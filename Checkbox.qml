@@ -7,6 +7,7 @@
  */
 
 import Qt 4.7
+import Qt.labs.gestures 2.0
 
 Image {
     id: box
@@ -16,11 +17,21 @@ Image {
     signal clicked(bool checked)
 
     smooth: true
-    MouseArea {
+//    MouseArea {
+//        anchors.fill: parent
+//        onClicked: {
+//            if(box.enabled) {
+//                box.clicked(box.checked);
+//            }
+//        }
+//    }
+    GestureArea {
         anchors.fill: parent
-        onClicked: {
-            if(box.enabled) {
-                box.clicked(box.checked);
+        Tap {
+            onFinished: {
+                if(box.enabled) {
+                    box.clicked(box.checked);
+                }
             }
         }
     }

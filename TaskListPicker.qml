@@ -9,6 +9,7 @@
 import Qt 4.7
 import MeeGo.App.Tasks 0.1
 import MeeGo.Components 0.1
+import Qt.labs.gestures 2.0
 
 Item {
     id: container
@@ -23,10 +24,19 @@ Item {
         opacity: 0.5
     }
 
-    MouseArea {
+//    MouseArea {
+//        anchors.fill: parent
+//        onClicked: {
+//            container.visible = false;
+//        }
+//    }
+
+    GestureArea {
         anchors.fill: parent
-        onClicked: {
-            container.visible = false;
+        Tap {
+            onFinished: {
+                container.visible = false;
+            }
         }
     }
 
@@ -60,14 +70,22 @@ Item {
                 elide: Text.ElideMiddle
                 horizontalAlignment: Text.AlignHCenter
             }
-            MouseArea {
+//            MouseArea {
+//                anchors.fill: parent
+//                onClicked: {
+//                    container.selected(listId);
+//                    container.visible = false;
+//                }
+//            }
+            GestureArea {
                 anchors.fill: parent
-                onClicked: {
-                    container.selected(listId);
-                    container.visible = false;
+                Tap {
+                    onFinished: {
+                        container.selected(listId);
+                        container.visible = false;
+                    }
                 }
             }
-
         }
 
         footer:  Item {
@@ -85,14 +103,21 @@ Item {
                 anchors.centerIn: parent
                 elide: Text.ElideMiddle
             }
-            MouseArea {
-                anchors.fill: parent
-                onClicked: {
-                    createDialog.show();
+//            MouseArea {
+//                anchors.fill: parent
+//                onClicked: {
+//                    createDialog.show();
 
+//                }
+//            }
+            GestureArea {
+                anchors.fill: parent
+                Tap {
+                    onFinished: {
+                        createDialog.show();
+                    }
                 }
             }
-
         }
     }
 

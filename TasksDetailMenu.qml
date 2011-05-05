@@ -1,6 +1,7 @@
 import QtQuick 1.0
 import MeeGo.Components 0.1
 import MeeGo.App.Tasks 0.1
+import Qt.labs.gestures 2.0
 
 Column {
     id: detailMenu
@@ -91,10 +92,18 @@ Column {
                     horizontalAlignment: Text.AlignHCenter
                     font.pixelSize: theme_fontPixelSizeLarge
                 }
-                MouseArea {
+//                MouseArea {
+//                    anchors.fill: parent
+//                    onClicked: {
+//                        detailMenu.task.mListId = listId
+//                    }
+//                }
+                GestureArea {
                     anchors.fill: parent
-                    onClicked: {
-                        detailMenu.task.mListId = listId
+                    Tap {
+                        onFinished: {
+                            detailMenu.task.mListId = listId
+                        }
                     }
                 }
             }

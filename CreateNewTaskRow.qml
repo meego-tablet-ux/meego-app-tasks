@@ -8,6 +8,7 @@
 
 import Qt 4.7
 import MeeGo.Components 0.1
+import Qt.labs.gestures 2.0
 
 Item {
     id: row
@@ -99,13 +100,22 @@ Item {
             x: 10
             source: "image://theme/tasks/icn_calendardropdown"
         }
-        MouseArea {
+//        MouseArea {
+//            anchors.fill: parent
+//            onClicked: {
+//                var map = icon.mapToItem(null,mouseX, mouseY);
+//                //landingScreenContextMenu.payload = dinstance;
+//                timeMenu.setPosition(map.x,map.y);
+//                timeMenu.show();
+//            }
+//        }
+        GestureArea {
             anchors.fill: parent
-            onClicked: {
-                var map = icon.mapToItem(null,mouseX, mouseY);
-                //landingScreenContextMenu.payload = dinstance;
-                timeMenu.setPosition(map.x,map.y);
-                timeMenu.show();
+            Tap {
+                onFinished: {
+                    timeMenu.setPosition(gesture.position.x, gesture.position.y);
+                    timeMenu.show();
+                }
             }
         }
     }

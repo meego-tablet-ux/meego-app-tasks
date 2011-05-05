@@ -8,6 +8,7 @@
 
 import Qt 4.7
 import MeeGo.App.Tasks 0.1
+import Qt.labs.gestures 2.0
 
 Item {
     id: container
@@ -202,15 +203,28 @@ Item {
                 anchors.top: parent.bottom
                 source: "image://theme/tasks/ln_grey_l"
             }
-            MouseArea {
-                anchors.fill: parent
-                onClicked: {
-                     allViews.children[index].collapsed = !allViews.children[index].collapsed;
+//            MouseArea {
+//                anchors.fill: parent
+//                onClicked: {
+//                     allViews.children[index].collapsed = !allViews.children[index].collapsed;
 
-                     text.text = titleText(index);
-                     if (!allViews.children[index].collapsed) {
-                         ensureShowingList(index);
-                     }
+//                     text.text = titleText(index);
+//                     if (!allViews.children[index].collapsed) {
+//                         ensureShowingList(index);
+//                     }
+//                }
+//            }
+            GestureArea {
+                anchors.fill: parent
+                Tap {
+                    onFinished: {
+                         allViews.children[index].collapsed = !allViews.children[index].collapsed;
+
+                         text.text = titleText(index);
+                         if (!allViews.children[index].collapsed) {
+                             ensureShowingList(index);
+                         }
+                    }
                 }
             }
         }
@@ -317,17 +331,33 @@ Item {
                          (index == privateData.selectedRow)
             }
 
-            MouseArea {
+//            MouseArea {
+//                anchors.fill: parent
+//                onClicked: {
+//                    privateData.selectedCategory = view.categoryIndex;
+//                    privateData.selectedRow = index;
+//                    var map = dinstance.mapToItem(container, mouseX, mouseY);
+//                    container.clickedAtRow(index, map.x, map.y,dinstance);
+//                }
+//                onPressAndHold: {
+//                    var map = dinstance.mapToItem(container, mouseX, mouseY);
+//                    container.pressAndHoldAtRow(index, map.x, map.y, dinstance);
+//                }
+//            }
+
+            GestureArea {
                 anchors.fill: parent
-                onClicked: {
-                    privateData.selectedCategory = view.categoryIndex;
-                    privateData.selectedRow = index;
-                    var map = dinstance.mapToItem(container, mouseX, mouseY);
-                    container.clickedAtRow(index, map.x, map.y,dinstance);
+                Tap {
+                    onFinished: {
+                        privateData.selectedCategory = view.categoryIndex;
+                        privateData.selectedRow = index;
+                        container.clickedAtRow(index, gesture.position.x, gesture.position.y,dinstance);
+                    }
                 }
-                onPressAndHold: {
-                    var map = dinstance.mapToItem(container, mouseX, mouseY);
-                    container.pressAndHoldAtRow(index, map.x, map.y, dinstance);
+                TapAndHold {
+                    onFinished: {
+                        container.pressAndHoldAtRow(index, gesture.position.x, gesture.position.y, dinstance);
+                    }
                 }
             }
 

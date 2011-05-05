@@ -9,6 +9,7 @@
 import Qt 4.7
 import MeeGo.Components 0.1
 import MeeGo.App.Tasks 0.1
+import Qt.labs.gestures 2.0
 
 Item {
     id: container
@@ -120,18 +121,36 @@ Item {
             anchors.top: parent.bottom
             source: "image://theme/tasks/ln_grey_l"
         }
-        MouseArea {
+//        MouseArea {
+//            anchors.fill: parent
+//            onClicked: {
+//                 view.collapsed = !view.collapsed;
+//                 text.text = getTitleText();
+//                 if (!view.collapsed) {
+//                   //  ensureShowingList(index);
+//                 }
+//            }
+//            onPressAndHold: {
+//                // test code, to be delted
+//                mode = 2;
+//            }
+//        }
+        GestureArea {
             anchors.fill: parent
-            onClicked: {
-                 view.collapsed = !view.collapsed;
-                 text.text = getTitleText();
-                 if (!view.collapsed) {
-                   //  ensureShowingList(index);
-                 }
+            Tap {
+                onFinished: {
+                     view.collapsed = !view.collapsed;
+                     text.text = getTitleText();
+                     if (!view.collapsed) {
+                       //  ensureShowingList(index);
+                     }
+                }
             }
-            onPressAndHold: {
-                // test code, to be delted
-                mode = 2;
+            TapAndHold {
+                onFinished: {
+                    // test code, to be delted
+                    mode = 2;
+                }
             }
         }
     }
@@ -257,27 +276,56 @@ Item {
                 visible: (index == privateData.selectedRow)
             }
 
-            MouseArea {
-                anchors.fill: parent
-                onClicked: {
-                    privateData.selectedRow = index;
-                    if (mode ==0 ) {
-                    var map = dinstance.mapToItem(container, mouseX, mouseY);
-                    container.clickedAtRow(index, map.x, map.y,dinstance);
-                    }else if (mode == 1)
-                    {
-                        // adding mode, do nothing?
-                    }else if (mode == 2){
-                        toggleSelected(mTaskId)
+//            MouseArea {
+//                anchors.fill: parent
+//                onClicked: {
+//                    privateData.selectedRow = index;
+//                    if (mode ==0 ) {
+//                    var map = dinstance.mapToItem(container, mouseX, mouseY);
+//                    container.clickedAtRow(index, map.x, map.y,dinstance);
+//                    }else if (mode == 1)
+//                    {
+//                        // adding mode, do nothing?
+//                    }else if (mode == 2){
+//                        toggleSelected(mTaskId)
+//                    }
+//                }
+//                onPressAndHold: {
+//                    if (mode == 0) {
+//                        var map = dinstance.mapToItem(container, mouseX, mouseY);
+//                        container.pressAndHoldAtRow(index, map.x, map.y, dinstance);
+//                    }
+//                }
+//            }
+            GestureArea {
+//                anchors.fill: parent
+                anchors.top: parent.top
+                anchors.bottom: parent.bottom
+                anchors.left: parent.left
+                anchors.right: reorderBt.left
+                Tap {
+                    onFinished: {
+                        privateData.selectedRow = index;
+                        if (mode == 0) {
+//                            var map = dinstance.mapToItem(container, mouseX, mouseY);
+                            container.clickedAtRow(index, gesture.position.x, gesture.position.y,dinstance);
+                        } else if (mode == 1) {
+                            // adding mode, do nothing?
+                        }else if (mode == 2){
+                            toggleSelected(mTaskId);
+                        }
                     }
                 }
-                onPressAndHold: {
-                    if (mode == 0) {
-                        var map = dinstance.mapToItem(container, mouseX, mouseY);
-                        container.pressAndHoldAtRow(index, map.x, map.y, dinstance);
+                TapAndHold {
+                    onFinished: {
+                        if (mode == 0) {
+//                            var map = dinstance.mapToItem(container, mouseX, mouseY);
+                            container.pressAndHoldAtRow(index, gesture.position.x, gesture.position.y, dinstance);
+                        }
                     }
                 }
             }
+
             Checkbox {
                 id: selectBox
                 x: (rowHeight - width)/2
@@ -328,76 +376,157 @@ Item {
                 visible: listReorderable
                 y: (rowHeight - height)/2
 
-                MouseArea {
+//                MouseArea {
+//                    property int start: 0
+//                    property bool isPositionChanged: false
+
+//                    anchors.fill: parent
+//                    onPressed : {
+//                        area.interactive = false;
+//                        dinstance.grabbed = true;
+
+//                        if (mode == 2 && selectedIds.indexOf(mTaskId) != -1 && selectedIds.length > 1) {//only for multiple drag&drop
+//                            isMultipleDragActive = true;
+//                            start = selectedIds.indexOf(mTaskId);
+//                            var tempArray = new Array();
+//                            tempArray = tempArray.concat(selectedIds.slice(0, start));
+
+//                            if (start != selectedIds.length-1) {
+//                                tempArray = tempArray.concat(selectedIds.slice(start+1, selectedIds.length));
+//                            }
+
+////                            selectedIds = tempArray;
+//                            view.model.hideTasks(tempArray);
+//                        }
+//                    }
+//                    onMousePositionChanged: {
+//                        var mapToArea = reorderBt.mapToItem(area, mouseX, mouseY);
+
+//                        //scroll up
+//                        if (area.height - mapToArea.y <= 1 && area.contentY+area.height<=area.contentHeight)
+//                            area.contentY+=5;
+
+//                        //scroll down
+//                        if ((mapToArea.y+area.contentY <= area.contentY+container.titleHeight) && area.contentY >= 0)
+//                            area.contentY-=5;
+
+//                        var map = reorderBt.mapToItem(view, mouseX, mouseY);
+//                        var target = view.indexAt(map.x, map.y + view.contentY);
+//                        if ( target != -1 && target != index) {
+//                            if (mode == 2) {//only for multiple drag&drop
+//                                isPositionChanged = true;
+//                                var diff = target - index;
+//                                if (diff > 1) {
+//                                    for (var i=index+1; i<target; ++i) {
+//                                        start = i;
+//                                        view.model.reorderTask(mTaskId, i);
+//                                    }
+//                                }
+
+//                                start = target;
+//                            }
+
+//                            view.model.reorderTask(mTaskId, target);
+//                            privateData.selectedRow = -1;
+//                        }
+//                    }
+//                    onReleased: {
+//                        if (mode == 2 && isMultipleDragActive) {//only for multiple drag&drop
+//                            if (!isPositionChanged)
+//                                view.model.showHiddenTasksOldPositions(view.model.listId);
+//                            else
+//                                view.model.showHiddenTasks(view.model.listId, start+1);
+//                            isMultipleDragActive = false;
+//                            isPositionChanged = false;
+//                        }
+//                        view.model.saveReorder(mListId);
+//                        area.interactive = true;
+//                        dinstance.grabbed = false;
+//                    }
+//                }
+
+                GestureArea {
+                    id: gestureArea
                     property int start: 0
                     property bool isPositionChanged: false
 
                     anchors.fill: parent
-                    onPressed : {
-                        area.interactive = false;
-                        dinstance.grabbed = true;
 
-                        if (mode == 2 && selectedIds.indexOf(mTaskId) != -1 && selectedIds.length > 1) {//only for multiple drag&drop
-                            isMultipleDragActive = true;
-                            start = selectedIds.indexOf(mTaskId);
-                            var tempArray = new Array();
-                            tempArray = tempArray.concat(selectedIds.slice(0, start));
+                    property variant startPoint: null
 
-                            if (start != selectedIds.length-1) {
-                                tempArray = tempArray.concat(selectedIds.slice(start+1, selectedIds.length));
-                            }
+                    TapAndHold {
+                        onFinished: {
+                            var mapped = reorderBt.parent.mapFromItem(null, gesture.position.x, gesture.position.y);
+                            mapped.y += reorderBt.parent.y;
+                            gestureArea.startPoint = mapped;
 
-//                            selectedIds = tempArray;
-                            view.model.hideTasks(tempArray);
-                        }
-                    }
-                    onMousePositionChanged: { 
-                        var mapToArea = reorderBt.mapToItem(area, mouseX, mouseY);
+                            area.interactive = false;
+                            dinstance.grabbed = true;
 
-                        //scroll up
-                        if (area.height - mapToArea.y <= 1 && area.contentY+area.height<=area.contentHeight)
-                            area.contentY+=5;
+                            if (mode == 2 && selectedIds.indexOf(mTaskId) != -1 && selectedIds.length > 1) {//only for multiple drag&drop
+                                isMultipleDragActive = true;
+                                start = selectedIds.indexOf(mTaskId);
+                                var tempArray = new Array();
+                                tempArray = tempArray.concat(selectedIds.slice(0, start));
 
-                        //scroll down
-                        if ((mapToArea.y+area.contentY <= area.contentY+container.titleHeight) && area.contentY >= 0)
-                            area.contentY-=5;
-
-                        var map = reorderBt.mapToItem(view, mouseX, mouseY);
-                        var target = view.indexAt(map.x, map.y + view.contentY);
-                        if ( target != -1 && target != index) {
-                            if (mode == 2) {//only for multiple drag&drop
-                                isPositionChanged = true;
-                                var diff = target - index;
-                                if (diff > 1) {
-                                    for (var i=index+1; i<target; ++i) {
-                                        start = i;
-                                        view.model.reorderTask(mTaskId, i);
-                                    }
+                                if (start != selectedIds.length-1) {
+                                    tempArray = tempArray.concat(selectedIds.slice(start+1, selectedIds.length));
                                 }
 
-                                start = target;
+    //                            selectedIds = tempArray;
+                                view.model.hideTasks(tempArray);
                             }
-
-                            view.model.reorderTask(mTaskId, target);
-                            privateData.selectedRow = -1;
                         }
                     }
-                    onReleased: {
-                        if (mode == 2 && isMultipleDragActive) {//only for multiple drag&drop
-                            if (!isPositionChanged)
-                                view.model.showHiddenTasksOldPositions(view.model.listId);
-                            else
-                                view.model.showHiddenTasks(view.model.listId, start+1);
-                            isMultipleDragActive = false;
-                            isPositionChanged = false;
+
+                    Pan {
+                        onUpdated: {
+                            var currentPoint = gestureArea.startPoint;
+                            currentPoint.y += gesture.offset.y;
+
+//                            //scroll up
+//                            if (area.height - currentPoint.y <= 1 && area.contentY+area.height<=area.contentHeight)
+//                                area.contentY+=5;
+
+//                            //scroll down
+//                            if ((currentPoint.y+area.contentY <= area.contentY+container.titleHeight) && area.contentY >= 0)
+//                                area.contentY-=5;
+
+                            var target = view.indexAt(currentPoint.x, currentPoint.y/* + view.contentY*/);
+                            if ( target != -1 && target != index) {
+                                if (mode == 2) {//only for multiple drag&drop
+                                    isPositionChanged = true;
+                                    var diff = target - index;
+                                    if (diff > 1) {
+                                        for (var i=index+1; i<target; ++i) {
+                                            start = i;
+                                            view.model.reorderTask(mTaskId, i);
+                                        }
+                                    }
+
+                                    start = target;
+                                }
+
+                                view.model.reorderTask(mTaskId, target);
+                                privateData.selectedRow = -1;
+                            }
                         }
-                        view.model.saveReorder(mListId);
-                        area.interactive = true;
-                        dinstance.grabbed = false;
+                        onFinished: {
+                            if (mode == 2 && isMultipleDragActive) {//only for multiple drag&drop
+                                if (!isPositionChanged)
+                                    view.model.showHiddenTasksOldPositions(view.model.listId);
+                                else
+                                    view.model.showHiddenTasks(view.model.listId, start+1);
+                                isMultipleDragActive = false;
+                                isPositionChanged = false;
+                            }
+                            view.model.saveReorder(mListId);
+                            area.interactive = true;
+                            dinstance.grabbed = false;
+                        }
                     }
                 }
             }
-
         }
     }
 

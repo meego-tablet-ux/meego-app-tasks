@@ -9,7 +9,8 @@
 import Qt 4.7
 import MeeGo.App.Tasks 0.1
 import MeeGo.Components 0.1
-import MeeGo.Labs.Components 0.1 as Labs    //export them_* constants
+import Qt.labs.gestures 2.0
+import MeeGo.Labs.Components 0.1 as Labs    //export theme_* constants
 
 Window {
     id: window
@@ -398,23 +399,41 @@ Window {
                         anchors.verticalCenter:parent.verticalCenter
                         source: "image://theme/icn_forward_dn"
                     }
-                    MouseArea {
+//                    MouseArea {
+//                        anchors.fill:parent
+//                        onClicked: {
+//                            customlistModel.listId = listId;
+//                            customlistModel.listName = text.text;
+//                            window.addPage(customlistPageComponent);
+//                        }
+//                        onPressAndHold : {
+//                            if (listId != 0) {
+//                                var map = dinstance.mapToItem(landingScreenPage, mouseX, mouseY);
+//                                landingScreenContextMenu.payload = dinstance;
+//                                landingScreenContextMenu.setPosition(map.x,map.y);
+//                                landingScreenContextMenu.show();
+//                            }
+//                        }
+//                    }
+                    GestureArea {
                         anchors.fill:parent
-                        onClicked: {
-                            customlistModel.listId = listId;
-                            customlistModel.listName = text.text;
-                            window.addPage(customlistPageComponent);
+                        Tap {
+                            onFinished: {
+                                customlistModel.listId = listId;
+                                customlistModel.listName = text.text;
+                                window.addPage(customlistPageComponent);
+                            }
                         }
-                        onPressAndHold : {
-                            if (listId != 0) {
-                                var map = dinstance.mapToItem(landingScreenPage, mouseX, mouseY);
-                                landingScreenContextMenu.payload = dinstance;
-                                landingScreenContextMenu.setPosition(map.x,map.y);
-                                landingScreenContextMenu.show();
+                        TapAndHold {
+                            onFinished : {
+                                if (listId != 0) {
+                                    landingScreenContextMenu.payload = dinstance;
+                                    landingScreenContextMenu.setPosition(gesture.position.x, gesture.position.y);
+                                    landingScreenContextMenu.show();
+                                }
                             }
                         }
                     }
-
                 }
 
                 header: Item{
@@ -496,9 +515,15 @@ Window {
                         anchors.verticalCenter:parent.verticalCenter
                         source: "image://theme/icn_forward_dn"
                     }
-                    MouseArea {
-                        anchors.fill:parent
-                        onClicked: window.addPage(allDueTasksPageComponent)
+//                    MouseArea {
+//                        anchors.fill:parent
+//                        onClicked: window.addPage(allDueTasksPageComponent)
+//                    }
+                    GestureArea {
+                        anchors.fill: parent
+                        Tap {
+                            onFinished: window.addPage(allDueTasksPageComponent)
+                        }
                     }
                 }
 
