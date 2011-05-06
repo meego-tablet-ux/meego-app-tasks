@@ -53,6 +53,10 @@ Window {
         application: "Tasks"
     }
 
+    Labs.LocaleHelper {
+        id: localeHelper
+    }
+
     toolBarTitle: labelTasks
 
     Component.onCompleted: switchBook(landingScreenPageComponent)
@@ -67,7 +71,8 @@ Window {
                 now.getYear() == date.getYear() )
             return labelToday
 
-        return qsTr("%1 %2").arg(Qt.formatDate(date,"d") + "").arg(Qt.formatDate(date,"MMM") + "");
+        return localeHelper.localDate(date, LocalHelper.DateFullShort);
+//        return qsTr("%1 %2").arg(Qt.formatDate(date,"d") + "").arg(Qt.formatDate(date,"MMM") + "");
     }
 
     function getFormattedDateYear(date) {
@@ -80,7 +85,8 @@ Window {
                 now.getYear() == date.getYear() )
             return labelToday
 
-        return qsTr("%1 %2 %3").arg(Qt.formatDate(date,"d") + "").arg(Qt.formatDate(date,"MMM") + "").arg(Qt.formatDate(date,"yyyy") + "");
+        return localeHelper.localDate(date, LocalHelper.DateFullShort);
+//        return qsTr("%1 %2 %3").arg(Qt.formatDate(date,"d") + "").arg(Qt.formatDate(date,"MMM") + "").arg(Qt.formatDate(date,"yyyy") + "");
     }
     function isOverdue(date) {
         if (!date.getDate)
