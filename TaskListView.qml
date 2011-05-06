@@ -583,7 +583,7 @@ Item {
            // container.model.viewModel.moveTasksToList(selectedIds, 0);
            // container.selectedIds = [];
             picker.show();
-           container.mode = 0;
+            container.mode = 0;
         }
         onClickedDelete: {
             delConfirmDialog.show();

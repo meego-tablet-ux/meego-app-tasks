@@ -609,8 +609,8 @@ Window {
                             onClicked: {
 				//Hitting a task list multiple times will cause
 				// the task to be added to the page stack multiple times 
-				if (window.pageStack.busy)
-                                       return;
+                                if (window.pageStack.busy)
+                                    return;
 
                                 customlistModel.listId = listId;
                                 customlistModel.listName = text.text;
@@ -723,6 +723,9 @@ Window {
 
                                 onFinished: {
                                     mPressed = false;
+                                    // Prevent adding extra pages
+                                    if (window.pageStack.busy)
+                                        return;
                                     window.addPage(allDueTasksPageComponent);
                                 }
 
