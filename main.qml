@@ -9,13 +9,15 @@
 import Qt 4.7
 import MeeGo.App.Tasks 0.1
 import MeeGo.Components 0.1
-import Qt.labs.gestures 2.0
+//import Qt.labs.gestures 2.0
 import MeeGo.Labs.Components 0.1 as Labs    //export theme_* constants
 
 Window {
     id: window
     property string labelTasks: qsTr("Tasks")
     property string labelAllDueTasks: qsTr("All due tasks")
+    property string labelAllDureTasksASCOrder: qsTr("Order: asc")
+    property string labelAllDureTasksDESCOrder: qsTr("Order: desc")
     property string labelOverdue: qsTr("Overdue")
     property string labelUpComing: qsTr("Upcoming")
     property string labelSomeday: qsTr("Someday")
@@ -185,11 +187,15 @@ Window {
         id: overdueModel
         modelType: TasksListModel.Timeview
         timeGroups: TasksListModel.Overdue
+
+        Component.onCompleted: overdueModel.sort(overdueModel.sortOrder)
     }
     TasksListModel {
         id: upcomingModel
         modelType: TasksListModel.Timeview
         timeGroups: TasksListModel.Upcoming
+
+        Component.onCompleted: upcomingModel.sort(upcomingModel.sortOrder)
     }
     TasksListModel {
         id: somedayModel
@@ -406,22 +412,39 @@ Window {
                         source: "image://theme/icn_forward_dn"
                     }
 
-                    GestureArea {
-                        anchors.fill:parent
-                        Tap {
-                            onFinished: {
-                                customlistModel.listId = listId;
-                                customlistModel.listName = text.text;
-                                window.addPage(customlistPageComponent);
-                            }
+//                    GestureArea {
+//                        anchors.fill:parent
+//                        Tap {
+//                            onFinished: {
+//                                customlistModel.listId = listId;
+//                                customlistModel.listName = text.text;
+//                                window.addPage(customlistPageComponent);
+//                            }
+//                        }
+//                        TapAndHold {
+//                            onFinished : {
+//                                if (listId != 0) {
+//                                    landingScreenContextMenu.payload = dinstance;
+//                                    landingScreenContextMenu.setPosition(gesture.position.x, gesture.position.y);
+//                                    landingScreenContextMenu.show();
+//                                }
+//                            }
+//                        }
+//                    }
+
+                    MouseArea {
+                        anchors.fill: parent
+                        onClicked: {
+                            customlistModel.listId = listId;
+                            customlistModel.listName = text.text;
+                            window.addPage(customlistPageComponent);
                         }
-                        TapAndHold {
-                            onFinished : {
-                                if (listId != 0) {
-                                    landingScreenContextMenu.payload = dinstance;
-                                    landingScreenContextMenu.setPosition(gesture.position.x, gesture.position.y);
-                                    landingScreenContextMenu.show();
-                                }
+                        onPressAndHold: {
+                            if (listId != 0) {
+                                var map = dinstance.mapToItem(landingScreenPage, mouseX, mouseY);
+                                landingScreenContextMenu.payload = dinstance;
+                                landingScreenContextMenu.setPosition(map.x, map.y);
+                                landingScreenContextMenu.show();
                             }
                         }
                     }
@@ -507,11 +530,16 @@ Window {
                         source: "image://theme/icn_forward_dn"
                     }
 
-                    GestureArea {
+//                    GestureArea {
+//                        anchors.fill: parent
+//                        Tap {
+//                            onFinished: window.addPage(allDueTasksPageComponent)
+//                        }
+//                    }
+
+                    MouseArea {
                         anchors.fill: parent
-                        Tap {
-                            onFinished: window.addPage(allDueTasksPageComponent)
-                        }
+                        onClicked: window.addPage(allDueTasksPageComponent)
                     }
                 }
 
@@ -544,8 +572,12 @@ Window {
 //                taskDetailContextMenu.hide();
 //            }
 
-            actionMenuModel: [ labelAllDueTasks, labelOverdue, labelUpComing, labelSomeday ]
-            actionMenuPayload: [ 0, 1, 2, 3 ]
+            actionMenuModel: [ labelAllDueTasks,
+                                labelOverdue,
+                                labelUpComing,
+                                labelSomeday,
+                                overdueModel.sortOrder == TasksListModel.ASC ? labelAllDureTasksASCOrder : labelAllDureTasksDESCOrder ]
+            actionMenuPayload: [ 0, 1, 2, 3, 4 ]
 
             onActionMenuTriggered: {
                 if(selectedItem == 0) {
@@ -560,8 +592,57 @@ Window {
                 } else if(selectedItem == 3) {
                     alldueTasksList.model = [somedayCItem];
                     alldueTasksList.forceShowTitle = true;
+                } else if (selectedItem == 4) {
+                    var order = overdueModel.sortOrder == TasksListModel.ASC ? TasksListModel.DESC : TasksListModel.ASC;
+                    overdueModel.sort(order);
+                    upcomingModel.sort(order);
                 }
             }
+
+//            enableCustomActionMenu: true
+
+//            onActionMenuIconClicked: {
+//                if (window.pageStack.currentPage != allDueTasksPage)
+//                    return;
+//                var mappedPoint = allDueTasksPageMenu.mapToItem(allDueTasksPage, mouseX, mouseY);
+//                allDueTasksPageMenu.setPosition(mappedPoint.x, mappedPoint.y);
+//                allDueTasksPageMenu.show();
+//            }
+
+//            ContextMenu {
+//                id: allDueTasksPageMenu
+//                content: Column {
+//                    ActionMenu {
+//                        model: [ labelAllDueTasks,
+//                            labelOverdue,
+//                            labelUpComing,
+//                            labelSomeday,
+//                            overdueModel.sortOrder == TasksListModel.ASC ? labelAllDureTasksASCOrder : labelAllDureTasksDESCOrder ]
+//                        payload: [ 0, 1, 2, 3, 4 ]
+
+//                        onTriggered: {
+//                            if(payload[index] == 0) {
+//                                alldueTasksList.model = [overdueCItem, upcomingCItem, somedayCItem];
+//                                alldueTasksList.forceShowTitle = false;
+//                            } else if(payload[index] == 1) {
+//                                alldueTasksList.model = [overdueCItem];
+//                                alldueTasksList.forceShowTitle = true;
+//                            } else if(payload[index] == 2) {
+//                                alldueTasksList.model = [upcomingCItem];
+//                                alldueTasksList.forceShowTitle = true;
+//                            } else if(payload[index] == 3) {
+//                                alldueTasksList.model = [somedayCItem];
+//                                alldueTasksList.forceShowTitle = true;
+//                            } else if (payload[index] == 4) {
+//                                var order = overdueModel.sortOrder == TasksListModel.ASC ? TasksListModel.DESC : TasksListModel.ASC;
+//                                overdueModel.sort(order);
+//                                upcomingModel.sort(order);
+//                            }
+//                            allDueTasksPageMenu.hide();
+//                        }
+//                    }
+//                }
+//            }
 
             // Category Items
             CategoryItem {

@@ -16,6 +16,7 @@ TasksListModel::TasksListModel()
     , m_modelType(AllLists)
     , m_timeGroups(Someday)
     , m_listId(-1)
+    , m_sortOrder(DESC)
 {
     QHash<int, QByteArray> roles;
     roles.insert(TaskID, "taskId");
@@ -471,4 +472,60 @@ QVariant TasksListModel::taskRole(TasksTaskItem *task, int role) const
     else if (role == ListID)
         return QVariant(task->list()->id());
     return QVariant();
+}
+
+static bool lessThen(const QPair<TasksTaskItem *, int> &a, const QPair<TasksTaskItem *, int> &b)
+{
+    return a.first < b.first;
+}
+
+static bool greaterThen(const QPair<TasksTaskItem *, int> &a, const QPair<TasksTaskItem *, int> &b)
+{
+    return a.first > b.first;
+}
+
+void TasksListModel::sort(int column, Qt::SortOrder order)
+{
+    Q_UNUSED(column);
+
+    QList<TasksTaskItem *> *tasks = 0;
+    if (m_modelType == Timeview) {
+        if (m_timeGroups == Someday)
+            tasks = &Database->m_somedayTasks;
+        else if (m_timeGroups == Overdue)
+            tasks = &Database->m_overdueTasks;
+        else if (m_timeGroups == Upcoming)
+           tasks = &Database->m_upcomingTasks;
+    }
+    Q_ASSERT(tasks);
+    if (!tasks)
+        return;
+
+    emit layoutAboutToBeChanged();
+
+    QList<QPair<TasksTaskItem *, int> > list;
+    for (int i = 0; i < tasks->count(); ++i)
+        list << qMakePair(tasks->at(i), i);
+
+    if (order == Qt::AscendingOrder) {
+        qSort(list.begin(), list.end(), lessThen);
+    } else {
+        qSort(list.begin(), list.end(), greaterThen);
+    }
+
+    tasks->clear();
+    QVector<int> forwarding(list.count());
+    for (int i = 0; i < list.count(); ++i) {
+        tasks->append(list[i].first);
+        forwarding[list[i].second] = i;
+    }
+
+    QModelIndexList oldIndexes = persistentIndexList();
+    QModelIndexList newIndexes;
+    for (int i = 0; i < oldIndexes.count(); ++i)
+        newIndexes << index(forwarding[oldIndexes[i].row()], 0);
+    changePersistentIndexList(oldIndexes, newIndexes);
+
+    emit layoutChanged();
+    emit modelSorted();
 }
