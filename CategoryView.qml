@@ -353,11 +353,11 @@ Item {
                 onClicked:  {
                     privateData.selectedCategory = view.categoryIndex;
                     privateData.selectedRow = index;
-                    var map = dinstance.mapToItem(container, mouseX, mouseY);
+                    var map = mapToItem(null, mouseX, mouseY);
                     container.clickedAtRow(index, map.x, map.y,dinstance);
                 }
                 onPressAndHold: {
-                    var map = dinstance.mapToItem(container, mouseX, mouseY);
+                    var map = mapToItem(null, mouseX, mouseY);
                     container.pressAndHoldAtRow(index, map.x, map.y,dinstance);
                 }
             }

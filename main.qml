@@ -441,7 +441,7 @@ Window {
                         }
                         onPressAndHold: {
                             if (listId != 0) {
-                                var map = dinstance.mapToItem(landingScreenPage, mouseX, mouseY);
+                                var map = mapToItem(null, mouseX, mouseY);
                                 landingScreenContextMenu.payload = dinstance;
                                 landingScreenContextMenu.setPosition(map.x, map.y);
                                 landingScreenContextMenu.show();

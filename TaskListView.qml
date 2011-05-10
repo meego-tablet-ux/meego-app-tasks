@@ -310,7 +310,7 @@ Item {
                 onClicked: {
                     privateData.selectedRow = index;
                     if (mode == 0) {
-                        var map = dinstance.mapToItem(container, mouseX, mouseY);
+                        var map = mapToItem(null, mouseX, mouseY);
                         container.clickedAtRow(index, map.x, map.y,dinstance);
                     } else if (mode == 1) {
                         // adding mode, do nothing?
@@ -320,7 +320,7 @@ Item {
                 }
                 onPressAndHold: {
                     if (mode == 0) {
-                        var map = dinstance.mapToItem(container, mouseX, mouseY);
+                        var map = mapToItem(null, mouseX, mouseY);
                         container.pressAndHoldAtRow(index, map.x, map.y, dinstance);
                     }
                 }
