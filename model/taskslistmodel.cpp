@@ -16,7 +16,7 @@ TasksListModel::TasksListModel()
     , m_modelType(AllLists)
     , m_timeGroups(Someday)
     , m_listId(-1)
-    , m_sortOrder(DESC)
+    , m_sortOrder(ASC)
 {
     QHash<int, QByteArray> roles;
     roles.insert(TaskID, "taskId");
@@ -476,12 +476,12 @@ QVariant TasksListModel::taskRole(TasksTaskItem *task, int role) const
 
 static bool lessThen(const QPair<TasksTaskItem *, int> &a, const QPair<TasksTaskItem *, int> &b)
 {
-    return a.first < b.first;
+    return a.first->dueDate() < b.first->dueDate();
 }
 
 static bool greaterThen(const QPair<TasksTaskItem *, int> &a, const QPair<TasksTaskItem *, int> &b)
 {
-    return a.first > b.first;
+    return a.first->dueDate() > b.first->dueDate();
 }
 
 void TasksListModel::sort(int column, Qt::SortOrder order)
@@ -496,8 +496,11 @@ void TasksListModel::sort(int column, Qt::SortOrder order)
             tasks = &Database->m_overdueTasks;
         else if (m_timeGroups == Upcoming)
            tasks = &Database->m_upcomingTasks;
+    } else if (m_modelType == List && Database->m_listsMap.contains(m_listId)) {
+        TasksListItem *list = Database->m_listsMap[m_listId];
+        tasks = &list->taskList();
     }
-    Q_ASSERT(tasks);
+
     if (!tasks)
         return;
 

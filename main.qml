@@ -187,15 +187,11 @@ Window {
         id: overdueModel
         modelType: TasksListModel.Timeview
         timeGroups: TasksListModel.Overdue
-
-        Component.onCompleted: overdueModel.sort(overdueModel.sortOrder)
     }
     TasksListModel {
         id: upcomingModel
         modelType: TasksListModel.Timeview
         timeGroups: TasksListModel.Upcoming
-
-        Component.onCompleted: upcomingModel.sort(upcomingModel.sortOrder)
     }
     TasksListModel {
         id: somedayModel
@@ -206,7 +202,6 @@ Window {
         id: customlistModel
         property string listName
         modelType: TasksListModel.List
-
     }
     TasksListModel {
         id: allListsModel
@@ -215,6 +210,16 @@ Window {
 
     TasksListModel {
         id: editorList
+    }
+
+    function currentSortOrderText(model)
+    {
+        return model.sortOrder == TasksListModel.ASC ? labelAllDureTasksASCOrder : labelAllDureTasksDESCOrder
+    }
+
+    function swapSortOrder(model)
+    {
+        return model.sortOrder == TasksListModel.ASC ? TasksListModel.DESC : TasksListModel.ASC;
     }
 
     bookMenuPayload: [ landingScreenPageComponent ]
@@ -572,11 +577,21 @@ Window {
 //                taskDetailContextMenu.hide();
 //            }
 
+            Connections {
+                target: window.pageStack
+                onCurrentPageChanged: {
+                    if (window.pageStack.currentPage != allDueTasksPage)
+                        return;
+                    overdueModel.sort(TasksListModel.DESC);
+                    upcomingModel.sort(TasksListModel.DESC);
+                }
+            }
+
             actionMenuModel: [ labelAllDueTasks,
                                 labelOverdue,
                                 labelUpComing,
                                 labelSomeday,
-                                overdueModel.sortOrder == TasksListModel.ASC ? labelAllDureTasksASCOrder : labelAllDureTasksDESCOrder ]
+                                currentSortOrderText(overdueModel) ]
             actionMenuPayload: [ 0, 1, 2, 3, 4 ]
 
             onActionMenuTriggered: {
@@ -593,56 +608,11 @@ Window {
                     alldueTasksList.model = [somedayCItem];
                     alldueTasksList.forceShowTitle = true;
                 } else if (selectedItem == 4) {
-                    var order = overdueModel.sortOrder == TasksListModel.ASC ? TasksListModel.DESC : TasksListModel.ASC;
+                    var order = swapSortOrder(overdueModel);
                     overdueModel.sort(order);
                     upcomingModel.sort(order);
                 }
             }
-
-//            enableCustomActionMenu: true
-
-//            onActionMenuIconClicked: {
-//                if (window.pageStack.currentPage != allDueTasksPage)
-//                    return;
-//                var mappedPoint = allDueTasksPageMenu.mapToItem(allDueTasksPage, mouseX, mouseY);
-//                allDueTasksPageMenu.setPosition(mappedPoint.x, mappedPoint.y);
-//                allDueTasksPageMenu.show();
-//            }
-
-//            ContextMenu {
-//                id: allDueTasksPageMenu
-//                content: Column {
-//                    ActionMenu {
-//                        model: [ labelAllDueTasks,
-//                            labelOverdue,
-//                            labelUpComing,
-//                            labelSomeday,
-//                            overdueModel.sortOrder == TasksListModel.ASC ? labelAllDureTasksASCOrder : labelAllDureTasksDESCOrder ]
-//                        payload: [ 0, 1, 2, 3, 4 ]
-
-//                        onTriggered: {
-//                            if(payload[index] == 0) {
-//                                alldueTasksList.model = [overdueCItem, upcomingCItem, somedayCItem];
-//                                alldueTasksList.forceShowTitle = false;
-//                            } else if(payload[index] == 1) {
-//                                alldueTasksList.model = [overdueCItem];
-//                                alldueTasksList.forceShowTitle = true;
-//                            } else if(payload[index] == 2) {
-//                                alldueTasksList.model = [upcomingCItem];
-//                                alldueTasksList.forceShowTitle = true;
-//                            } else if(payload[index] == 3) {
-//                                alldueTasksList.model = [somedayCItem];
-//                                alldueTasksList.forceShowTitle = true;
-//                            } else if (payload[index] == 4) {
-//                                var order = overdueModel.sortOrder == TasksListModel.ASC ? TasksListModel.DESC : TasksListModel.ASC;
-//                                overdueModel.sort(order);
-//                                upcomingModel.sort(order);
-//                            }
-//                            allDueTasksPageMenu.hide();
-//                        }
-//                    }
-//                }
-//            }
 
             // Category Items
             CategoryItem {
@@ -866,6 +836,7 @@ Window {
                 if(customlistModel.count != customlistModel.icount) { //implying there are completed tasks
                     returnMe.push(labelDeleteCompletedTask);
                 }
+                returnMe.push(currentSortOrderText(customlistModel));
                 return returnMe;
             }
 
@@ -903,7 +874,14 @@ Window {
                 if(customlistModel.count != customlistModel.icount) { //implying there are completed tasks
                     runMe.push(deleteCompFun);
                 }
+                runMe.push(swapSortOrderForCustomModel);
                 runMe[index]();
+            }
+
+            function swapSortOrderForCustomModel()
+            {
+                customlistModel.sort(swapSortOrder(customlistModel));
+                customlistPage.actionMenuModel = makeActionMenuModel();
             }
 
             actionMenuModel: makeActionMenuModel()

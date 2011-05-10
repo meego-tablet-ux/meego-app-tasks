@@ -127,7 +127,7 @@ void TasksListItem::showHiddenTasks()
      m_hiddenTasks.clear();
 }
 
-QList<TasksTaskItem *> TasksListItem::taskList()
+QList<TasksTaskItem *> &TasksListItem::taskList()
 {
     return m_tasks;
 }

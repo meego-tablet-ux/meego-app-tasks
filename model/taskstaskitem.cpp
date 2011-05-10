@@ -71,15 +71,3 @@ void TasksTaskItem::setAttachments(const QStringList &attachments)
 {
         m_attachments = attachments;
 }
-
-bool TasksTaskItem::operator < (const TasksTaskItem &other) const
-{
-//    return m_createdDateTime < other.m_createdDateTime;
-    return m_dueDate < other.m_dueDate;
-}
-
-bool TasksTaskItem::operator > (const TasksTaskItem &other) const
-{
-//    return m_createdDateTime > other.m_createdDateTime;
-    return m_dueDate > other.m_dueDate;
-}

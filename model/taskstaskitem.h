@@ -44,9 +44,6 @@ public:
         void setCreatedDateTime(const QDateTime &createdDateTime);
         void setUrls(const QStringList &urls);
         void setAttachments(const QStringList &attachments);
-
-        bool operator < (const TasksTaskItem &other) const;
-        bool operator > (const TasksTaskItem &other) const;
 private:
         static int ids;
         TasksListItem *m_list;

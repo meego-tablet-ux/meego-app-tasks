@@ -42,7 +42,7 @@ public:
         void hideTask(int index, int oldIndex);
         void showHiddenTasks(int startIndex);
         void showHiddenTasks();
-        QList<TasksTaskItem *> taskList();
+        QList<TasksTaskItem *> &taskList();
 private:
         friend class TasksDatabase;
         friend class TasksDBEngine;
