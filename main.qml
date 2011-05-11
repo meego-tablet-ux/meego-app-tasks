@@ -9,13 +9,15 @@
 import Qt 4.7
 import MeeGo.App.Tasks 0.1
 import MeeGo.Components 0.1
-import Qt.labs.gestures 2.0
+//import Qt.labs.gestures 2.0
 import MeeGo.Labs.Components 0.1 as Labs    //export theme_* constants
 
 Window {
     id: window
     property string labelTasks: qsTr("Tasks")
     property string labelAllDueTasks: qsTr("All due tasks")
+    property string labelAllDureTasksASCOrder: qsTr("Order: asc")
+    property string labelAllDureTasksDESCOrder: qsTr("Order: desc")
     property string labelOverdue: qsTr("Overdue")
     property string labelUpComing: qsTr("Upcoming")
     property string labelSomeday: qsTr("Someday")
@@ -200,7 +202,6 @@ Window {
         id: customlistModel
         property string listName
         modelType: TasksListModel.List
-
     }
     TasksListModel {
         id: allListsModel
@@ -209,6 +210,16 @@ Window {
 
     TasksListModel {
         id: editorList
+    }
+
+    function currentSortOrderText(model)
+    {
+        return model.sortOrder == TasksListModel.ASC ? labelAllDureTasksASCOrder : labelAllDureTasksDESCOrder
+    }
+
+    function swapSortOrder(model)
+    {
+        return model.sortOrder == TasksListModel.ASC ? TasksListModel.DESC : TasksListModel.ASC;
     }
 
     bookMenuPayload: [ landingScreenPageComponent ]
@@ -406,22 +417,39 @@ Window {
                         source: "image://theme/icn_forward_dn"
                     }
 
-                    GestureArea {
-                        anchors.fill:parent
-                        Tap {
-                            onFinished: {
-                                customlistModel.listId = listId;
-                                customlistModel.listName = text.text;
-                                window.addPage(customlistPageComponent);
-                            }
+//                    GestureArea {
+//                        anchors.fill:parent
+//                        Tap {
+//                            onFinished: {
+//                                customlistModel.listId = listId;
+//                                customlistModel.listName = text.text;
+//                                window.addPage(customlistPageComponent);
+//                            }
+//                        }
+//                        TapAndHold {
+//                            onFinished : {
+//                                if (listId != 0) {
+//                                    landingScreenContextMenu.payload = dinstance;
+//                                    landingScreenContextMenu.setPosition(gesture.position.x, gesture.position.y);
+//                                    landingScreenContextMenu.show();
+//                                }
+//                            }
+//                        }
+//                    }
+
+                    MouseArea {
+                        anchors.fill: parent
+                        onClicked: {
+                            customlistModel.listId = listId;
+                            customlistModel.listName = text.text;
+                            window.addPage(customlistPageComponent);
                         }
-                        TapAndHold {
-                            onFinished : {
-                                if (listId != 0) {
-                                    landingScreenContextMenu.payload = dinstance;
-                                    landingScreenContextMenu.setPosition(gesture.position.x, gesture.position.y);
-                                    landingScreenContextMenu.show();
-                                }
+                        onPressAndHold: {
+                            if (listId != 0) {
+                                var map = mapToItem(null, mouseX, mouseY);
+                                landingScreenContextMenu.payload = dinstance;
+                                landingScreenContextMenu.setPosition(map.x, map.y);
+                                landingScreenContextMenu.show();
                             }
                         }
                     }
@@ -507,11 +535,16 @@ Window {
                         source: "image://theme/icn_forward_dn"
                     }
 
-                    GestureArea {
+//                    GestureArea {
+//                        anchors.fill: parent
+//                        Tap {
+//                            onFinished: window.addPage(allDueTasksPageComponent)
+//                        }
+//                    }
+
+                    MouseArea {
                         anchors.fill: parent
-                        Tap {
-                            onFinished: window.addPage(allDueTasksPageComponent)
-                        }
+                        onClicked: window.addPage(allDueTasksPageComponent)
                     }
                 }
 
@@ -544,8 +577,22 @@ Window {
 //                taskDetailContextMenu.hide();
 //            }
 
-            actionMenuModel: [ labelAllDueTasks, labelOverdue, labelUpComing, labelSomeday ]
-            actionMenuPayload: [ 0, 1, 2, 3 ]
+            Connections {
+                target: window.pageStack
+                onCurrentPageChanged: {
+                    if (window.pageStack.currentPage != allDueTasksPage)
+                        return;
+                    overdueModel.sort(TasksListModel.DESC);
+                    upcomingModel.sort(TasksListModel.DESC);
+                }
+            }
+
+            actionMenuModel: [ labelAllDueTasks,
+                                labelOverdue,
+                                labelUpComing,
+                                labelSomeday,
+                                currentSortOrderText(overdueModel) ]
+            actionMenuPayload: [ 0, 1, 2, 3, 4 ]
 
             onActionMenuTriggered: {
                 if(selectedItem == 0) {
@@ -560,6 +607,10 @@ Window {
                 } else if(selectedItem == 3) {
                     alldueTasksList.model = [somedayCItem];
                     alldueTasksList.forceShowTitle = true;
+                } else if (selectedItem == 4) {
+                    var order = swapSortOrder(overdueModel);
+                    overdueModel.sort(order);
+                    upcomingModel.sort(order);
                 }
             }
 
@@ -785,6 +836,7 @@ Window {
                 if(customlistModel.count != customlistModel.icount) { //implying there are completed tasks
                     returnMe.push(labelDeleteCompletedTask);
                 }
+                returnMe.push(currentSortOrderText(customlistModel));
                 return returnMe;
             }
 
@@ -822,7 +874,14 @@ Window {
                 if(customlistModel.count != customlistModel.icount) { //implying there are completed tasks
                     runMe.push(deleteCompFun);
                 }
+                runMe.push(swapSortOrderForCustomModel);
                 runMe[index]();
+            }
+
+            function swapSortOrderForCustomModel()
+            {
+                customlistModel.sort(swapSortOrder(customlistModel));
+                customlistPage.actionMenuModel = makeActionMenuModel();
             }
 
             actionMenuModel: makeActionMenuModel()

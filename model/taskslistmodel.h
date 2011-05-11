@@ -23,12 +23,14 @@ class TasksListModel : public QAbstractListModel
         Q_ENUMS(ModelType)
         Q_ENUMS(TimeGroups)
         Q_ENUMS(TasksTaskItem::ReminderType)
+        Q_ENUMS(SortOrder)
         Q_PROPERTY(ModelType modelType READ modelType WRITE setModelType NOTIFY modelTypeChanged);
         Q_PROPERTY(TimeGroups timeGroups READ timeGroups WRITE setTimeGroups NOTIFY timeGroupsChanged);
         Q_PROPERTY(int listId READ listId WRITE setListId NOTIFY listIdChanged);
         Q_PROPERTY(QString filter READ filter WRITE setFilter);
         Q_PROPERTY(int count READ count NOTIFY countChanged);
         Q_PROPERTY(int icount READ icount NOTIFY icountChanged);
+        Q_PROPERTY(SortOrder sortOrder READ sortOrder NOTIFY modelSorted);
 public:
         enum ReminderType {
                 NoReminder,
@@ -66,6 +68,7 @@ public:
                 Timeview = 3,
                 AllTasks = 4
         };
+        enum SortOrder { ASC = Qt::AscendingOrder, DESC = Qt::DescendingOrder };
         explicit TasksListModel();
         ~TasksListModel();
 
@@ -91,6 +94,10 @@ public:
 
         virtual bool insertRows(int row, int count, const QModelIndex &parent = QModelIndex());
         virtual bool removeRows(int row, int count, const QModelIndex &parent = QModelIndex());
+
+        virtual void sort(int column, Qt::SortOrder order);
+
+        SortOrder sortOrder() const { return m_sortOrder; }
 
 public slots:
         void addList(const QString &name);
@@ -119,6 +126,7 @@ public slots:
         void moveTasksToList(const QStringList &taskIds, int destListId);
         void commitAddedTasks();
         void rollbackAddedTasks();
+        void sort(SortOrder order) { m_sortOrder = order; sort(0, Qt::SortOrder(order)); }
 
 signals:
         void modelTypeChanged(ModelType t);
@@ -126,6 +134,8 @@ signals:
         void listIdChanged(int id);
         void countChanged();
         void icountChanged();
+        void modelSorted();
+
 private slots:
         void onBeginInsertRow(int r);
         void onBeginInsertRows(int r, int c);
@@ -152,6 +162,8 @@ private:
 
         QList<TasksListItem *> m_taskListsFiltered;
         QList<TasksTaskItem *> m_tasksFiltered;
+
+        SortOrder m_sortOrder;
 };
 
 #endif // TASKSLISTMODEL_H

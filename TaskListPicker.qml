@@ -9,7 +9,7 @@
 import Qt 4.7
 import MeeGo.App.Tasks 0.1
 import MeeGo.Components 0.1
-import Qt.labs.gestures 2.0
+//import Qt.labs.gestures 2.0
 
 Item {
     id: container
@@ -24,13 +24,18 @@ Item {
         opacity: 0.5
     }
 
-    GestureArea {
+//    GestureArea {
+//        anchors.fill: parent
+//        Tap {
+//            onFinished: {
+//                container.visible = false;
+//            }
+//        }
+//    }
+
+    MouseArea {
         anchors.fill: parent
-        Tap {
-            onFinished: {
-                container.visible = false;
-            }
-        }
+        onClicked: container.visible = false
     }
 
 
@@ -64,13 +69,21 @@ Item {
                 horizontalAlignment: Text.AlignHCenter
             }
 
-            GestureArea {
+//            GestureArea {
+//                anchors.fill: parent
+//                Tap {
+//                    onFinished: {
+//                        container.selected(listId);
+//                        container.visible = false;
+//                    }
+//                }
+//            }
+
+            MouseArea {
                 anchors.fill: parent
-                Tap {
-                    onFinished: {
-                        container.selected(listId);
-                        container.visible = false;
-                    }
+                onClicked: {
+                    container.selected(listId);
+                    container.visible = false;
                 }
             }
         }
@@ -91,13 +104,17 @@ Item {
                 elide: Text.ElideMiddle
             }
 
-            GestureArea {
-                anchors.fill: parent
-                Tap {
-                    onFinished: {
-                        createDialog.show();
-                    }
-                }
+//            GestureArea {
+//                anchors.fill: parent
+//                Tap {
+//                    onFinished: {
+//                        createDialog.show();
+//                    }
+//                }
+//            }
+
+            MouseArea {
+                onClicked: createDialog.show()
             }
         }
     }

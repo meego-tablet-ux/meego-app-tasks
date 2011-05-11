@@ -44,7 +44,6 @@ public:
         void setCreatedDateTime(const QDateTime &createdDateTime);
         void setUrls(const QStringList &urls);
         void setAttachments(const QStringList &attachments);
-
 private:
         static int ids;
         TasksListItem *m_list;
