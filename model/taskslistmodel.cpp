@@ -77,6 +77,7 @@ void TasksListModel::setFilter(const QString &filter)
     beginResetModel();
     doFiltering();
     endResetModel();
+    emit filterChanged();
 }
 
 void TasksListModel::doFiltering()

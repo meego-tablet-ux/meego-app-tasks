@@ -101,6 +101,17 @@ Item {
 
         area.contentY = y;
     }
+    function updateTitles()
+    {
+        for (var i = 0; i < container.model.length; ++i)
+            titles.children[i].updateTitleText();
+    }
+
+    onVisibleChanged: {
+        if (visible)
+            updateTitles();
+    }
+
     QtObject {
         id: privateData
         property int selectedCategory: -1
@@ -128,6 +139,11 @@ Item {
                 }
             }
         }
+
+        property bool movementEnded: true
+
+        onMovementStarted: movementEnded = false
+        onMovementEnded: movementEnded = true
     }
     Item {
         id: titles
@@ -158,7 +174,8 @@ Item {
                 }
             }
 
-            onYChanged: {
+            function updateTitleText()
+            {
                 var prevIndex = index - 1;
                 var nextIndex = index + 1;
                 if (prevIndex < 0 || nextIndex >= titles.children.length)
@@ -177,6 +194,13 @@ Item {
                 } else {
                     titles.children[index].text = titleCollapsedText(index, false);
                 }
+            }
+
+            onYChanged: {
+                if (area.movementEnded)
+                    return;
+
+                updateTitleText();
             }
 
             color:modelData.titleColor
@@ -220,12 +244,12 @@ Item {
                 anchors.fill: parent
 
                 onClicked: {
-                     allViews.children[index].collapsed = !allViews.children[index].collapsed;
+                    allViews.children[index].collapsed = !allViews.children[index].collapsed;
 
-                     text.text = titleText(index);
-                     if (!allViews.children[index].collapsed) {
-                         ensureShowingList(index);
-                     }
+                    text.text = titleText(index);
+                    if (!allViews.children[index].collapsed) {
+                        ensureShowingList(index);
+                    }
                 }
             }
         }
@@ -240,13 +264,23 @@ Item {
 
             property bool collapsed: false
 
+            Connections {
+                target: modelData.viewModel
+                onFilterChanged: {
+                    viewItem.visible = !isZeroModel(index);
+                    titles.children[index].visible = viewItem.visible;
+                    container.updateTitles();
+                }
+            }
+
             ListView {
                 id: view
                 width: container.width
                 height:viewItem.collapsed ? 0:  viewHeight
                 clip: true
                 x: 0
-                y:titleHeight
+                y: titleHeight
+
                 interactive: false
                 property int viewHeight: count * (container.rowHeight )
                 property int categoryIndex: index

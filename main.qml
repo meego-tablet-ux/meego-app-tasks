@@ -635,7 +635,7 @@ Window {
             }
             CategoryView {
                 id: alldueTasksList
-                parent: allDueTasksPage.content
+                parent: allDueTasksPage
                 anchors.fill:parent
                 model: [overdueCItem, upcomingCItem, somedayCItem]
                 titleHeight: window.titleHeight

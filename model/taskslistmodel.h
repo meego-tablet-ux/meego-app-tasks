@@ -27,7 +27,7 @@ class TasksListModel : public QAbstractListModel
         Q_PROPERTY(ModelType modelType READ modelType WRITE setModelType NOTIFY modelTypeChanged);
         Q_PROPERTY(TimeGroups timeGroups READ timeGroups WRITE setTimeGroups NOTIFY timeGroupsChanged);
         Q_PROPERTY(int listId READ listId WRITE setListId NOTIFY listIdChanged);
-        Q_PROPERTY(QString filter READ filter WRITE setFilter);
+        Q_PROPERTY(QString filter READ filter WRITE setFilter NOTIFY filterChanged);
         Q_PROPERTY(int count READ count NOTIFY countChanged);
         Q_PROPERTY(int icount READ icount NOTIFY icountChanged);
         Q_PROPERTY(SortOrder sortOrder READ sortOrder NOTIFY modelSorted);
@@ -135,6 +135,7 @@ signals:
         void countChanged();
         void icountChanged();
         void modelSorted();
+        void filterChanged();
 
 private slots:
         void onBeginInsertRow(int r);

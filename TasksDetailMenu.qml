@@ -42,14 +42,14 @@ Column {
             onClicked: {
                 editorList.setCompleted(task.mTaskId, isChecked);
             }
-            isChecked: task.mCompleted
+            isChecked: task ? task.mCompleted : false
         }
         TextEntry {
             id: taskName
             readOnly: !detailMenu.editing
             defaultText: qsTr("Insert task name")
             font.strikeout: compCheckbox.isChecked
-            text: task.mTask;
+            text: task ? task.mTask : ""
             font.pixelSize: theme_fontPixelSizeLarge
         }
     }
@@ -77,7 +77,7 @@ Column {
                 width: parent.width
                 height: 40
                 color: {
-                    if(listId != detailMenu.task.mListId) {
+                    if(detailMenu.task && listId != detailMenu.task.mListId) {
                         return theme_fontColorNormal;
                     } else {
                         return theme_fontColorHighlight;
@@ -112,7 +112,7 @@ Column {
         }
         Text {
             id: listText
-            text: listNames[task.mListId]
+            text: task ? listNames[task.mListId] : ""
             visible: !editing
             font.pixelSize: theme_fontPixelSizeLarge
         }
@@ -130,7 +130,7 @@ Column {
         }
         Text {
             id: duedateText
-            text: getFormattedDateYear(task.mDueDate)
+            text: task ? getFormattedDateYear(task.mDueDate) : ""
             font.pixelSize: theme_fontPixelSizeLarge
             anchors.verticalCenter: parent.verticalCenter
         }
@@ -139,7 +139,7 @@ Column {
             onLabel: qsTr("Date")
             offLabel: qsTr("Someday")
             visible: editing
-            on:task.mHasDueDate;
+            on: task ? task.mHasDueDate : false
             anchors.verticalCenter: parent.verticalCenter
         }
         Button {
@@ -173,7 +173,7 @@ Column {
             id: notesData
             readOnly: !detailMenu.editing
             defaultText: detailMenu.editing ?  qsTr("Add a note here")  : ""
-            text:  task.mNotes;
+            text: task ? task.mNotes : ""
             font.pixelSize: theme_fontPixelSizeLarge
         }
     }
