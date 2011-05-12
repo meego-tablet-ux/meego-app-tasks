@@ -24,7 +24,8 @@ Item {
     property bool selectedDueDate: false
     property date selectedDate
     property date nullDate //used for resetting the selected date
-    property variant checkMark: qsTr("* "); //: used to indicate the currently selected duedate for the new task
+     //: used to indicate the currently selected duedate for the new task
+    property variant checkMark: qsTr("* ");
     property variant timeSelectModel: [ checkMark +labelSomeday, labelToday, labelTomorrow,
         labelNextWeek, labelSetDueDate];
 
