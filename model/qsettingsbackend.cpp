@@ -9,64 +9,57 @@
 #include "qsettingsbackend.h"
 
 #include <QtDeclarative/qdeclarative.h>
+#include <QApplication>
+
+static const QString generalGroup = "General/";
+static const QString isRunningFirstTimeKey = "isRunningFirstTime";
 
 QmlSetting::QmlSetting(QDeclarativeItem *parent):
-        QDeclarativeItem(parent)
+        QDeclarativeItem(parent),
+    m_settings("MeeGo", "meego-app-tasks")
 {
     // By default, QDeclarativeItem does not draw anything. If you subclass
     // QDeclarativeItem to create a visual item, you will need to uncomment the
     // following line:
 
     // setFlag(ItemHasNoContents, false);
+
+    connect(qApp, SIGNAL(aboutToQuit()), SLOT(saveSettings()));
 }
 
-QmlSetting::~QmlSetting()
+QmlSetting::~QmlSetting()//WARNING: dtor is never called
 {
-    delete m_settings;
 }
 
 QString QmlSetting::organization()
 {
-    return m_organization;
-}
-
-void QmlSetting::setOrganization(const QString& value)
-{
-    m_organization = value;
-    emit organizationChanged();
+    return m_settings.organizationName();
 }
 
 QString QmlSetting::application()
 {
-    return m_application;
+    return m_settings.applicationName();
 }
 
-void QmlSetting::setApplication(const QString& value)
+QVariant QmlSetting::get(const QString& key) const
 {
-    m_application = value;
-    emit applicationChanged();
+    return m_settings.value(generalGroup + key);
 }
 
-void QmlSetting::componentComplete()
+void QmlSetting::set(const QString& key, const QVariant &value)
 {
-    m_settings = new QSettings(m_organization,m_application);
-    connect(this,SIGNAL(applicationChanged()),this,SLOT(refresh()));
-    connect(this,SIGNAL(organizationChanged()),this,SLOT(refresh()));
-}
-
-QVariant QmlSetting::get(const QString& key)
-{
-    return m_settings->value(key);
-}
-
-void QmlSetting::set(const QString& key, QVariant value)
-{
-    m_settings->setValue(key, value);
+    m_settings.setValue(generalGroup + key, value);
     emit valueChanged(key, value);
 }
 
-void QmlSetting::refresh()
+bool QmlSetting::isRunningFirstTime() const
 {
-    delete m_settings;
-    m_settings = new QSettings(m_organization,m_application);
+    return m_settings.value(generalGroup + isRunningFirstTimeKey, true).toBool();
+}
+
+void QmlSetting::saveSettings()
+{
+    if (isRunningFirstTime())
+        m_settings.setValue(generalGroup + isRunningFirstTimeKey, false);
+    m_settings.sync();
 }

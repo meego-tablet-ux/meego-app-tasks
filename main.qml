@@ -51,8 +51,6 @@ Window {
 
     QmlSetting {
         id: qmlSettings
-        organization: "Intel"
-        application: "Tasks"
     }
 
     Labs.LocaleHelper {
@@ -267,6 +265,7 @@ Window {
                 onAccepted: {
                     allListsModel.addList(textinput.text);
                     textinput.text = "";
+                    listsViewBlankSlate.visible = false;
                 }
                 onRejected: {
                     textinput.text = "";
@@ -329,237 +328,266 @@ Window {
                 }
             }
 
-            ListView {
-                id: listview
-                parent: landingScreenPage
-                anchors.fill: landingScreenPage
-                model: allListsModel
-                clip:true
-                interactive: (contentHeight + rowHeight) > listview.height
-                delegate: Item{
-                    id: dinstance
-                    width: parent.width
-                    height: rowHeight
-                    property string mListId: listId
-                    property string mListName: listName
+            Column {
+                anchors.fill: parent
+                spacing: 20
 
-                    Rectangle {
-                        color: "white"
-                        anchors.fill: parent
-                    }
+                ListView {
+                    id: listview
 
-                    Image {
-                        id: separator
+                    anchors.left: parent.left
+                    anchors.right: parent.right
+                    height: listsViewBlankSlate.visible ? 150 : parent.height   //TODO: calculate 150 properly
+
+                    model: allListsModel
+                    clip:true
+                    interactive: (contentHeight + rowHeight) > listview.height
+                    delegate: Item{
+                        id: dinstance
                         width: parent.width
-                        anchors.bottom: parent.bottom
-                        source: "image://theme/tasks/ln_grey_l"
-                    }
+                        height: rowHeight
+                        property string mListId: listId
+                        property string mListName: listName
 
-                    Image {
-                        id: icon
-                        source: listId == 0? "image://theme/tasks/icn_defaultlist":""
-                        anchors.verticalCenter: parent.verticalCenter
-                        anchors.left:parent.left
-                        anchors.leftMargin: horizontalMargin
-                        height:parent.height - 2* verticalMargin
-                        width: height
-                        smooth:true
-                        fillMode:Image.PreserveAspectFit
-                    }
-
-                    Text {
-                        id: text
-                        anchors.left: parent.left
-                        anchors.leftMargin: 2*horizontalMargin + parent.height - 2* verticalMargin
-                        height: parent.height
-                        anchors.right: icompletedCount.left
-                        anchors.rightMargin:horizontalMargin
-                        text:  listName
-                        horizontalAlignment: Text.AlignLeft
-                        verticalAlignment: Text.AlignVCenter
-                        //font.bold: true
-                        font.pixelSize: theme_fontPixelSizeLarge
-                        elide: Text.ElideRight
-                        color: theme_fontColorNormal
-                    }
-
-                    Image {
-                        id: separator_top
-                        width: parent.width
-                        anchors.top: parent.bottom
-                        source: "image://theme/tasks/ln_grey_l"
-                    }
-                    Rectangle {
-                        id: icompletedCount
-                        width: height
-                        height: parent.height - 2* verticalMargin
-                        radius: width/4
-                        color:"lightgray"
-                        anchors.verticalCenter: parent.verticalCenter
-                        anchors.right: goArrow.left
-                        anchors.rightMargin: horizontalMargin
-                        visible: !(icountText.text=="")
-                        Text {
-                            id: icountText
+                        Rectangle {
+                            color: "white"
                             anchors.fill: parent
-                            verticalAlignment: Text.AlignVCenter
-                            horizontalAlignment: Text.AlignHCenter
-                            text:listIncompletedCount
-                            font.pixelSize: theme_fontPixelSizeSmall
                         }
 
-                    }
-                    Image {
-                        id: goArrow
-                        anchors.right:parent.right
-                        anchors.rightMargin: horizontalMargin
-                        anchors.verticalCenter:parent.verticalCenter
-                        source: "image://theme/icn_forward_dn"
-                    }
-
-//                    GestureArea {
-//                        anchors.fill:parent
-//                        Tap {
-//                            onFinished: {
-//                                customlistModel.listId = listId;
-//                                customlistModel.listName = text.text;
-//                                window.addPage(customlistPageComponent);
-//                            }
-//                        }
-//                        TapAndHold {
-//                            onFinished : {
-//                                if (listId != 0) {
-//                                    landingScreenContextMenu.payload = dinstance;
-//                                    landingScreenContextMenu.setPosition(gesture.position.x, gesture.position.y);
-//                                    landingScreenContextMenu.show();
-//                                }
-//                            }
-//                        }
-//                    }
-
-                    MouseArea {
-                        anchors.fill: parent
-                        onClicked: {
-                            customlistModel.listId = listId;
-                            customlistModel.listName = text.text;
-                            window.addPage(customlistPageComponent);
+                        Image {
+                            id: separator
+                            width: parent.width
+                            anchors.bottom: parent.bottom
+                            source: "image://theme/tasks/ln_grey_l"
                         }
-                        onPressAndHold: {
-                            if (listId != 0) {
-                                var map = mapToItem(null, mouseX, mouseY);
-                                landingScreenContextMenu.payload = dinstance;
-                                landingScreenContextMenu.setPosition(map.x, map.y);
-                                landingScreenContextMenu.show();
-                            }
+
+                        Image {
+                            id: icon
+                            source: listId == 0? "image://theme/tasks/icn_defaultlist":""
+                            anchors.verticalCenter: parent.verticalCenter
+                            anchors.left:parent.left
+                            anchors.leftMargin: horizontalMargin
+                            height:parent.height - 2* verticalMargin
+                            width: height
+                            smooth:true
+                            fillMode:Image.PreserveAspectFit
                         }
-                    }
-                }
 
-                header: Item{
-                    id: allDueTasksItem
-                    //parent: landingScreenPage.content
-                    width: parent.width
-                    height: rowHeight
-                    Image {
-                        id: icon
-                        source: "image://theme/tasks/icn_header_tasks"
-                        anchors.verticalCenter: parent.verticalCenter
-                        anchors.left:parent.left
-                        anchors.leftMargin: horizontalMargin
-                        height:parent.height - 2* verticalMargin
-                        width: height
-                        smooth:true
-                        fillMode:Image.PreserveAspectFit
-                    }
-
-                    Rectangle {
-                        color: "white"
-                        anchors.fill: parent
-                    }
-
-                    Image {
-                        id: separator
-                        width: parent.width
-                        anchors.bottom: parent.bottom
-                        source: "image://theme/tasks/ln_grey_l"
-                    }
-
-                    Text {
-                        id: text
-                        anchors.left: parent.left
-                        anchors.leftMargin: 2*horizontalMargin + parent.height - 2* verticalMargin
-                        height: parent.height
-                        anchors.right: icompletedCount.left
-                        anchors.rightMargin:horizontalMargin
-                        text:  labelAllDueTasks
-                        horizontalAlignment: Text.AlignLeft
-                        verticalAlignment: Text.AlignVCenter
-                        font.pixelSize: theme_fontPixelSizeLarge
-                        elide: Text.ElideRight
-                        color: theme_fontColorNormal
-                    }
-
-                    Image {
-                        id: separator_top
-                        width: parent.width
-                        anchors.top: parent.bottom
-                        source: "image://theme/tasks/ln_grey_l"
-                    }
-                    Rectangle {
-                        id: icompletedCount
-                        width: height
-                        height: parent.height - 2* verticalMargin
-                        radius: width/4
-                        color:"lightgray"
-                        anchors.verticalCenter: parent.verticalCenter
-                        anchors.right: goArrow.left
-                        anchors.rightMargin: horizontalMargin
-                        visible: !(icountText.text=="")
                         Text {
-                            id: icountText
-                            anchors.fill: parent
+                            id: text
+                            anchors.left: parent.left
+                            anchors.leftMargin: 2*horizontalMargin + parent.height - 2* verticalMargin
+                            height: parent.height
+                            anchors.right: icompletedCount.left
+                            anchors.rightMargin:horizontalMargin
+                            text:  listName
+                            horizontalAlignment: Text.AlignLeft
                             verticalAlignment: Text.AlignVCenter
-                            horizontalAlignment: Text.AlignHCenter
-                            text:overdueModel.icount + upcomingModel.icount + somedayModel.icount
-                            font.pixelSize: theme_fontPixelSizeSmall
+                            //font.bold: true
+                            font.pixelSize: theme_fontPixelSizeLarge
+                            elide: Text.ElideRight
                             color: theme_fontColorNormal
                         }
 
+                        Image {
+                            id: separator_top
+                            width: parent.width
+                            anchors.top: parent.bottom
+                            source: "image://theme/tasks/ln_grey_l"
+                        }
+                        Rectangle {
+                            id: icompletedCount
+                            width: height
+                            height: parent.height - 2* verticalMargin
+                            radius: width/4
+                            color:"lightgray"
+                            anchors.verticalCenter: parent.verticalCenter
+                            anchors.right: goArrow.left
+                            anchors.rightMargin: horizontalMargin
+                            visible: !(icountText.text=="")
+                            Text {
+                                id: icountText
+                                anchors.fill: parent
+                                verticalAlignment: Text.AlignVCenter
+                                horizontalAlignment: Text.AlignHCenter
+                                text:listIncompletedCount
+                                font.pixelSize: theme_fontPixelSizeSmall
+                            }
+
+                        }
+                        Image {
+                            id: goArrow
+                            anchors.right:parent.right
+                            anchors.rightMargin: horizontalMargin
+                            anchors.verticalCenter:parent.verticalCenter
+                            source: "image://theme/icn_forward_dn"
+                        }
+
+    //                    GestureArea {
+    //                        anchors.fill:parent
+    //                        Tap {
+    //                            onFinished: {
+    //                                customlistModel.listId = listId;
+    //                                customlistModel.listName = text.text;
+    //                                window.addPage(customlistPageComponent);
+    //                            }
+    //                        }
+    //                        TapAndHold {
+    //                            onFinished : {
+    //                                if (listId != 0) {
+    //                                    landingScreenContextMenu.payload = dinstance;
+    //                                    landingScreenContextMenu.setPosition(gesture.position.x, gesture.position.y);
+    //                                    landingScreenContextMenu.show();
+    //                                }
+    //                            }
+    //                        }
+    //                    }
+
+                        MouseArea {
+                            anchors.fill: parent
+                            onClicked: {
+                                customlistModel.listId = listId;
+                                customlistModel.listName = text.text;
+                                window.addPage(customlistPageComponent);
+                            }
+                            onPressAndHold: {
+                                if (listId != 0) {
+                                    var map = mapToItem(null, mouseX, mouseY);
+                                    landingScreenContextMenu.payload = dinstance;
+                                    landingScreenContextMenu.setPosition(map.x, map.y);
+                                    landingScreenContextMenu.show();
+                                }
+                            }
+                        }
                     }
 
-                    Image {
-                        id: goArrow
-                        anchors.right:parent.right
-                        anchors.rightMargin: horizontalMargin
-                        anchors.verticalCenter:parent.verticalCenter
-                        source: "image://theme/icn_forward_dn"
-                    }
+                    header: Item{
+                        id: allDueTasksItem
+                        //parent: landingScreenPage.content
+                        width: parent.width
+                        height: rowHeight
+                        Image {
+                            id: icon
+                            source: "image://theme/tasks/icn_header_tasks"
+                            anchors.verticalCenter: parent.verticalCenter
+                            anchors.left:parent.left
+                            anchors.leftMargin: horizontalMargin
+                            height:parent.height - 2* verticalMargin
+                            width: height
+                            smooth:true
+                            fillMode:Image.PreserveAspectFit
+                        }
 
-//                    GestureArea {
-//                        anchors.fill: parent
-//                        Tap {
-//                            onFinished: window.addPage(allDueTasksPageComponent)
-//                        }
-//                    }
+                        Rectangle {
+                            color: "white"
+                            anchors.fill: parent
+                        }
 
-                    MouseArea {
-                        anchors.fill: parent
-                        onClicked: window.addPage(allDueTasksPageComponent)
+                        Image {
+                            id: separator
+                            width: parent.width
+                            anchors.bottom: parent.bottom
+                            source: "image://theme/tasks/ln_grey_l"
+                        }
+
+                        Text {
+                            id: text
+                            anchors.left: parent.left
+                            anchors.leftMargin: 2*horizontalMargin + parent.height - 2* verticalMargin
+                            height: parent.height
+                            anchors.right: icompletedCount.left
+                            anchors.rightMargin:horizontalMargin
+                            text:  labelAllDueTasks
+                            horizontalAlignment: Text.AlignLeft
+                            verticalAlignment: Text.AlignVCenter
+                            font.pixelSize: theme_fontPixelSizeLarge
+                            elide: Text.ElideRight
+                            color: theme_fontColorNormal
+                        }
+
+                        Image {
+                            id: separator_top
+                            width: parent.width
+                            anchors.top: parent.bottom
+                            source: "image://theme/tasks/ln_grey_l"
+                        }
+                        Rectangle {
+                            id: icompletedCount
+                            width: height
+                            height: parent.height - 2* verticalMargin
+                            radius: width/4
+                            color:"lightgray"
+                            anchors.verticalCenter: parent.verticalCenter
+                            anchors.right: goArrow.left
+                            anchors.rightMargin: horizontalMargin
+                            visible: !(icountText.text=="")
+                            Text {
+                                id: icountText
+                                anchors.fill: parent
+                                verticalAlignment: Text.AlignVCenter
+                                horizontalAlignment: Text.AlignHCenter
+                                text:overdueModel.icount + upcomingModel.icount + somedayModel.icount
+                                font.pixelSize: theme_fontPixelSizeSmall
+                                color: theme_fontColorNormal
+                            }
+
+                        }
+
+                        Image {
+                            id: goArrow
+                            anchors.right:parent.right
+                            anchors.rightMargin: horizontalMargin
+                            anchors.verticalCenter:parent.verticalCenter
+                            source: "image://theme/icn_forward_dn"
+                        }
+
+    //                    GestureArea {
+    //                        anchors.fill: parent
+    //                        Tap {
+    //                            onFinished: window.addPage(allDueTasksPageComponent)
+    //                        }
+    //                    }
+
+                        MouseArea {
+                            anchors.fill: parent
+                            onClicked: window.addPage(allDueTasksPageComponent)
+                        }
                     }
                 }
 
-                //footer
-                footer: Text {
-                    id: footerText
-                    y: listview.count * rowHeight + 15
-                    width: listview.width
-                    height: paintedHeight
-                    horizontalAlignment: Text.AlignHCenter
-                    wrapMode: Text.WordWrap
-                    text: qsTr("You can create a new list using the action menu")
-                    visible: listview.count == 1
-                    color: theme_fontColorNormal
-                    font.pixelSize: theme_fontPixelSizeLarge
+                BlankSlate {
+                    id: listsViewBlankSlate
+                    anchors.left: parent.left
+                    anchors.right: parent.right
+                    height: parent.height - listview.height
+
+                    visible: qmlSettings.isRunningFirstTime
+
+                    title: qsTr("Use the default task list, or make a new one")
+                    buttonText: qsTr("Create a new task list")
+
+                    viewModel: ListModel {
+                        ListElement {
+                            source: ""
+                            title: QT_TR_NOOP("What's a task list?")
+                            subTitle: QT_TR_NOOP("A task list is a collection of tasks. Use the default task list we have created for you, or make a new one.")
+                            buttonText: ""
+                        }
+                        ListElement {
+                            source: ""
+                            title: QT_TR_NOOP("How do I create tasks?")
+                            subTitle: QT_TR_NOOP("To create a task, start by selecting a task list. Then tap on the new task line.")
+                            buttonText: ""
+                        }
+                        ListElement {
+                            source: ""
+                            title: QT_TR_NOOP("How do I check completed tasks?")
+                            subTitle: QT_TR_NOOP("To mark a task as completed, tap the check box.")
+                            buttonText: ""
+                        }
+                    }
+
+                    onButtonClicked: newListDialog.show()
                 }
             }
         }
@@ -584,6 +612,7 @@ Window {
                         return;
                     overdueModel.sort(TasksListModel.DESC);
                     upcomingModel.sort(TasksListModel.DESC);
+                    tryShowBlankSlate(0);
                 }
             }
 
@@ -594,7 +623,25 @@ Window {
                                 currentSortOrderText(overdueModel) ]
             actionMenuPayload: [ 0, 1, 2, 3, 4 ]
 
+            property int prevSelectedItem: 0
+
+            function tryShowBlankSlate(index)
+            {
+                allDueBlankSlates.model.setProperty(prevSelectedItem, "visible", false);
+                if (!qmlSettings.isRunningFirstTime
+                        || index > 3
+                        || overdueModel.count > 0
+                        || upcomingModel.count > 0
+                        || somedayModel.count > 0)
+                    return;
+
+                prevSelectedItem = index;
+                allDueBlankSlates.model.setProperty(index, "visible", true);
+            }
+
             onActionMenuTriggered: {
+                tryShowBlankSlate(selectedItem);
+
                 if(selectedItem == 0) {
                     alldueTasksList.model = [overdueCItem, upcomingCItem, somedayCItem];
                     alldueTasksList.forceShowTitle = false;
@@ -641,6 +688,8 @@ Window {
                 titleHeight: window.titleHeight
                 rowHeight: window.rowHeight
 
+                visible: !qmlSettings.isRunningFirstTime || overdueModel.count > 0 || upcomingModel.count > 0 || somedayModel.count > 0
+
                 onClickedAtRow: {
                     var map = alldueTasksList.mapToItem(allDueTasksPage, x, y);
                     taskDetailContextMenu.displayContextMenu(map.x,map.y,payload,false);
@@ -657,6 +706,59 @@ Window {
                     allDueTasksPageContextMenu.mousePos = map;
                     allDueTasksPageContextMenu.setPosition(map.x,map.y)
                     allDueTasksPageContextMenu.show();
+                }
+            }
+
+            Repeater {
+                id: allDueBlankSlates
+
+                model: ListModel {
+                    ListElement {
+                        title: QT_TR_NOOP("You have no due tasks")
+                        visible: false
+                    }
+                    ListElement {
+                        title: QT_TR_NOOP("You have no overdue tasks")
+                        visible: false
+                    }
+                    ListElement {
+                        title: QT_TR_NOOP("You have no upcoming tasks")
+                        visible: false
+                    }
+                    ListElement {
+                        title: QT_TR_NOOP("You have no someday tasks")
+                        visible: false
+                    }
+                }
+                delegate: BlankSlate {
+                    id: allDueTasksBlankSlate
+                    anchors.topMargin: 20
+                    anchors.fill: parent
+
+                    title: model.title
+                    buttonVisible: false
+
+                    visible: model.visible
+
+                    viewModel: ListModel {
+                        ListElement {
+                            source: ""
+                            title: QT_TR_NOOP("How do I create tasks?")
+                            subTitle: QT_TR_NOOP("To create a task, start by selecting a task list. Then tap on the new task line.")
+                            buttonText: QT_TR_NOOP("Select a task list")
+                        }
+                    }
+
+                    onViewItemButtonClicked: picker.visible = true
+                }
+            }
+
+            TaskListPicker {
+                id: picker
+                visible:false
+                onSelected: {
+                    visible = false;
+                    //TODO: finish me
                 }
             }
 

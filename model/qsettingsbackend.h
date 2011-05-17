@@ -18,8 +18,9 @@ class QmlSetting : public QDeclarativeItem
     Q_OBJECT
     Q_DISABLE_COPY(QmlSetting)
 
-    Q_PROPERTY(QString organization READ organization WRITE setOrganization NOTIFY organizationChanged)
-    Q_PROPERTY(QString application READ application WRITE setApplication NOTIFY applicationChanged)
+    Q_PROPERTY(QString organization READ organization CONSTANT)
+    Q_PROPERTY(QString application READ application CONSTANT)
+    Q_PROPERTY(bool isRunningFirstTime READ isRunningFirstTime CONSTANT)
 
 public:
 
@@ -27,31 +28,22 @@ public:
     ~QmlSetting();
 
     QString organization();
-    void setOrganization(const QString& value);
-
     QString application();
-    void setApplication(const QString& value);
 
-    void componentComplete();
+    bool isRunningFirstTime() const;
 
 signals:
-    void organizationChanged();
-    void applicationChanged();
-    void valueChanged(const QString& key, QVariant value);
+    void valueChanged(const QString& key, const QVariant &value);
 
 public slots:
-    QVariant get(const QString& key);
-    void set(const QString& key, QVariant value);
-
+    QVariant get(const QString& key) const;
+    void set(const QString& key, const QVariant &value);
 
 private slots:
-    void refresh();
+    void saveSettings();
 
 private:
-    QString m_organization;
-    QString m_application;
-    QSettings *m_settings;
-
+    QSettings m_settings;
 };
 
 QML_DECLARE_TYPE(QmlSetting)
