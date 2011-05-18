@@ -9,7 +9,7 @@
 import QtQuick 1.0
 import MeeGo.Components 0.1
 
-Item {
+Rectangle {
     id: slate
 
     property alias title: headerTitle.text
