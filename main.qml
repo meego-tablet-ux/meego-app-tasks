@@ -610,7 +610,7 @@ Window {
                         return;
                     overdueModel.sort(TasksListModel.DESC);
                     upcomingModel.sort(TasksListModel.DESC);
-                    tryShowBlankSlate(0);
+                    tryShowBlankOrNoContentSlate(0);
                 }
             }
 
@@ -623,22 +623,30 @@ Window {
 
             property int prevSelectedItem: 0
 
-            function tryShowBlankSlate(index)
+            function tryShowBlankOrNoContentSlate(index)
             {
                 allDueBlankSlates.model.setProperty(prevSelectedItem, "visible", false);
-                if (!qmlSettings.isRunningFirstTime
-                        || index > 3
-                        || overdueModel.count > 0
-                        || upcomingModel.count > 0
-                        || somedayModel.count > 0)
+                if (index > 3)
                     return;
+
+                if (!index && (overdueModel.count > 0 || upcomingModel.count > 0 || somedayModel.count > 0)) {
+                    alldueTasksList.visible = true;
+                    return;
+                } else if ((index == 1 && overdueModel.count > 0)
+                    || (index == 2 && upcomingModel.count > 0)
+                    || (index == 3 && somedayModel.count > 0)) {
+                    alldueTasksList.visible = true;
+                    return;
+                }
+
+                alldueTasksList.visible = false;
 
                 prevSelectedItem = index;
                 allDueBlankSlates.model.setProperty(index, "visible", true);
             }
 
             onActionMenuTriggered: {
-                tryShowBlankSlate(selectedItem);
+                tryShowBlankOrNoContentSlate(selectedItem);
 
                 if(selectedItem == 0) {
                     alldueTasksList.model = [overdueCItem, upcomingCItem, somedayCItem];
@@ -686,8 +694,6 @@ Window {
                 titleHeight: window.titleHeight
                 rowHeight: window.rowHeight
 
-                visible: !qmlSettings.isRunningFirstTime || overdueModel.count > 0 || upcomingModel.count > 0 || somedayModel.count > 0
-
                 onClickedAtRow: {
                     var map = alldueTasksList.mapToItem(allDueTasksPage, x, y);
                     taskDetailContextMenu.displayContextMenu(map.x,map.y,payload,false);
@@ -711,6 +717,8 @@ Window {
                 id: allDueBlankSlates
 
                 model: ListModel {
+                    id: blankSlatesModel
+
                     ListElement {
                         title: QT_TR_NOOP("You have no due tasks")
                         visible: false
@@ -734,10 +742,13 @@ Window {
                     anchors.fill: parent
 
                     title: model.title
-                    buttonVisible: false
+                    subTitle: !qmlSettings.isRunningFirstTime ? qsTr("To create a task, start by selecting a task list.") : ""
+                    buttonVisible: !qmlSettings.isRunningFirstTime
+                    buttonText: qsTr("Select a task list")
 
                     visible: model.visible
 
+                    viewVisible: qmlSettings.isRunningFirstTime
                     viewModel: ListModel {
                         ListElement {
                             source: ""
@@ -748,6 +759,7 @@ Window {
                     }
 
                     onViewItemButtonClicked: picker.visible = true
+                    onButtonClicked: picker.visible = true
                 }
             }
 
@@ -756,7 +768,8 @@ Window {
                 visible:false
                 onSelected: {
                     visible = false;
-                    //TODO: finish me
+                    customlistModel.listId = listId;
+                    window.addPage(customlistPageComponent);
                 }
             }
 
