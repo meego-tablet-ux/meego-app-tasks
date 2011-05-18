@@ -71,8 +71,7 @@ Window {
                 now.getYear() == date.getYear() )
             return labelToday
 
-        return localeHelper.localDate(date,Labs.LocaleHelper.DateFullNumShort);
-        //return qsTr("%1 %2").arg(Qt.formatDate(date,"d") + "").arg(Qt.formatDate(date,"MMM") + "");
+        return localeHelper.localDate(date,Labs.LocaleHelper.DateMonthDay);
     }
 
     function getFormattedDateYear(date) {
@@ -86,7 +85,6 @@ Window {
             return labelToday
 
         return localeHelper.localDate(date,Labs.LocaleHelper.DateFullNumShort);
-        //return qsTr("%1 %2 %3").arg(Qt.formatDate(date,"d") + "").arg(Qt.formatDate(date,"MMM") + "").arg(Qt.formatDate(date,"yyyy") + "");
     }
     function isOverdue(date) {
         if (!date.getDate)
