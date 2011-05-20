@@ -9,7 +9,6 @@
 #include "qsettingsbackend.h"
 
 #include <QtDeclarative/qdeclarative.h>
-#include <QApplication>
 
 static const QString generalGroup = "General/";
 static const QString isRunningFirstTimeKey = "isRunningFirstTime";
@@ -22,9 +21,7 @@ QmlSetting::QmlSetting(QDeclarativeItem *parent):
     // QDeclarativeItem to create a visual item, you will need to uncomment the
     // following line:
 
-    // setFlag(ItemHasNoContents, false);
-
-    connect(qApp, SIGNAL(aboutToQuit()), SLOT(saveSettings()));
+    // setFlag(ItemHasNoContents, false)
 }
 
 QmlSetting::~QmlSetting()//WARNING: dtor is never called
@@ -57,9 +54,10 @@ bool QmlSetting::isRunningFirstTime() const
     return m_settings.value(generalGroup + isRunningFirstTimeKey, true).toBool();
 }
 
-void QmlSetting::saveSettings()
+void QmlSetting::setRunningFirstTime(bool first)
 {
-    if (isRunningFirstTime())
-        m_settings.setValue(generalGroup + isRunningFirstTimeKey, false);
+    if (first == isRunningFirstTime())
+        return;
+    m_settings.setValue(generalGroup + isRunningFirstTimeKey, first);
     m_settings.sync();
 }

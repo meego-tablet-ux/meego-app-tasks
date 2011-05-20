@@ -20,7 +20,7 @@ class QmlSetting : public QDeclarativeItem
 
     Q_PROPERTY(QString organization READ organization CONSTANT)
     Q_PROPERTY(QString application READ application CONSTANT)
-    Q_PROPERTY(bool isRunningFirstTime READ isRunningFirstTime CONSTANT)
+    Q_PROPERTY(bool isRunningFirstTime READ isRunningFirstTime WRITE setRunningFirstTime NOTIFY isRunningFirstTimeChanged)
 
 public:
 
@@ -30,10 +30,12 @@ public:
     QString organization();
     QString application();
 
+    void setRunningFirstTime(bool first);
     bool isRunningFirstTime() const;
 
 signals:
     void valueChanged(const QString& key, const QVariant &value);
+    void isRunningFirstTimeChanged();
 
 public slots:
     QVariant get(const QString& key) const;

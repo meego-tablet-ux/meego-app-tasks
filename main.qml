@@ -51,6 +51,8 @@ Window {
 
     QmlSetting {
         id: qmlSettings
+        Component.onCompleted: qmlSettings.isRunningFirstTime = false   //TODO: hack, it brakes Blank Slates for ListView, but it is necessary,
+                                                                        //because neither Component.onDestruction nor QmlSettings::dtor never get called.
     }
 
     Labs.LocaleHelper {
@@ -772,6 +774,7 @@ Window {
                     visible = false;
                     customlistModel.listId = listId;
                     window.addPage(customlistPageComponent);
+//                    switchBook(customlistPageComponent)
                 }
             }
 
