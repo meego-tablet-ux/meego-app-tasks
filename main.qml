@@ -771,8 +771,8 @@ Window {
                 onSelected: {
                     visible = false;
                     customlistModel.listId = listId;
+                    switchBook(landingScreenPageComponent);
                     window.addPage(customlistPageComponent);
-//                    switchBook(customlistPageComponent)
                 }
             }
 
