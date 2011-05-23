@@ -35,6 +35,11 @@ Item {
     // 2 multiple selection mode
     property int mode: 0
 
+    onModeChanged: {
+        if (mode == 1)
+            newrow.textinput.focus = true;
+    }
+
     function getTitleText(){
         var collapsed = view.collapsed;
         var tt = model.title;

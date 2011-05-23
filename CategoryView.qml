@@ -53,6 +53,8 @@ Item {
     function getTitleYValue(index) {
         // list.y is the height of the previous lists
         var top = -area.contentY;
+        if (!allViews.children[index])
+            return top;
         var list = allViews.children[index].y;
         var title = titles.children[index]
         if (list == undefined || title == undefined)
