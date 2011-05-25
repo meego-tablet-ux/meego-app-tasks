@@ -9,7 +9,7 @@
 import Qt 4.7
 import MeeGo.App.Tasks 0.1
 import MeeGo.Components 0.1
-//import Qt.labs.gestures 2.0
+import MeeGo.Ux.Gestures 0.1
 import MeeGo.Labs.Components 0.1 as Labs    //export theme_* constants
 
 Window {
@@ -53,7 +53,17 @@ Window {
         id: qmlSettings
         Component.onCompleted: qmlSettings.isRunningFirstTime = false   //TODO: hack, it brakes Blank Slates for ListView, but it is necessary,
                                                                         //because neither Component.onDestruction nor QmlSettings::dtor never get called.
+//        isRunningFirstTime: saveRestore.restoreRequired ? saveRestore.value("isRunningFirstTime") : true
     }
+
+//    SaveRestoreState {
+//        id: saveRestore
+
+//        onSaveRequired: {
+//            setValue("isRunningFirstTime", false);
+//            sync();
+//        }
+//    }
 
     Labs.LocaleHelper {
         id: localeHelper
@@ -423,42 +433,42 @@ Window {
                             source: "image://theme/icn_forward_dn"
                         }
 
-    //                    GestureArea {
-    //                        anchors.fill:parent
-    //                        Tap {
-    //                            onFinished: {
-    //                                customlistModel.listId = listId;
-    //                                customlistModel.listName = text.text;
-    //                                window.addPage(customlistPageComponent);
-    //                            }
-    //                        }
-    //                        TapAndHold {
-    //                            onFinished : {
-    //                                if (listId != 0) {
-    //                                    landingScreenContextMenu.payload = dinstance;
-    //                                    landingScreenContextMenu.setPosition(gesture.position.x, gesture.position.y);
-    //                                    landingScreenContextMenu.show();
-    //                                }
-    //                            }
-    //                        }
-    //                    }
-
-                        MouseArea {
-                            anchors.fill: parent
-                            onClicked: {
-                                customlistModel.listId = listId;
-                                customlistModel.listName = text.text;
-                                window.addPage(customlistPageComponent);
+                        GestureArea {
+                            anchors.fill:parent
+                            Tap {
+                                onFinished: {
+                                    customlistModel.listId = listId;
+                                    customlistModel.listName = text.text;
+                                    window.addPage(customlistPageComponent);
+                                }
                             }
-                            onPressAndHold: {
-                                if (listId != 0) {
-                                    var map = mapToItem(null, mouseX, mouseY);
-                                    landingScreenContextMenu.payload = dinstance;
-                                    landingScreenContextMenu.setPosition(map.x, map.y);
-                                    landingScreenContextMenu.show();
+                            TapAndHold {
+                                onFinished : {
+                                    if (listId != 0) {
+                                        landingScreenContextMenu.payload = dinstance;
+                                        landingScreenContextMenu.setPosition(gesture.position.x, gesture.position.y);
+                                        landingScreenContextMenu.show();
+                                    }
                                 }
                             }
                         }
+
+//                        MouseArea {
+//                            anchors.fill: parent
+//                            onClicked: {
+//                                customlistModel.listId = listId;
+//                                customlistModel.listName = text.text;
+//                                window.addPage(customlistPageComponent);
+//                            }
+//                            onPressAndHold: {
+//                                if (listId != 0) {
+//                                    var map = mapToItem(null, mouseX, mouseY);
+//                                    landingScreenContextMenu.payload = dinstance;
+//                                    landingScreenContextMenu.setPosition(map.x, map.y);
+//                                    landingScreenContextMenu.show();
+//                                }
+//                            }
+//                        }
                     }
 
                     header: Item{
@@ -541,17 +551,17 @@ Window {
                             source: "image://theme/icn_forward_dn"
                         }
 
-    //                    GestureArea {
-    //                        anchors.fill: parent
-    //                        Tap {
-    //                            onFinished: window.addPage(allDueTasksPageComponent)
-    //                        }
-    //                    }
-
-                        MouseArea {
+                        GestureArea {
                             anchors.fill: parent
-                            onClicked: window.addPage(allDueTasksPageComponent)
+                            Tap {
+                                onFinished: window.addPage(allDueTasksPageComponent)
+                            }
                         }
+
+//                        MouseArea {
+//                            anchors.fill: parent
+//                            onClicked: window.addPage(allDueTasksPageComponent)
+//                        }
                     }
                 }
 

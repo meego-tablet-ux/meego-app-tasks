@@ -9,7 +9,7 @@
 import Qt 4.7
 import MeeGo.App.Tasks 0.1
 import MeeGo.Components 0.1
-//import Qt.labs.gestures 2.0
+import MeeGo.Ux.Gestures 0.1
 
 Item {
     id: container
@@ -24,19 +24,19 @@ Item {
         opacity: 0.5
     }
 
-//    GestureArea {
-//        anchors.fill: parent
-//        Tap {
-//            onFinished: {
-//                container.visible = false;
-//            }
-//        }
-//    }
-
-    MouseArea {
+    GestureArea {
         anchors.fill: parent
-        onClicked: container.visible = false
+        Tap {
+            onFinished: {
+                container.visible = false;
+            }
+        }
     }
+
+//    MouseArea {
+//        anchors.fill: parent
+//        onClicked: container.visible = false
+//    }
 
 
     TasksListModel {
@@ -69,23 +69,23 @@ Item {
                 horizontalAlignment: Text.AlignHCenter
             }
 
-//            GestureArea {
-//                anchors.fill: parent
-//                Tap {
-//                    onFinished: {
-//                        container.selected(listId);
-//                        container.visible = false;
-//                    }
-//                }
-//            }
-
-            MouseArea {
+            GestureArea {
                 anchors.fill: parent
-                onClicked: {
-                    container.selected(listId);
-                    container.visible = false;
+                Tap {
+                    onFinished: {
+                        container.selected(listId);
+                        container.visible = false;
+                    }
                 }
             }
+
+//            MouseArea {
+//                anchors.fill: parent
+//                onClicked: {
+//                    container.selected(listId);
+//                    container.visible = false;
+//                }
+//            }
         }
 
         footer:  Item {
@@ -104,18 +104,18 @@ Item {
                 elide: Text.ElideMiddle
             }
 
-//            GestureArea {
-//                anchors.fill: parent
-//                Tap {
-//                    onFinished: {
-//                        createDialog.show();
-//                    }
-//                }
-//            }
-
-            MouseArea {
-                onClicked: createDialog.show()
+            GestureArea {
+                anchors.fill: parent
+                Tap {
+                    onFinished: {
+                        createDialog.show();
+                    }
+                }
             }
+
+//            MouseArea {
+//                onClicked: createDialog.show()
+//            }
         }
     }
 

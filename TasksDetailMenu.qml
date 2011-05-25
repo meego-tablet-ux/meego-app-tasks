@@ -1,7 +1,7 @@
 import QtQuick 1.0
 import MeeGo.Components 0.1
 import MeeGo.App.Tasks 0.1
-//import Qt.labs.gestures 2.0
+import MeeGo.Ux.Gestures 0.1
 
 Column {
     id: detailMenu
@@ -93,21 +93,21 @@ Column {
                     font.pixelSize: theme_fontPixelSizeLarge
                 }
 
-//                GestureArea {
-//                    anchors.fill: parent
-//                    Tap {
-//                        onFinished: {
-//                            detailMenu.task.mListId = listId
-//                        }
-//                    }
-//                }
-
-                MouseArea {
+                GestureArea {
                     anchors.fill: parent
-                    onClicked: {
-                        detailMenu.task.mListId = listId
+                    Tap {
+                        onFinished: {
+                            detailMenu.task.mListId = listId
+                        }
                     }
                 }
+
+//                MouseArea {
+//                    anchors.fill: parent
+//                    onClicked: {
+//                        detailMenu.task.mListId = listId
+//                    }
+//                }
             }
         }
         Text {
