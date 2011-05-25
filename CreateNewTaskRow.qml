@@ -50,7 +50,7 @@ Item {
         id: separator
         width: parent.width
         anchors.bottom: parent.bottom
-        source: "image://theme/tasks/ln_grey_l"
+        source: "image://themedimage/images/tasks/ln_grey_l"
     }
 
     Checkbox {
@@ -64,7 +64,7 @@ Item {
 
     Image {
         id: vDivider
-        source: "image://theme/tasks/ln_grey_p"
+        source: "image://themedimage/images/tasks/ln_grey_p"
         height: parent.height
         width: 1
         anchors.left: checkbox.right
@@ -92,34 +92,34 @@ Item {
 
     Image {
         id: icon
-        source: "image://theme/tasks/frm_dropdown"
+        source: "image://themedimage/images/tasks/frm_dropdown"
         anchors.right: parent.right
         anchors.rightMargin: 20
         anchors.verticalCenter: parent.verticalCenter
         Image {
             id: closedTop
             x: 10
-            source: "image://theme/tasks/icn_calendardropdown"
+            source: "image://themedimage/images/tasks/icn_calendardropdown"
         }
 
-        GestureArea {
-            anchors.fill: parent
-            Tap {
-                onFinished: {
-                    timeMenu.setPosition(gesture.position.x, gesture.position.y);
-                    timeMenu.show();
-                }
-            }
-        }
-
-//        MouseArea {
+//        GestureArea {
 //            anchors.fill: parent
-//            onClicked: {
-//                var map = icon.mapToItem(null, mouseX, mouseY);
-//                timeMenu.setPosition(map.x, map.y);
-//                timeMenu.show();
+//            Tap {
+//                onFinished: {
+//                    timeMenu.setPosition(gesture.position.x, gesture.position.y);
+//                    timeMenu.show();
+//                }
 //            }
 //        }
+
+        MouseArea {
+            anchors.fill: parent
+            onClicked: {
+                var map = icon.mapToItem(null, mouseX, mouseY);
+                timeMenu.setPosition(map.x, map.y);
+                timeMenu.show();
+            }
+        }
     }
 
     ContextMenu {

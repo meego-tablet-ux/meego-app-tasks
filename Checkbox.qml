@@ -18,24 +18,24 @@ Image {
 
     smooth: true
 
-    GestureArea {
-        anchors.fill: parent
-        Tap {
-            onFinished: {
-                if(box.enabled) {
-                    box.clicked(box.checked);
-                }
-            }
-        }
-    }
-
-//    MouseArea {
+//    GestureArea {
 //        anchors.fill: parent
-//        onClicked:  {
-//            if(box.enabled)
-//                box.clicked(box.checked);
+//        Tap {
+//            onFinished: {
+//                if(box.enabled) {
+//                    box.clicked(box.checked);
+//                }
+//            }
 //        }
 //    }
+
+    MouseArea {
+        anchors.fill: parent
+        onClicked:  {
+            if(box.enabled)
+                box.clicked(box.checked);
+        }
+    }
 
     opacity: enabled ? 1 : 0.25
 
@@ -45,7 +45,7 @@ Image {
             when: checked
             PropertyChanges {
                 target: box
-                source:"image://theme/tasks/btn_checkbox_on"
+                source:"image://themedimage/images/tasks/btn_checkbox_on"
             }
         },
         State {
@@ -53,7 +53,7 @@ Image {
             when: !checked
             PropertyChanges {
                 target: box
-                source:"image://theme/tasks/btn_checkbox_off"
+                source:"image://themedimage/images/tasks/btn_checkbox_off"
             }
         }
     ]

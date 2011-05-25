@@ -13,11 +13,16 @@ import MeeGo.Ux.Gestures 0.1
 
 Item {
     id: container
+
+    Theme {
+        id: theme
+    }
+
     width: 640
     height: 480
     property int titleHeight: 60
     property variant model
-    property int rowHeight: theme_listBackgroundPixelHeightOne
+    property int rowHeight: theme.listBackgroundPixelHeightOne
     property bool addNewRow: true
     property variant rowDelegate: cellComponent
     property int textHMargin: 20
@@ -111,55 +116,55 @@ Item {
             text:  getTitleText()
             horizontalAlignment: Text.AlignLeft
             verticalAlignment: Text.AlignVCenter
-            font.pixelSize: theme_fontPixelSizeLarge
+            font.pixelSize: theme.fontPixelSizeLarge
             elide: Text.ElideRight
         }
         Image {
             id: separator_top
             width: parent.width
             anchors.bottom: parent.top
-            source: "image://theme/tasks/ln_grey_l"
+            source: "image://themedimage/images/tasks/ln_grey_l"
         }
         Image {
             id: separator_bt
             width: parent.width
             anchors.top: parent.bottom
-            source: "image://theme/tasks/ln_grey_l"
+            source: "image://themedimage/images/tasks/ln_grey_l"
         }
 
-        GestureArea {
-            anchors.fill: parent
-            Tap {
-                onFinished: {
-                     view.collapsed = !view.collapsed;
-                     text.text = getTitleText();
-                     if (!view.collapsed) {
-                       //  ensureShowingList(index);
-                     }
-                }
-            }
-            TapAndHold {
-                onFinished: {
-                    // test code, to be delted
-                    mode = 2;
-                }
-            }
-        }
-
-//        MouseArea {
+//        GestureArea {
 //            anchors.fill: parent
-//            onClicked: {
-//                view.collapsed = !view.collapsed;
-//                text.text = getTitleText();
-//                if (!view.collapsed) {
-//                  //  ensureShowingList(index);
+//            Tap {
+//                onFinished: {
+//                     view.collapsed = !view.collapsed;
+//                     text.text = getTitleText();
+//                     if (!view.collapsed) {
+//                       //  ensureShowingList(index);
+//                     }
 //                }
 //            }
-//            onPressAndHold: {
+//            TapAndHold {
+//                onFinished: {
 //                    // test code, to be delted
 //                    mode = 2;
+//                }
 //            }
 //        }
+
+        MouseArea {
+            anchors.fill: parent
+            onClicked: {
+                view.collapsed = !view.collapsed;
+                text.text = getTitleText();
+                if (!view.collapsed) {
+                  //  ensureShowingList(index);
+                }
+            }
+            onPressAndHold: {
+                    // test code, to be delted
+                    mode = 2;
+            }
+        }
     }
 
     QtObject {
@@ -216,7 +221,7 @@ Item {
 
             /*Image { //The "proper" way that makes it look ugly
                 id: backimage
-                source: "image://meegotheme/widgets/common/list/list-single-inactive"
+                source: "image://themedimage/widgets/common/list/list-single-inactive"
                 anchors.fill: parent
             }*/
 
@@ -230,7 +235,7 @@ Item {
                 verticalAlignment: Text.AlignVCenter
                 elide: Text.ElideRight
                 font.strikeout: mCompleted
-                font.pixelSize: theme_fontPixelSizeLarge
+                font.pixelSize: theme.fontPixelSizeLarge
                 visible: !isMultipleDragActive
             }
             Text {
@@ -238,11 +243,11 @@ Item {
                 text: getFormattedDate(mDueDate)
                 anchors.right: reorderBt.left
                 anchors.rightMargin:textHMargin
-                font.pixelSize: theme_fontPixelSizeLarge
+                font.pixelSize: theme.fontPixelSizeLarge
                 height: dinstance.height
                 horizontalAlignment: Text.AlignLeft
                 verticalAlignment: Text.AlignVCenter
-                color:theme_fontColorNormal
+                color:theme.fontColorNormal
                 visible: !isMultipleDragActive
             }
 
@@ -257,14 +262,14 @@ Item {
                 verticalAlignment: Text.AlignVCenter
                 elide: Text.ElideRight
                 font.strikeout: mCompleted
-                font.pixelSize: theme_fontPixelSizeLarge
+                font.pixelSize: theme.fontPixelSizeLarge
                 visible: isMultipleDragActive
             }
 
 
             Image {
                 id: reminderIcon
-                source: "image://theme/tasks/icn_alarmclock"
+                source: "image://themedimage/images/tasks/icn_alarmclock"
                 anchors.right: duedateText.left
                 anchors.rightMargin:textHMargin
                 visible: mHasDueDate && (mReminderType!= TasksListModel.NoReminder)
@@ -274,62 +279,62 @@ Item {
                 id: separator
                 width: parent.width
                 anchors.bottom: parent.bottom
-                source: "image://theme/tasks/ln_grey_l"
+                source: "image://themedimage/images/tasks/ln_grey_l"
             }
             Image {
                 id: highlight
-                source: "image://theme/tasks/bg_highlightedpanel_l"
+                source: "image://themedimage/images/tasks/bg_highlightedpanel_l"
                 anchors.fill: parent
                 visible: (index == privateData.selectedRow)
             }
 
 
-            GestureArea {
-                anchors.top: parent.top
-                anchors.bottom: parent.bottom
-                anchors.left: parent.left
-                anchors.right: reorderBt.left
-                Tap {
-                    onFinished: {
-                        privateData.selectedRow = index;
-                        if (mode == 0) {
-                            container.clickedAtRow(index, gesture.position.x, gesture.position.y,dinstance);
-                        } else if (mode == 1) {
-                            // adding mode, do nothing?
-                        }else if (mode == 2){
-                            toggleSelected(mTaskId);
-                        }
-                    }
-                }
-                TapAndHold {
-                    onFinished: {
-                        if (mode == 0) {
-                            container.pressAndHoldAtRow(index, gesture.position.x, gesture.position.y, dinstance);
-                        }
-                    }
-                }
-            }
-
-//            MouseArea {
-//                anchors.fill: parent
-//                onClicked: {
-//                    privateData.selectedRow = index;
-//                    if (mode == 0) {
-//                        var map = mapToItem(null, mouseX, mouseY);
-//                        container.clickedAtRow(index, map.x, map.y,dinstance);
-//                    } else if (mode == 1) {
-//                        // adding mode, do nothing?
-//                    }else if (mode == 2){
-//                        toggleSelected(mTaskId);
+//            GestureArea {
+//                anchors.top: parent.top
+//                anchors.bottom: parent.bottom
+//                anchors.left: parent.left
+//                anchors.right: reorderBt.left
+//                Tap {
+//                    onFinished: {
+//                        privateData.selectedRow = index;
+//                        if (mode == 0) {
+//                            container.clickedAtRow(index, gesture.position.x, gesture.position.y,dinstance);
+//                        } else if (mode == 1) {
+//                            // adding mode, do nothing?
+//                        }else if (mode == 2){
+//                            toggleSelected(mTaskId);
+//                        }
 //                    }
 //                }
-//                onPressAndHold: {
-//                    if (mode == 0) {
-//                        var map = mapToItem(null, mouseX, mouseY);
-//                        container.pressAndHoldAtRow(index, map.x, map.y, dinstance);
+//                TapAndHold {
+//                    onFinished: {
+//                        if (mode == 0) {
+//                            container.pressAndHoldAtRow(index, gesture.position.x, gesture.position.y, dinstance);
+//                        }
 //                    }
 //                }
 //            }
+
+            MouseArea {
+                anchors.fill: parent
+                onClicked: {
+                    privateData.selectedRow = index;
+                    if (mode == 0) {
+                        var map = mapToItem(null, mouseX, mouseY);
+                        container.clickedAtRow(index, map.x, map.y,dinstance);
+                    } else if (mode == 1) {
+                        // adding mode, do nothing?
+                    }else if (mode == 2){
+                        toggleSelected(mTaskId);
+                    }
+                }
+                onPressAndHold: {
+                    if (mode == 0) {
+                        var map = mapToItem(null, mouseX, mouseY);
+                        container.pressAndHoldAtRow(index, map.x, map.y, dinstance);
+                    }
+                }
+            }
 
             Checkbox {
                 id: selectBox
@@ -357,7 +362,7 @@ Item {
 
             Image {
                 id: vDivider
-                source: "image://theme/tasks/ln_grey_p"
+                source: "image://themedimage/images/tasks/ln_grey_p"
                 height: parent.height
                 width: 1
                 anchors.left: box.right
@@ -366,7 +371,7 @@ Item {
 
             Image {
                 id: overdueIcon
-                source: "image://theme/tasks/icn_overdue_red"
+                source: "image://themedimage/images/tasks/icn_overdue_red"
                 anchors.verticalCenter: parent.verticalCenter
                 x: titleText.x + titleText.paintedWidth + 20
                 visible: isOverdue(mDueDate) && mHasDueDate
@@ -375,160 +380,160 @@ Item {
 
             Image {
                 id: reorderBt
-                source: "image://theme/tasks/icn_grabhandle"
+                source: "image://themedimage/images/tasks/icn_grabhandle"
                 anchors.right: parent.right
                 anchors.rightMargin: 20
                 visible: listReorderable
                 y: (rowHeight - height)/2
 
-                GestureArea {
-                    id: gestureArea
-                    property int start: 0
-                    property bool isPositionChanged: false
-
-                    anchors.fill: parent
-
-                    property variant startPoint: null
-
-                    TapAndHold {
-                        onFinished: {
-                            var mapped = reorderBt.parent.mapFromItem(null, gesture.position.x, gesture.position.y);
-                            mapped.y += reorderBt.parent.y;
-                            gestureArea.startPoint = mapped;
-
-                            area.interactive = false;
-                            dinstance.grabbed = true;
-
-                            if (mode == 2 && selectedIds.indexOf(mTaskId) != -1 && selectedIds.length > 1) {//only for multiple drag&drop
-                                isMultipleDragActive = true;
-                                start = selectedIds.indexOf(mTaskId);
-                                var tempArray = new Array();
-                                tempArray = tempArray.concat(selectedIds.slice(0, start));
-
-                                if (start != selectedIds.length-1) {
-                                    tempArray = tempArray.concat(selectedIds.slice(start+1, selectedIds.length));
-                                }
-
-    //                            selectedIds = tempArray;
-                                view.model.hideTasks(tempArray);
-                            }
-                        }
-                    }
-
-                    Pan {
-                        onUpdated: {
-                            var currentPoint = gestureArea.startPoint;
-                            currentPoint.y += gesture.offset.y;
-
-//                            //scroll up
-//                            if (area.height - currentPoint.y <= 1 && area.contentY+area.height<=area.contentHeight)
-//                                area.contentY+=5;
-
-//                            //scroll down
-//                            if ((currentPoint.y+area.contentY <= area.contentY+container.titleHeight) && area.contentY >= 0)
-//                                area.contentY-=5;
-
-                            var target = view.indexAt(currentPoint.x, currentPoint.y/* + view.contentY*/);
-                            if ( target != -1 && target != index) {
-                                if (mode == 2) {//only for multiple drag&drop
-                                    isPositionChanged = true;
-                                    var diff = target - index;
-                                    if (diff > 1) {
-                                        for (var i=index+1; i<target; ++i) {
-                                            start = i;
-                                            view.model.reorderTask(mTaskId, i);
-                                        }
-                                    }
-
-                                    start = target;
-                                }
-
-                                view.model.reorderTask(mTaskId, target);
-                                privateData.selectedRow = -1;
-                            }
-                        }
-                        onFinished: {
-                            if (mode == 2 && isMultipleDragActive) {//only for multiple drag&drop
-                                if (!isPositionChanged)
-                                    view.model.showHiddenTasksOldPositions(view.model.listId);
-                                else
-                                    view.model.showHiddenTasks(view.model.listId, start+1);
-                                isMultipleDragActive = false;
-                                isPositionChanged = false;
-                            }
-                            view.model.saveReorder(mListId);
-                            area.interactive = true;
-                            dinstance.grabbed = false;
-                        }
-                    }
-                }
-
-//                MouseArea {
+//                GestureArea {
+//                    id: gestureArea
 //                    property int start: 0
 //                    property bool isPositionChanged: false
 
 //                    anchors.fill: parent
-//                    onPressed : {
-//                        area.interactive = false;
-//                        dinstance.grabbed = true;
 
-//                        if (mode == 2 && selectedIds.indexOf(mTaskId) != -1 && selectedIds.length > 1) {//only for multiple drag&drop
-//                            isMultipleDragActive = true;
-//                            start = selectedIds.indexOf(mTaskId);
-//                            var tempArray = new Array();
-//                            tempArray = tempArray.concat(selectedIds.slice(0, start));
+//                    property variant startPoint: null
 
-//                            if (start != selectedIds.length-1) {
-//                                tempArray = tempArray.concat(selectedIds.slice(start+1, selectedIds.length));
-//                            }
+//                    TapAndHold {
+//                        onFinished: {
+//                            var mapped = reorderBt.parent.mapFromItem(null, gesture.position.x, gesture.position.y);
+//                            mapped.y += reorderBt.parent.y;
+//                            gestureArea.startPoint = mapped;
 
-////                            selectedIds = tempArray;
-//                            view.model.hideTasks(tempArray);
-//                        }
-//                    }
-//                    onMousePositionChanged: {
-//                        var mapToArea = reorderBt.mapToItem(area, mouseX, mouseY);
+//                            area.interactive = false;
+//                            dinstance.grabbed = true;
 
-//                        //scroll up
-//                        if (area.height - mapToArea.y <= 1 && area.contentY+area.height<=area.contentHeight)
-//                            area.contentY+=5;
+//                            if (mode == 2 && selectedIds.indexOf(mTaskId) != -1 && selectedIds.length > 1) {//only for multiple drag&drop
+//                                isMultipleDragActive = true;
+//                                start = selectedIds.indexOf(mTaskId);
+//                                var tempArray = new Array();
+//                                tempArray = tempArray.concat(selectedIds.slice(0, start));
 
-//                        //scroll down
-//                        if ((mapToArea.y+area.contentY <= area.contentY+container.titleHeight) && area.contentY >= 0)
-//                            area.contentY-=5;
-
-//                        var map = reorderBt.mapToItem(view, mouseX, mouseY);
-//                        var target = view.indexAt(map.x, map.y + view.contentY);
-//                        if ( target != -1 && target != index) {
-//                            if (mode == 2) {//only for multiple drag&drop
-//                                isPositionChanged = true;
-//                                var diff = target - index;
-//                                if (diff > 1) {
-//                                    for (var i=index+1; i<target; ++i) {
-//                                        start = i;
-//                                        view.model.reorderTask(mTaskId, i);
-//                                    }
+//                                if (start != selectedIds.length-1) {
+//                                    tempArray = tempArray.concat(selectedIds.slice(start+1, selectedIds.length));
 //                                }
-//                                start = target;
+
+//    //                            selectedIds = tempArray;
+//                                view.model.hideTasks(tempArray);
 //                            }
-//                            view.model.reorderTask(mTaskId, target);
-//                            privateData.selectedRow = -1;
 //                        }
 //                    }
-//                    onReleased: {
-//                        if (mode == 2 && isMultipleDragActive) {//only for multiple drag&drop
-//                            if (!isPositionChanged)
-//                                view.model.showHiddenTasksOldPositions(view.model.listId);
-//                            else
-//                                view.model.showHiddenTasks(view.model.listId, start+1);
-//                            isMultipleDragActive = false;
-//                            isPositionChanged = false;
+
+//                    Pan {
+//                        onUpdated: {
+//                            var currentPoint = gestureArea.startPoint;
+//                            currentPoint.y += gesture.offset.y;
+
+////                            //scroll up
+////                            if (area.height - currentPoint.y <= 1 && area.contentY+area.height<=area.contentHeight)
+////                                area.contentY+=5;
+
+////                            //scroll down
+////                            if ((currentPoint.y+area.contentY <= area.contentY+container.titleHeight) && area.contentY >= 0)
+////                                area.contentY-=5;
+
+//                            var target = view.indexAt(currentPoint.x, currentPoint.y/* + view.contentY*/);
+//                            if ( target != -1 && target != index) {
+//                                if (mode == 2) {//only for multiple drag&drop
+//                                    isPositionChanged = true;
+//                                    var diff = target - index;
+//                                    if (diff > 1) {
+//                                        for (var i=index+1; i<target; ++i) {
+//                                            start = i;
+//                                            view.model.reorderTask(mTaskId, i);
+//                                        }
+//                                    }
+
+//                                    start = target;
+//                                }
+
+//                                view.model.reorderTask(mTaskId, target);
+//                                privateData.selectedRow = -1;
+//                            }
 //                        }
-//                        view.model.saveReorder(mListId);
-//                        area.interactive = true;
-//                        dinstance.grabbed = false;
+//                        onFinished: {
+//                            if (mode == 2 && isMultipleDragActive) {//only for multiple drag&drop
+//                                if (!isPositionChanged)
+//                                    view.model.showHiddenTasksOldPositions(view.model.listId);
+//                                else
+//                                    view.model.showHiddenTasks(view.model.listId, start+1);
+//                                isMultipleDragActive = false;
+//                                isPositionChanged = false;
+//                            }
+//                            view.model.saveReorder(mListId);
+//                            area.interactive = true;
+//                            dinstance.grabbed = false;
+//                        }
 //                    }
 //                }
+
+                MouseArea {
+                    property int start: 0
+                    property bool isPositionChanged: false
+
+                    anchors.fill: parent
+                    onPressed : {
+                        area.interactive = false;
+                        dinstance.grabbed = true;
+
+                        if (mode == 2 && selectedIds.indexOf(mTaskId) != -1 && selectedIds.length > 1) {//only for multiple drag&drop
+                            isMultipleDragActive = true;
+                            start = selectedIds.indexOf(mTaskId);
+                            var tempArray = new Array();
+                            tempArray = tempArray.concat(selectedIds.slice(0, start));
+
+                            if (start != selectedIds.length-1) {
+                                tempArray = tempArray.concat(selectedIds.slice(start+1, selectedIds.length));
+                            }
+
+//                            selectedIds = tempArray;
+                            view.model.hideTasks(tempArray);
+                        }
+                    }
+                    onMousePositionChanged: {
+                        var mapToArea = reorderBt.mapToItem(area, mouseX, mouseY);
+
+                        //scroll up
+                        if (area.height - mapToArea.y <= 1 && area.contentY+area.height<=area.contentHeight)
+                            area.contentY+=5;
+
+                        //scroll down
+                        if ((mapToArea.y+area.contentY <= area.contentY+container.titleHeight) && area.contentY >= 0)
+                            area.contentY-=5;
+
+                        var map = reorderBt.mapToItem(view, mouseX, mouseY);
+                        var target = view.indexAt(map.x, map.y + view.contentY);
+                        if ( target != -1 && target != index) {
+                            if (mode == 2) {//only for multiple drag&drop
+                                isPositionChanged = true;
+                                var diff = target - index;
+                                if (diff > 1) {
+                                    for (var i=index+1; i<target; ++i) {
+                                        start = i;
+                                        view.model.reorderTask(mTaskId, i);
+                                    }
+                                }
+                                start = target;
+                            }
+                            view.model.reorderTask(mTaskId, target);
+                            privateData.selectedRow = -1;
+                        }
+                    }
+                    onReleased: {
+                        if (mode == 2 && isMultipleDragActive) {//only for multiple drag&drop
+                            if (!isPositionChanged)
+                                view.model.showHiddenTasksOldPositions(view.model.listId);
+                            else
+                                view.model.showHiddenTasks(view.model.listId, start+1);
+                            isMultipleDragActive = false;
+                            isPositionChanged = false;
+                        }
+                        view.model.saveReorder(mListId);
+                        area.interactive = true;
+                        dinstance.grabbed = false;
+                    }
+                }
             }
         }
     }
@@ -541,8 +546,8 @@ Item {
         showAcceptButton: true
         cancelButtonText:  qsTr( "No" )
         acceptButtonText: qsTr( "Yes" )
-        acceptButtonImage: "image://theme/btn_red_up"
-        acceptButtonImagePressed:"image://theme/btn_red_dn"
+        acceptButtonImage: "image://themedimage/images/btn_red_up"
+        acceptButtonImagePressed:"image://themedimage/images/btn_red_dn"
         title: {
             if(container.selectedIds.length > 1) {
                 return qsTr("Are you sure you want to delete these %1 tasks?").arg(container.selectedIds.length);

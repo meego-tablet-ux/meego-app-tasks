@@ -11,7 +11,7 @@ import MeeGo.Components 0.1
 
 BorderImage {
     id: bar
-    source: "image://meegotheme/widgets/common/action-bar/action-bar-background"
+    source: "image://themedimage/widgets/common/action-bar/action-bar-background"
     width: 1024
     height:80
     border.left: 20
@@ -39,7 +39,7 @@ BorderImage {
     signal clickedOk()
 
     Image {
-        source: "image://meegotheme/widgets/common/action-bar/action-bar-shadow"
+        source: "image://themedimage/widgets/common/action-bar/action-bar-shadow"
         anchors.bottom: bar.top
         width: parent.width
     }
@@ -52,8 +52,8 @@ BorderImage {
         Button {
             id: saveBt
             text:labelSave
-            bgSourceUp:"image://theme/btn_blue_up"
-            bgSourceDn:"image://theme/btn_blue_dn"
+            bgSourceUp:"image://themedimage/images/btn_blue_up"
+            bgSourceDn:"image://themedimage/images/btn_blue_dn"
             onClicked: {
                 bar.clickedSave();
             }
@@ -62,8 +62,8 @@ BorderImage {
         Button {
             id: moveBt
             text:labelMove.arg(model.length)
-            bgSourceUp:"image://theme/btn_blue_up"
-            bgSourceDn:"image://theme/btn_blue_dn"
+            bgSourceUp:"image://themedimage/images/btn_blue_up"
+            bgSourceDn:"image://themedimage/images/btn_blue_dn"
             active: model.length > 0
             onClicked: {
                 bar.clickedMove();
@@ -72,8 +72,8 @@ BorderImage {
         Button {
             id: deleteBt
             text: labelDelete.arg(model.length)
-            bgSourceUp:"image://theme/btn_blue_up"
-            bgSourceDn:"image://theme/btn_blue_dn"
+            bgSourceUp:"image://themedimage/images/btn_blue_up"
+            bgSourceDn:"image://themedimage/images/btn_blue_dn"
             active: model.length > 0
             onClicked: {
                 bar.clickedDelete();
@@ -82,8 +82,8 @@ BorderImage {
         Button {
             id: okBt
             text: labelOk
-            bgSourceUp:"image://theme/btn_blue_up"
-            bgSourceDn:"image://theme/btn_blue_dn"
+            bgSourceUp:"image://themedimage/images/btn_blue_up"
+            bgSourceDn:"image://themedimage/images/btn_blue_dn"
             onClicked: {
                 bar.clickedOk();
             }
