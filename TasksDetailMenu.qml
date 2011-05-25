@@ -130,7 +130,7 @@ Column {
         }
         Text {
             id: duedateText
-            text: task ? getFormattedDateYear(task.mDueDate) : ""
+            text: task ? getFormattedDate(task.mDueDate) : ""
             font.pixelSize: theme_fontPixelSizeLarge
             anchors.verticalCenter: parent.verticalCenter
         }

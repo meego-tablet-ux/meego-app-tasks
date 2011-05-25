@@ -13,6 +13,8 @@
 #include <QtCore/QVariant>
 #include <QtCore/QSettings>
 
+class QLocale;
+
 class QmlSetting : public QDeclarativeItem
 {
     Q_OBJECT
@@ -23,6 +25,12 @@ class QmlSetting : public QDeclarativeItem
     Q_PROPERTY(bool isRunningFirstTime READ isRunningFirstTime WRITE setRunningFirstTime NOTIFY isRunningFirstTimeChanged)
 
 public:
+    enum DateTimeFormat
+    {
+        DateMonthDay,
+        DateFullNumShort
+    };
+    Q_ENUMS(DateTimeFormat)
 
     QmlSetting(QDeclarativeItem *parent = 0);
     ~QmlSetting();
@@ -40,12 +48,17 @@ signals:
 public slots:
     QVariant get(const QString& key) const;
     void set(const QString& key, const QVariant &value);
+    QString localDate(const QDate &date, int format) const;
 
 private slots:
     void saveSettings();
 
 private:
+    QString formatString(int formant) const;
+
+private:
     QSettings m_settings;
+    QLocale m_locale;
 };
 
 QML_DECLARE_TYPE(QmlSetting)

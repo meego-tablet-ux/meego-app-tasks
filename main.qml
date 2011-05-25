@@ -65,9 +65,9 @@ Window {
 //        }
 //    }
 
-    Labs.LocaleHelper {
-        id: localeHelper
-    }
+//    Labs.LocaleHelper {
+//        id: localeHelper
+//    }
 
     toolBarTitle: labelTasks
 
@@ -83,21 +83,23 @@ Window {
                 now.getYear() == date.getYear() )
             return labelToday
 
-        return localeHelper.localDate(date,Labs.LocaleHelper.DateMonthDay);
+//        return localeHelper.localDate(date,Labs.LocaleHelper.DateMonthDay);
+        return qmlSettings.localDate(date, now.getYear() == date.getYear() ? QmlSetting.DateMonthDay : QmlSetting.DateFullNumShort);
     }
 
-    function getFormattedDateYear(date) {
-        if (!date.getDate()) {
-            return labelSomeday;
-        }
-        var now = new Date();
-        if (now.getDate() == date.getDate() &&
-                now.getMonth() == date.getMonth() &&
-                now.getYear() == date.getYear() )
-            return labelToday
+//    function getFormattedDateYear(date) { //TODO: should be removed after testing
+//        if (!date.getDate()) {
+//            return labelSomeday;
+//        }
+//        var now = new Date();
+//        if (now.getDate() == date.getDate() &&
+//                now.getMonth() == date.getMonth() &&
+//                now.getYear() == date.getYear() )
+//            return labelToday
 
-        return localeHelper.localDate(date,Labs.LocaleHelper.DateFullNumShort);
-    }
+////        return localeHelper.localDate(date,Labs.LocaleHelper.DateFullNumShort);
+//        return qmlSettings.localDate(date,QmlSetting.DateFullNumShort);
+//    }
     function isOverdue(date) {
         if (!date.getDate)
             return false;

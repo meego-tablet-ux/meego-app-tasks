@@ -9,6 +9,7 @@
 #include "qsettingsbackend.h"
 
 #include <QtDeclarative/qdeclarative.h>
+#include <QDate>
 
 static const QString generalGroup = "General/";
 static const QString isRunningFirstTimeKey = "isRunningFirstTime";
@@ -24,7 +25,7 @@ QmlSetting::QmlSetting(QDeclarativeItem *parent):
     // setFlag(ItemHasNoContents, false)
 }
 
-QmlSetting::~QmlSetting()//WARNING: dtor is never called
+QmlSetting::~QmlSetting()
 {
 }
 
@@ -60,4 +61,26 @@ void QmlSetting::setRunningFirstTime(bool first)
         return;
     m_settings.setValue(generalGroup + isRunningFirstTimeKey, first);
     m_settings.sync();
+}
+
+QString QmlSetting::localDate(const QDate &date, int format) const
+{
+    return date.toString(formatString(format));
+}
+
+QString QmlSetting::formatString(int format) const
+{
+    QString res;
+    switch (format) {
+    case DateMonthDay:
+        res = tr("MMMM d");
+        break;
+    case DateFullNumShort:
+        res = m_locale.dateFormat(QLocale::ShortFormat);
+        break;
+    default:
+        qDebug() << Q_FUNC_INFO << "unknown format" << format;
+        break;
+    }
+    return res;
 }
