@@ -588,6 +588,9 @@ Item {
             newrow.reset();
             container.titleText = getTitleText();
             container.mode = 0;
+
+            if (area.contentHeight > area.height)
+                area.contentY = (area.contentHeight - area.height);
         }
         onClickedMove: {
            // container.model.viewModel.moveTasksToList(selectedIds, 0);
