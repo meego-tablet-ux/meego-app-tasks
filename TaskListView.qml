@@ -27,6 +27,7 @@ Item {
     property variant rowDelegate: cellComponent
     property int textHMargin: 20
     property bool listReorderable: true
+    property string titleText
 
     property variant selectedIds: []
 
@@ -113,7 +114,7 @@ Item {
             id: text
             anchors.fill: parent
             anchors.leftMargin: textHMargin
-            text:  getTitleText()
+            text:  container.titleText
             horizontalAlignment: Text.AlignLeft
             verticalAlignment: Text.AlignVCenter
             font.pixelSize: theme.fontPixelSizeLarge
@@ -155,7 +156,7 @@ Item {
             anchors.fill: parent
             onClicked: {
                 view.collapsed = !view.collapsed;
-                text.text = getTitleText();
+                container.titleText = getTitleText();
                 if (!view.collapsed) {
                   //  ensureShowingList(index);
                 }
@@ -585,6 +586,7 @@ Item {
             container.model.viewModel.commitAddedTasks();
             container.selectedIds = [];
             newrow.reset();
+            container.titleText = getTitleText();
             container.mode = 0;
         }
         onClickedMove: {
