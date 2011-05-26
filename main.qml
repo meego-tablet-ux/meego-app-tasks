@@ -1125,7 +1125,8 @@ Window {
                 property int listId: -1
                 onAccepted: {
                     editorList.removeList(listId);
-                    window.previousApplicationPage();
+                    if (window.pageStack.currentPage == customlistPage)
+                        window.pageStack.pop();
                 }
             }
 
