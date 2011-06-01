@@ -48,7 +48,7 @@ Window {
         id: theme
     }
 
-    property int rowHeight: theme.listBackgroundPixelHeightOne
+    property int rowHeight: theme_listBackgroundPixelHeightOne
     property int horizontalMargin: 20
     property int verticalMargin: 10
     property int titleHeight: 50
@@ -1052,7 +1052,7 @@ Window {
 
             TaskListView {
                 id: taskListView
-                parent:customlistPage.content
+                parent:customlistPage
                 anchors.fill:parent
                 property alias title: categoryitem.title
                 property alias viewModel: categoryitem.viewModel
