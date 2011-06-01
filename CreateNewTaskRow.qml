@@ -24,9 +24,7 @@ Item {
     property bool selectedDueDate: false
     property date selectedDate
     property date nullDate //used for resetting the selected date
-     //: used to indicate the currently selected duedate for the new task
-    property variant checkMark: qsTr("* ");
-    property variant timeSelectModel: [ checkMark +labelSomeday, labelToday, labelTomorrow,
+    property variant timeSelectModel: [ labelSomeday, labelToday, labelTomorrow,
         labelNextWeek, labelSetDueDate];
 
     signal confirmedInput();
@@ -37,8 +35,7 @@ Item {
         textinput.focus = false;
         selectedDueDate = false;
         selectedDate = nullDate;
-        timeSelectModel = [ checkMark +labelSomeday, labelToday, labelTomorrow,
-                           labelNextWeek, labelSetDueDate];
+        timeMenu.selectedIndex =0;
     }
 
     Rectangle {
@@ -75,7 +72,7 @@ Item {
         id: textinput
         anchors.left: checkbox.right
         anchors.leftMargin: row.height / 2
-        anchors.right: icon.left
+        anchors.right: timeMenu.left
         height: row.height - 10
         anchors.verticalCenter: parent.verticalCenter
         defaultText: labelCreateNewTask
@@ -90,78 +87,42 @@ Item {
         }
     }
 
-    Image {
-        id: icon
-        source: "image://themedimage/images/tasks/frm_dropdown"
+    DropDown {
+        id: timeMenu
         anchors.right: parent.right
         anchors.rightMargin: 20
         anchors.verticalCenter: parent.verticalCenter
-        Image {
-            id: closedTop
-            x: 10
-            source: "image://themedimage/images/tasks/icn_calendardropdown"
+        width: 200
+        minWidth: 300
+        title: qsTr("Select Due Date")
+        height: parent.height
+        showTitleInMenu: true
+        titleColor: "black"
+        model:timeSelectModel
+        Component.onCompleted: {
+            selectedIndex = 0
         }
-
-//        GestureArea {
-//            anchors.fill: parent
-//            Tap {
-//                onFinished: {
-//                    timeMenu.setPosition(gesture.position.x, gesture.position.y);
-//                    timeMenu.show();
-//                }
-//            }
-//        }
-
-        MouseArea {
-            anchors.fill: parent
-            onClicked: {
-                var map = icon.mapToItem(null, mouseX, mouseY);
-                timeMenu.setPosition(map.x, map.y);
-                timeMenu.show();
+        onTriggered: {
+            if(index > 0) {
+                selectedDueDate = true;
+                if(index == 1) {
+                    selectedDate = new Date();
+                } else if(index == 2) {
+                    var tempDate = new Date(); //need a temp because this doesn't work otherwise
+                    tempDate.setDate(tempDate.getDate() + 1); //I don't know why
+                    selectedDate = tempDate;
+                } else if(index == 3) {
+                    var tempDate = new Date();
+                    tempDate.setDate(tempDate.getDate() + 7);
+                    selectedDate = tempDate;
+                }
+                else if(index == 4) {
+                    datePicker.show();
+                }
+            } else {
+                selectedDueDate = false;
+                selectedDate = nullDate;
             }
         }
-    }
-
-    ContextMenu {
-        id: timeMenu
-        content: ActionMenu {
-            model:timeSelectModel
-            onTriggered: {
-                timeMenu.hide();
-                if(index > 0) {
-                    selectedDueDate = true;
-                    if(index == 1) {
-                        selectedDate = new Date();
-                    } else if(index == 2) {
-                        var tempDate = new Date(); //need a temp because this doesn't work otherwise
-                        tempDate.setDate(tempDate.getDate() + 1); //I don't know why
-                        selectedDate = tempDate;
-                    } else if(index == 3) {
-                        var tempDate = new Date();
-                        tempDate.setDate(tempDate.getDate() + 7);
-                        selectedDate = tempDate;
-                    }
-                    else if(index == 4) {
-                        datePicker.show();
-                    }
-                } else {
-                    selectedDueDate = false;
-                    selectedDate = nullDate;
-                }
-
-                var temp = timeSelectModel;
-                for(var i=0;i<timeSelectModel.length;i++) {
-                    if(i == index) {
-                        temp[i] = temp[i].replace(checkMark,""); //it may already have a checkmark
-                        temp[i] = checkMark + temp[i] ;
-                    }else {
-                        temp[i] = temp[i].replace(checkMark,"");
-                    }
-                }
-                timeSelectModel = temp;
-            }
-
-        }
-
     }
 }
