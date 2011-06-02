@@ -27,7 +27,6 @@ Item {
     property variant rowDelegate: cellComponent
     property int textHMargin: 20
     property bool listReorderable: true
-    property string titleText
 
     property variant selectedIds: []
 
@@ -114,7 +113,7 @@ Item {
             id: text
             anchors.fill: parent
             anchors.leftMargin: textHMargin
-            text:  container.titleText
+            text: internal.titleText
             horizontalAlignment: Text.AlignLeft
             verticalAlignment: Text.AlignVCenter
             font.pixelSize: theme.fontPixelSizeLarge
@@ -156,7 +155,7 @@ Item {
             anchors.fill: parent
             onClicked: {
                 view.collapsed = !view.collapsed;
-                container.titleText = getTitleText();
+                internal.titleText = getTitleText();
                 if (!view.collapsed) {
                   //  ensureShowingList(index);
                 }
@@ -586,7 +585,7 @@ Item {
             container.model.viewModel.commitAddedTasks();
             container.selectedIds = [];
             newrow.reset();
-            container.titleText = getTitleText();
+            internal.titleText = getTitleText();
             container.mode = 0;
 
             if (area.contentHeight > area.height)
@@ -696,4 +695,9 @@ Item {
         }
     ]
 
+    QtObject {
+        //private data
+        id: internal
+        property string titleText: getTitleText()
+    }
 }

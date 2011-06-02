@@ -55,19 +55,17 @@ Window {
 
     QmlSetting {
         id: qmlSettings
-        Component.onCompleted: qmlSettings.isRunningFirstTime = false   //TODO: hack, it brakes Blank Slates for ListView, but it is necessary,
-                                                                        //because neither Component.onDestruction nor QmlSettings::dtor never get called.
-//        isRunningFirstTime: saveRestore.restoreRequired ? saveRestore.value("isRunningFirstTime") : true
+        isRunningFirstTime: saveRestore.value("isRunningFirstTime")
     }
 
-//    SaveRestoreState {
-//        id: saveRestore
+    SaveRestoreState {
+        id: saveRestore
 
-//        onSaveRequired: {
-//            setValue("isRunningFirstTime", false);
-//            sync();
-//        }
-//    }
+        onSaveRequired: {
+            setValue("isRunningFirstTime", false);
+            sync();
+        }
+    }
 
 //    Labs.LocaleHelper {
 //        id: localeHelper

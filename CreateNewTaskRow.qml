@@ -68,18 +68,6 @@ Item {
         anchors.leftMargin: 20
     }
 
-    TextEntry {
-        id: textinput
-        anchors.left: checkbox.right
-        anchors.leftMargin: row.height / 2
-        anchors.right: timeMenu.left
-        height: row.height - 10
-        anchors.verticalCenter: parent.verticalCenter
-        defaultText: labelCreateNewTask
-        onTextChanged:requestForEditing();
-    }
-
-
     DatePicker {
         id: datePicker
         onDateSelected: {
@@ -87,41 +75,56 @@ Item {
         }
     }
 
-    DropDown {
-        id: timeMenu
+    Row {
+        anchors.left: checkbox.right
+        anchors.leftMargin: row.height / 2
+        anchors.verticalCenter: parent.verticalCenter
         anchors.right: parent.right
         anchors.rightMargin: 20
-        anchors.verticalCenter: parent.verticalCenter
-        width: 200
-        minWidth: 300
-        title: qsTr("Select Due Date")
-        height: parent.height
-        showTitleInMenu: true
-        titleColor: "black"
-        model:timeSelectModel
-        Component.onCompleted: {
-            selectedIndex = 0
+
+        spacing: 5
+
+        TextEntry {
+            id: textinput
+            width: parent.width - timeMenu.width
+            height: row.height - 10
+            defaultText: labelCreateNewTask
+            onTextChanged:requestForEditing();
         }
-        onTriggered: {
-            if(index > 0) {
-                selectedDueDate = true;
-                if(index == 1) {
-                    selectedDate = new Date();
-                } else if(index == 2) {
-                    var tempDate = new Date(); //need a temp because this doesn't work otherwise
-                    tempDate.setDate(tempDate.getDate() + 1); //I don't know why
-                    selectedDate = tempDate;
-                } else if(index == 3) {
-                    var tempDate = new Date();
-                    tempDate.setDate(tempDate.getDate() + 7);
-                    selectedDate = tempDate;
+
+        DropDown {
+            id: timeMenu
+            width: 200
+            minWidth: 300
+            title: qsTr("Select Due Date")
+            height: textinput.height
+            showTitleInMenu: true
+            titleColor: "black"
+            model:timeSelectModel
+            Component.onCompleted: {
+                selectedIndex = 0
+            }
+            onTriggered: {
+                if(index > 0) {
+                    selectedDueDate = true;
+                    if(index == 1) {
+                        selectedDate = new Date();
+                    } else if(index == 2) {
+                        var tempDate = new Date(); //need a temp because this doesn't work otherwise
+                        tempDate.setDate(tempDate.getDate() + 1); //I don't know why
+                        selectedDate = tempDate;
+                    } else if(index == 3) {
+                        var tempDate = new Date();
+                        tempDate.setDate(tempDate.getDate() + 7);
+                        selectedDate = tempDate;
+                    }
+                    else if(index == 4) {
+                        datePicker.show();
+                    }
+                } else {
+                    selectedDueDate = false;
+                    selectedDate = nullDate;
                 }
-                else if(index == 4) {
-                    datePicker.show();
-                }
-            } else {
-                selectedDueDate = false;
-                selectedDate = nullDate;
             }
         }
     }
