@@ -16,9 +16,9 @@ Window {
     id: window
     property string labelTasks: qsTr("Tasks")
     property string labelAllDueTasks: qsTr("All due tasks")
-     //:Down arrow for the Ascending order
+    //:Up arrow for the Ascending order
     property string labelAllDureTasksASCOrder: qsTr("Order: %1").arg("↑")
-    //:Up arrow for the decending order
+    //:Down arrow for the decending order
     property string labelAllDureTasksDESCOrder: qsTr("Order: %1").arg("↓")
     property string labelOverdue: qsTr("Overdue")
     property string labelUpComing: qsTr("Upcoming")
