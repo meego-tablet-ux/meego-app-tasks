@@ -8,7 +8,8 @@
 
 import Qt 4.7
 import MeeGo.App.Tasks 0.1
-//import Qt.labs.gestures 2.0
+import MeeGo.Components 0.1
+import MeeGo.Ux.Gestures 0.1
 
 Item {
     id: container
@@ -53,6 +54,8 @@ Item {
     function getTitleYValue(index) {
         // list.y is the height of the previous lists
         var top = -area.contentY;
+        if (!allViews.children[index])
+            return top;
         var list = allViews.children[index].y;
         var title = titles.children[index]
         if (list == undefined || title == undefined)
@@ -156,6 +159,10 @@ Item {
         }
     }
 
+    Theme {
+        id: theme
+    }
+
     Component {
         id: titleComponent
         Rectangle {
@@ -212,20 +219,20 @@ Item {
                 horizontalAlignment: Text.AlignLeft
                 verticalAlignment: Text.AlignVCenter
                 //font.bold: true
-                font.pixelSize: theme_fontPixelSizeLarge
+                font.pixelSize: theme.fontPixelSizeLarge
                 elide: Text.ElideRight
             }
             Image {
                 id: separator_top
                 width: parent.width
                 anchors.bottom: parent.top
-                source: "image://theme/tasks/ln_grey_l"
+                source: "image://themedimage/images/tasks/ln_grey_l"
             }
             Image {
                 id: separator_bt
                 width: parent.width
                 anchors.top: parent.bottom
-                source: "image://theme/tasks/ln_grey_l"
+                source: "image://themedimage/images/tasks/ln_grey_l"
             }
 //            GestureArea {
 //                anchors.fill: parent
@@ -327,7 +334,7 @@ Item {
                 verticalAlignment: Text.AlignVCenter
                 elide: Text.ElideRight
                 font.strikeout: mCompleted
-                font.pixelSize: theme_fontPixelSizeLarge
+                font.pixelSize: theme.fontPixelSizeLarge
             }
 
             Text {
@@ -335,17 +342,17 @@ Item {
                 text:   getFormattedDate(mDueDate)
                 anchors.right: parent.right
                 anchors.rightMargin:textHMargin
-                font.pixelSize: theme_fontPixelSizeLarge
+                font.pixelSize: theme.fontPixelSizeLarge
                 height: dinstance.height
                 horizontalAlignment: Text.AlignLeft
                 verticalAlignment: Text.AlignVCenter
-                color:theme_fontColorNormal
+                color: theme.fontColorNormal
                 visible: mHasDueDate
             }
 
             Image {
                 id: reminderIcon
-                source: "image://theme/tasks/icn_alarmclock"
+                source: "image://themedimage/images/tasks/icn_alarmclock"
                 anchors.right: duedateText.left
                 anchors.rightMargin:textHMargin
                 visible: mHasDueDate && (mReminderType!= TasksListModel.NoReminder)
@@ -356,45 +363,45 @@ Item {
                 id: separator
                 width: parent.width
                 anchors.bottom: parent.bottom
-                source: "image://theme/tasks/ln_grey_l"
+                source: "image://themedimage/images/tasks/ln_grey_l"
             }
             Image {
                 id: highlight
-                source: "image://theme/tasks/bg_highlightedpanel_l"
+                source: "image://themedimage/images/tasks/bg_highlightedpanel_l"
                 anchors.fill: parent
                 visible: (view.categoryIndex == privateData.selectedCategory ) &&
                          (index == privateData.selectedRow)
             }
 
-//            GestureArea {
-//                anchors.fill: parent
-//                Tap {
-//                    onFinished: {
-//                        privateData.selectedCategory = view.categoryIndex;
-//                        privateData.selectedRow = index;
-//                        container.clickedAtRow(index, gesture.position.x, gesture.position.y,dinstance);
-//                    }
-//                }
-//                TapAndHold {
-//                    onFinished: {
-//                        container.pressAndHoldAtRow(index, gesture.position.x, gesture.position.y, dinstance);
-//                    }
-//                }
-//            }
-
-            MouseArea {
+            GestureArea {
                 anchors.fill: parent
-                onClicked:  {
-                    privateData.selectedCategory = view.categoryIndex;
-                    privateData.selectedRow = index;
-                    var map = mapToItem(null, mouseX, mouseY);
-                    container.clickedAtRow(index, map.x, map.y,dinstance);
+                Tap {
+                    onFinished: {
+                        privateData.selectedCategory = view.categoryIndex;
+                        privateData.selectedRow = index;
+                        container.clickedAtRow(index, gesture.position.x, gesture.position.y,dinstance);
+                    }
                 }
-                onPressAndHold: {
-                    var map = mapToItem(null, mouseX, mouseY);
-                    container.pressAndHoldAtRow(index, map.x, map.y,dinstance);
+                TapAndHold {
+                    onFinished: {
+                        container.pressAndHoldAtRow(index, gesture.position.x, gesture.position.y, dinstance);
+                    }
                 }
             }
+
+//            MouseArea {
+//                anchors.fill: parent
+//                onClicked:  {
+//                    privateData.selectedCategory = view.categoryIndex;
+//                    privateData.selectedRow = index;
+//                    var map = mapToItem(null, mouseX, mouseY);
+//                    container.clickedAtRow(index, map.x, map.y,dinstance);
+//                }
+//                onPressAndHold: {
+//                    var map = mapToItem(null, mouseX, mouseY);
+//                    container.pressAndHoldAtRow(index, map.x, map.y,dinstance);
+//                }
+//            }
 
             Checkbox {
                 id: box
@@ -421,7 +428,7 @@ Item {
 
             Image {
                 id: vDivider
-                source: "image://theme/tasks/ln_grey_p"
+                source: "image://themedimage/images/tasks/ln_grey_p"
                 height: parent.height
                 width: 1
                 anchors.left: box.right
@@ -430,7 +437,7 @@ Item {
 
             Image {
                 id: overdueIcon
-                source: "image://theme/tasks/icn_overdue_red"
+                source: "image://themedimage/images/tasks/icn_overdue_red"
                 anchors.verticalCenter: parent.verticalCenter
                 x: titleText.x + titleText.paintedWidth + 20
                 visible: isOverdue(mDueDate) && mHasDueDate

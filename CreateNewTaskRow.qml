@@ -8,7 +8,7 @@
 
 import Qt 4.7
 import MeeGo.Components 0.1
-//import Qt.labs.gestures 2.0
+import MeeGo.Ux.Gestures 0.1
 
 Item {
     id: row
@@ -24,9 +24,7 @@ Item {
     property bool selectedDueDate: false
     property date selectedDate
     property date nullDate //used for resetting the selected date
-     //: used to indicate the currently selected duedate for the new task
-    property variant checkMark: qsTr("* ");
-    property variant timeSelectModel: [ checkMark +labelSomeday, labelToday, labelTomorrow,
+    property variant timeSelectModel: [ labelSomeday, labelToday, labelTomorrow,
         labelNextWeek, labelSetDueDate];
 
     signal confirmedInput();
@@ -37,8 +35,7 @@ Item {
         textinput.focus = false;
         selectedDueDate = false;
         selectedDate = nullDate;
-        timeSelectModel = [ checkMark +labelSomeday, labelToday, labelTomorrow,
-                           labelNextWeek, labelSetDueDate];
+        timeMenu.selectedIndex =0;
     }
 
     Rectangle {
@@ -50,7 +47,7 @@ Item {
         id: separator
         width: parent.width
         anchors.bottom: parent.bottom
-        source: "image://theme/tasks/ln_grey_l"
+        source: "image://themedimage/images/tasks/ln_grey_l"
     }
 
     Checkbox {
@@ -64,24 +61,12 @@ Item {
 
     Image {
         id: vDivider
-        source: "image://theme/tasks/ln_grey_p"
+        source: "image://themedimage/images/tasks/ln_grey_p"
         height: parent.height
         width: 1
         anchors.left: checkbox.right
         anchors.leftMargin: 20
     }
-
-    TextEntry {
-        id: textinput
-        anchors.left: checkbox.right
-        anchors.leftMargin: row.height / 2
-        anchors.right: icon.left
-        height: row.height - 10
-        anchors.verticalCenter: parent.verticalCenter
-        defaultText: labelCreateNewTask
-        onTextChanged:requestForEditing();
-    }
-
 
     DatePicker {
         id: datePicker
@@ -90,44 +75,36 @@ Item {
         }
     }
 
-    Image {
-        id: icon
-        source: "image://theme/tasks/frm_dropdown"
+    Row {
+        anchors.left: checkbox.right
+        anchors.leftMargin: row.height / 2
+        anchors.verticalCenter: parent.verticalCenter
         anchors.right: parent.right
         anchors.rightMargin: 20
-        anchors.verticalCenter: parent.verticalCenter
-        Image {
-            id: closedTop
-            x: 10
-            source: "image://theme/tasks/icn_calendardropdown"
+
+        spacing: 5
+
+        TextEntry {
+            id: textinput
+            width: parent.width - timeMenu.width
+            height: row.height - 10
+            defaultText: labelCreateNewTask
+            onTextChanged:requestForEditing();
         }
 
-//        GestureArea {
-//            anchors.fill: parent
-//            Tap {
-//                onFinished: {
-//                    timeMenu.setPosition(gesture.position.x, gesture.position.y);
-//                    timeMenu.show();
-//                }
-//            }
-//        }
-
-        MouseArea {
-            anchors.fill: parent
-            onClicked: {
-                var map = icon.mapToItem(null, mouseX, mouseY);
-                timeMenu.setPosition(map.x, map.y);
-                timeMenu.show();
-            }
-        }
-    }
-
-    ContextMenu {
-        id: timeMenu
-        content: ActionMenu {
+        DropDown {
+            id: timeMenu
+            width: 200
+            minWidth: 300
+            title: qsTr("Select Due Date")
+            height: textinput.height
+            showTitleInMenu: true
+            titleColor: "black"
             model:timeSelectModel
+            Component.onCompleted: {
+                selectedIndex = 0
+            }
             onTriggered: {
-                timeMenu.hide();
                 if(index > 0) {
                     selectedDueDate = true;
                     if(index == 1) {
@@ -148,20 +125,7 @@ Item {
                     selectedDueDate = false;
                     selectedDate = nullDate;
                 }
-
-                var temp = timeSelectModel;
-                for(var i=0;i<timeSelectModel.length;i++) {
-                    if(i == index) {
-                        temp[i] = temp[i].replace(checkMark,""); //it may already have a checkmark
-                        temp[i] = checkMark + temp[i] ;
-                    }else {
-                        temp[i] = temp[i].replace(checkMark,"");
-                    }
-                }
-                timeSelectModel = temp;
             }
-
         }
-
     }
 }

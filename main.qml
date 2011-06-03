@@ -9,15 +9,17 @@
 import Qt 4.7
 import MeeGo.App.Tasks 0.1
 import MeeGo.Components 0.1
-//import Qt.labs.gestures 2.0
-import MeeGo.Labs.Components 0.1 as Labs    //export theme_* constants
+import MeeGo.Ux.Gestures 0.1
+//import MeeGo.Labs.Components 0.1 as Labs
 
 Window {
     id: window
     property string labelTasks: qsTr("Tasks")
     property string labelAllDueTasks: qsTr("All due tasks")
-    property string labelAllDureTasksASCOrder: qsTr("Order: asc")
-    property string labelAllDureTasksDESCOrder: qsTr("Order: desc")
+    //:Up arrow for the Ascending order
+    property string labelAllDureTasksASCOrder: qsTr("Order: %1").arg("↑")
+    //:Down arrow for the decending order
+    property string labelAllDureTasksDESCOrder: qsTr("Order: %1").arg("↓")
     property string labelOverdue: qsTr("Overdue")
     property string labelUpComing: qsTr("Upcoming")
     property string labelSomeday: qsTr("Someday")
@@ -44,6 +46,10 @@ Window {
     property string labelDelete: qsTr("Delete")
     property string labelDeleteSingleTask: qsTr("Are you sure you want to delete this task?")
 
+    Theme {
+        id: theme
+    }
+
     property int rowHeight: theme_listBackgroundPixelHeightOne
     property int horizontalMargin: 20
     property int verticalMargin: 10
@@ -51,13 +57,21 @@ Window {
 
     QmlSetting {
         id: qmlSettings
-        Component.onCompleted: qmlSettings.isRunningFirstTime = false   //TODO: hack, it brakes Blank Slates for ListView, but it is necessary,
-                                                                        //because neither Component.onDestruction nor QmlSettings::dtor never get called.
+        isRunningFirstTime: saveRestore.value("isRunningFirstTime")
     }
 
-    Labs.LocaleHelper {
-        id: localeHelper
+    SaveRestoreState {
+        id: saveRestore
+
+        onSaveRequired: {
+            setValue("isRunningFirstTime", false);
+            sync();
+        }
     }
+
+//    Labs.LocaleHelper {
+//        id: localeHelper
+//    }
 
     toolBarTitle: labelTasks
 
@@ -73,21 +87,9 @@ Window {
                 now.getYear() == date.getYear() )
             return labelToday
 
-        return localeHelper.localDate(date,Labs.LocaleHelper.DateMonthDay);
+        return qmlSettings.localDate(date, now.getYear() == date.getYear() ? QmlSetting.DateMonthDay : QmlSetting.DateFullNumShort);
     }
 
-    function getFormattedDateYear(date) {
-        if (!date.getDate()) {
-            return labelSomeday;
-        }
-        var now = new Date();
-        if (now.getDate() == date.getDate() &&
-                now.getMonth() == date.getMonth() &&
-                now.getYear() == date.getYear() )
-            return labelToday
-
-        return localeHelper.localDate(date,Labs.LocaleHelper.DateFullNumShort);
-    }
     function isOverdue(date) {
         if (!date.getDate)
             return false;
@@ -274,8 +276,8 @@ Window {
 
             ModalDialog{
                 id: deleteListDialog
-                acceptButtonImage:"image://theme/btn_red_up"
-                acceptButtonImagePressed:"image://theme/btn_red_dn"
+                acceptButtonImage:"image://themedimage/images/btn_red_up"
+                acceptButtonImagePressed:"image://themedimage/images/btn_red_dn"
                 title: labelDeleteListDialog
                 acceptButtonText: labelDelete
                 cancelButtonText:labelCancel
@@ -358,12 +360,12 @@ Window {
                             id: separator
                             width: parent.width
                             anchors.bottom: parent.bottom
-                            source: "image://theme/tasks/ln_grey_l"
+                            source: "image://themedimage/images/tasks/ln_grey_l"
                         }
 
                         Image {
                             id: icon
-                            source: listId == 0? "image://theme/tasks/icn_defaultlist":""
+                            source: listId == 0? "image://themedimage/images/tasks/icn_defaultlist":""
                             anchors.verticalCenter: parent.verticalCenter
                             anchors.left:parent.left
                             anchors.leftMargin: horizontalMargin
@@ -384,16 +386,16 @@ Window {
                             horizontalAlignment: Text.AlignLeft
                             verticalAlignment: Text.AlignVCenter
                             //font.bold: true
-                            font.pixelSize: theme_fontPixelSizeLarge
+                            font.pixelSize: theme.fontPixelSizeLarge
                             elide: Text.ElideRight
-                            color: theme_fontColorNormal
+                            color: theme.fontColorNormal
                         }
 
                         Image {
                             id: separator_top
                             width: parent.width
                             anchors.top: parent.bottom
-                            source: "image://theme/tasks/ln_grey_l"
+                            source: "image://themedimage/images/tasks/ln_grey_l"
                         }
                         Rectangle {
                             id: icompletedCount
@@ -411,7 +413,7 @@ Window {
                                 verticalAlignment: Text.AlignVCenter
                                 horizontalAlignment: Text.AlignHCenter
                                 text:listIncompletedCount
-                                font.pixelSize: theme_fontPixelSizeSmall
+                                font.pixelSize: theme.fontPixelSizeSmall
                             }
 
                         }
@@ -420,28 +422,9 @@ Window {
                             anchors.right:parent.right
                             anchors.rightMargin: horizontalMargin
                             anchors.verticalCenter:parent.verticalCenter
-                            source: "image://theme/icn_forward_dn"
+                            source: "image://themedimage/images/icn_forward_dn"
                         }
 
-    //                    GestureArea {
-    //                        anchors.fill:parent
-    //                        Tap {
-    //                            onFinished: {
-    //                                customlistModel.listId = listId;
-    //                                customlistModel.listName = text.text;
-    //                                window.addPage(customlistPageComponent);
-    //                            }
-    //                        }
-    //                        TapAndHold {
-    //                            onFinished : {
-    //                                if (listId != 0) {
-    //                                    landingScreenContextMenu.payload = dinstance;
-    //                                    landingScreenContextMenu.setPosition(gesture.position.x, gesture.position.y);
-    //                                    landingScreenContextMenu.show();
-    //                                }
-    //                            }
-    //                        }
-    //                    }
 
                         MouseArea {
                             anchors.fill: parent
@@ -468,7 +451,7 @@ Window {
                         height: rowHeight
                         Image {
                             id: icon
-                            source: "image://theme/tasks/icn_header_tasks"
+                            source: "image://themedimage/images/tasks/icn_header_tasks"
                             anchors.verticalCenter: parent.verticalCenter
                             anchors.left:parent.left
                             anchors.leftMargin: horizontalMargin
@@ -487,7 +470,7 @@ Window {
                             id: separator
                             width: parent.width
                             anchors.bottom: parent.bottom
-                            source: "image://theme/tasks/ln_grey_l"
+                            source: "image://themedimage/images/tasks/ln_grey_l"
                         }
 
                         Text {
@@ -500,16 +483,16 @@ Window {
                             text:  labelAllDueTasks
                             horizontalAlignment: Text.AlignLeft
                             verticalAlignment: Text.AlignVCenter
-                            font.pixelSize: theme_fontPixelSizeLarge
+                            font.pixelSize: theme.fontPixelSizeLarge
                             elide: Text.ElideRight
-                            color: theme_fontColorNormal
+                            color: theme.fontColorNormal
                         }
 
                         Image {
                             id: separator_top
                             width: parent.width
                             anchors.top: parent.bottom
-                            source: "image://theme/tasks/ln_grey_l"
+                            source: "image://themedimage/images/tasks/ln_grey_l"
                         }
                         Rectangle {
                             id: icompletedCount
@@ -527,8 +510,8 @@ Window {
                                 verticalAlignment: Text.AlignVCenter
                                 horizontalAlignment: Text.AlignHCenter
                                 text:overdueModel.icount + upcomingModel.icount + somedayModel.icount
-                                font.pixelSize: theme_fontPixelSizeSmall
-                                color: theme_fontColorNormal
+                                font.pixelSize: theme.fontPixelSizeSmall
+                                color: theme.fontColorNormal
                             }
 
                         }
@@ -538,15 +521,15 @@ Window {
                             anchors.right:parent.right
                             anchors.rightMargin: horizontalMargin
                             anchors.verticalCenter:parent.verticalCenter
-                            source: "image://theme/icn_forward_dn"
+                            source: "image://themedimage/images/icn_forward_dn"
                         }
 
-    //                    GestureArea {
-    //                        anchors.fill: parent
-    //                        Tap {
-    //                            onFinished: window.addPage(allDueTasksPageComponent)
-    //                        }
-    //                    }
+//                        GestureArea {
+//                            anchors.fill: parent
+//                            Tap {
+//                                onFinished: window.addPage(allDueTasksPageComponent)
+//                            }
+//                        }
 
                         MouseArea {
                             anchors.fill: parent
@@ -781,8 +764,8 @@ Window {
                 acceptButtonText: labelDelete
                 cancelButtonText:labelCancel
                 title: labelDeleteSingleTask
-                acceptButtonImage:"image://theme/btn_red_up"
-                acceptButtonImagePressed:"image://theme/btn_red_dn"
+                acceptButtonImage:"image://themedimage/images/btn_red_up"
+                acceptButtonImagePressed:"image://themedimage/images/btn_red_dn"
                 property int taskId: -1
 
                 content: Row {
@@ -795,7 +778,7 @@ Window {
                     Text {
                         id: checkboxTextArea
                         text: qsTr("Don't ask to confirm deleting tasks.")
-                        font.pixelSize: theme_fontPixelSizeLarge
+                        font.pixelSize: theme.fontPixelSizeLarge
                     }
                 }
                 onAccepted: {
@@ -1036,7 +1019,7 @@ Window {
 
             TaskListView {
                 id: taskListView
-                parent:customlistPage.content
+                parent:customlistPage
                 anchors.fill:parent
                 property alias title: categoryitem.title
                 property alias viewModel: categoryitem.viewModel
@@ -1075,8 +1058,8 @@ Window {
                 acceptButtonText: labelDelete
                 cancelButtonText:labelCancel
                 title: labelDeleteSingleTask
-                acceptButtonImage:"image://theme/btn_red_up"
-                acceptButtonImagePressed:"image://theme/btn_red_dn"
+                acceptButtonImage:"image://themedimage/images/btn_red_up"
+                acceptButtonImagePressed:"image://themedimage/images/btn_red_dn"
                 property int taskId: -1
 
                 content: Row {
@@ -1089,7 +1072,7 @@ Window {
                     Text {
                         id: checkboxTextArea
                         text: qsTr("Don't ask to confirm deleting tasks.")
-                        font.pixelSize: theme_fontPixelSizeLarge
+                        font.pixelSize: theme.fontPixelSizeLarge
                     }
                 }
                 onAccepted: {
@@ -1101,15 +1084,16 @@ Window {
 
             ModalDialog{
                 id: deleteListDialog
-                acceptButtonImage:"image://theme/btn_red_up"
-                acceptButtonImagePressed:"image://theme/btn_red_dn"
+                acceptButtonImage:"image://themedimage/images/btn_red_up"
+                acceptButtonImagePressed:"image://themedimage/images/btn_red_dn"
                 title: labelDeleteListDialog
                 acceptButtonText: labelDelete
                 cancelButtonText:labelCancel
                 property int listId: -1
                 onAccepted: {
                     editorList.removeList(listId);
-                    window.previousApplicationPage();
+                    if (window.pageStack.currentPage == customlistPage)
+                        window.pageStack.pop();
                 }
             }
 

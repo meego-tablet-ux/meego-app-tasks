@@ -7,7 +7,7 @@
  */
 
 import Qt 4.7
-//import Qt.labs.gestures 2.0
+import MeeGo.Ux.Gestures 0.1
 
 Image {
     id: box
@@ -45,7 +45,7 @@ Image {
             when: checked
             PropertyChanges {
                 target: box
-                source:"image://theme/tasks/btn_checkbox_on"
+                source:"image://themedimage/images/tasks/btn_checkbox_on"
             }
         },
         State {
@@ -53,7 +53,7 @@ Image {
             when: !checked
             PropertyChanges {
                 target: box
-                source:"image://theme/tasks/btn_checkbox_off"
+                source:"image://themedimage/images/tasks/btn_checkbox_off"
             }
         }
     ]

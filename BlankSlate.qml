@@ -42,7 +42,7 @@ Rectangle {
                 anchors.top: parent.top
                 anchors.left: parent.left
                 anchors.right: parent.right
-                source: "image://theme/tasks/ln_grey_l"
+                source: "image://themedimage/images/tasks/ln_grey_l"
             }
 
             Column {
@@ -82,7 +82,7 @@ Rectangle {
                 anchors.bottom: parent.bottom
                 anchors.left: parent.left
                 anchors.right: parent.right
-                source: "image://theme/tasks/ln_grey_l"
+                source: "image://themedimage/images/tasks/ln_grey_l"
             }
         }
 

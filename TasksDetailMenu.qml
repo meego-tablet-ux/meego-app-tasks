@@ -1,7 +1,7 @@
 import QtQuick 1.0
 import MeeGo.Components 0.1
 import MeeGo.App.Tasks 0.1
-//import Qt.labs.gestures 2.0
+import MeeGo.Ux.Gestures 0.1
 
 Column {
     id: detailMenu
@@ -33,6 +33,10 @@ Column {
         task.mNotes = notesData.text;
     }
 
+    Theme {
+        id: theme
+    }
+
     Row {
         id: nameRow
         spacing: hSpacing
@@ -50,7 +54,7 @@ Column {
             defaultText: qsTr("Insert task name")
             font.strikeout: compCheckbox.isChecked
             text: task ? task.mTask : ""
-            font.pixelSize: theme_fontPixelSizeLarge
+            font.pixelSize: theme.fontPixelSizeLarge
         }
     }
     Row {
@@ -59,8 +63,8 @@ Column {
         Text {
             id: listLabel
             text: qsTr("List:")
-            color: theme_fontColorHighlight
-            font.pixelSize: theme_fontPixelSizeLarge
+            color: theme.fontColorHighlight
+            font.pixelSize: theme.fontPixelSizeLarge
         }
         ListView {
             height: 200
@@ -78,9 +82,9 @@ Column {
                 height: 40
                 color: {
                     if(detailMenu.task && listId != detailMenu.task.mListId) {
-                        return theme_fontColorNormal;
+                        return theme.fontColorNormal;
                     } else {
-                        return theme_fontColorHighlight;
+                        return theme.fontColorHighlight;
                     }
                 }
                 Text {
@@ -90,7 +94,7 @@ Column {
                     width: parent.width
                     elide: Text.ElideMiddle
                     horizontalAlignment: Text.AlignHCenter
-                    font.pixelSize: theme_fontPixelSizeLarge
+                    font.pixelSize: theme.fontPixelSizeLarge
                 }
 
 //                GestureArea {
@@ -114,7 +118,7 @@ Column {
             id: listText
             text: task ? listNames[task.mListId] : ""
             visible: !editing
-            font.pixelSize: theme_fontPixelSizeLarge
+            font.pixelSize: theme.fontPixelSizeLarge
         }
     }
 
@@ -124,14 +128,14 @@ Column {
         Text {
             id: dueDateLabel
             text: qsTr("Due date:")
-            color: theme_fontColorHighlight
-            font.pixelSize: theme_fontPixelSizeLarge
+            color: theme.fontColorHighlight
+            font.pixelSize: theme.fontPixelSizeLarge
             anchors.verticalCenter: parent.verticalCenter
         }
         Text {
             id: duedateText
-            text: task ? getFormattedDateYear(task.mDueDate) : ""
-            font.pixelSize: theme_fontPixelSizeLarge
+            text: task ? getFormattedDate(task.mDueDate) : ""
+            font.pixelSize: theme.fontPixelSizeLarge
             anchors.verticalCenter: parent.verticalCenter
         }
         ToggleButton {
@@ -165,8 +169,8 @@ Column {
         Text {
             id: notesLabel
             text: qsTr("Notes")
-            color: theme_fontColorHighlight
-            font.pixelSize: theme_fontPixelSizeLarge
+            color: theme.fontColorHighlight
+            font.pixelSize: theme.fontPixelSizeLarge
             anchors.verticalCenter: parent.verticalCenter
         }
         TextEntry {
@@ -174,15 +178,15 @@ Column {
             readOnly: !detailMenu.editing
             defaultText: detailMenu.editing ?  qsTr("Add a note here")  : ""
             text: task ? task.mNotes : ""
-            font.pixelSize: theme_fontPixelSizeLarge
+            font.pixelSize: theme.fontPixelSizeLarge
         }
     }
     Button {
         id: deleteButton
         text: qsTr("Delete task")
         anchors.horizontalCenter: parent.horizontalCenter
-        bgSourceUp:"image://theme/btn_red_up"
-        bgSourceDn:"image://theme/btn_red_dn"
+        bgSourceUp:"image://themedimage/images/btn_red_up"
+        bgSourceDn:"image://themedimage/images/btn_red_dn"
         onClicked: {
             detailMenu.deleteTask(task.mTaskId);
         }
@@ -190,7 +194,7 @@ Column {
 
     Image {
         id: divider
-        source: "image://theme/tasks/frm_dropdown_divider"
+        source: "image://themedimage/images/tasks/frm_dropdown_divider"
         width: parent.width
     }
 
@@ -201,8 +205,8 @@ Column {
         Button {
             id: editButton
             text: qsTr("Edit")
-            bgSourceUp:"image://theme/btn_blue_up"
-            bgSourceDn:"image://theme/btn_blue_dn"
+            bgSourceUp:"image://themedimage/images/btn_blue_up"
+            bgSourceDn:"image://themedimage/images/btn_blue_dn"
             visible: !editing
             onClicked: {
                 detailMenu.editing = true;
@@ -213,8 +217,8 @@ Column {
             id: saveButton
             active: taskName.text != ""
             text: qsTr("Save")
-            bgSourceUp:"image://theme/btn_blue_up"
-            bgSourceDn:"image://theme/btn_blue_dn"
+            bgSourceUp:"image://themedimage/images/btn_blue_up"
+            bgSourceDn:"image://themedimage/images/btn_blue_dn"
             visible: editing
             onClicked: {
                 saveTaskFromInput();
