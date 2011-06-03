@@ -16,8 +16,10 @@ Window {
     id: window
     property string labelTasks: qsTr("Tasks")
     property string labelAllDueTasks: qsTr("All due tasks")
-    property string labelAllDureTasksASCOrder: qsTr("Order: asc")
-    property string labelAllDureTasksDESCOrder: qsTr("Order: desc")
+     //:Down arrow for the Ascending order
+    property string labelAllDureTasksASCOrder: qsTr("Order: %1").arg("↑")
+    //:Up arrow for the decending order
+    property string labelAllDureTasksDESCOrder: qsTr("Order: %1").arg("↓")
     property string labelOverdue: qsTr("Overdue")
     property string labelUpComing: qsTr("Upcoming")
     property string labelSomeday: qsTr("Someday")
@@ -85,23 +87,9 @@ Window {
                 now.getYear() == date.getYear() )
             return labelToday
 
-//        return localeHelper.localDate(date,Labs.LocaleHelper.DateMonthDay);
         return qmlSettings.localDate(date, now.getYear() == date.getYear() ? QmlSetting.DateMonthDay : QmlSetting.DateFullNumShort);
     }
 
-//    function getFormattedDateYear(date) { //TODO: should be removed after testing
-//        if (!date.getDate()) {
-//            return labelSomeday;
-//        }
-//        var now = new Date();
-//        if (now.getDate() == date.getDate() &&
-//                now.getMonth() == date.getMonth() &&
-//                now.getYear() == date.getYear() )
-//            return labelToday
-
-////        return localeHelper.localDate(date,Labs.LocaleHelper.DateFullNumShort);
-//        return qmlSettings.localDate(date,QmlSetting.DateFullNumShort);
-//    }
     function isOverdue(date) {
         if (!date.getDate)
             return false;
@@ -437,25 +425,6 @@ Window {
                             source: "image://themedimage/images/icn_forward_dn"
                         }
 
-//                        GestureArea {
-//                            anchors.fill:parent
-//                            Tap {
-//                                onFinished: {
-//                                    customlistModel.listId = listId;
-//                                    customlistModel.listName = text.text;
-//                                    window.addPage(customlistPageComponent);
-//                                }
-//                            }
-//                            TapAndHold {
-//                                onFinished : {
-//                                    if (listId != 0) {
-//                                        landingScreenContextMenu.payload = dinstance;
-//                                        landingScreenContextMenu.setPosition(gesture.position.x, gesture.position.y);
-//                                        landingScreenContextMenu.show();
-//                                    }
-//                                }
-//                            }
-//                        }
 
                         MouseArea {
                             anchors.fill: parent

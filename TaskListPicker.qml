@@ -114,6 +114,7 @@ Item {
 //            }
 
             MouseArea {
+                anchors.fill: parent
                 onClicked: createDialog.show()
             }
         }
