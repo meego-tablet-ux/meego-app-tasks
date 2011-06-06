@@ -97,21 +97,21 @@ Column {
                     font.pixelSize: theme.fontPixelSizeLarge
                 }
 
-//                GestureArea {
-//                    anchors.fill: parent
-//                    Tap {
-//                        onFinished: {
-//                            detailMenu.task.mListId = listId
-//                        }
-//                    }
-//                }
-
-                MouseArea {
+                GestureArea {
                     anchors.fill: parent
-                    onClicked: {
-                        detailMenu.task.mListId = listId
+                    Tap {
+                        onFinished: {
+                            detailMenu.task.mListId = listId
+                        }
                     }
                 }
+
+//                MouseArea {
+//                    anchors.fill: parent
+//                    onClicked: {
+//                        detailMenu.task.mListId = listId
+//                    }
+//                }
             }
         }
         Text {

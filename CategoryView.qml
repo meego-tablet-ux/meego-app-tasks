@@ -234,31 +234,31 @@ Item {
                 anchors.top: parent.bottom
                 source: "image://themedimage/images/tasks/ln_grey_l"
             }
-//            GestureArea {
-//                anchors.fill: parent
-//                Tap {
-//                    onFinished: {
-//                         allViews.children[index].collapsed = !allViews.children[index].collapsed;
-
-//                         text.text = titleText(index);
-//                         if (!allViews.children[index].collapsed) {
-//                             ensureShowingList(index);
-//                         }
-//                    }
-//                }
-//            }
-            MouseArea {
+            GestureArea {
                 anchors.fill: parent
+                Tap {
+                    onFinished: {
+                         allViews.children[index].collapsed = !allViews.children[index].collapsed;
 
-                onClicked: {
-                    allViews.children[index].collapsed = !allViews.children[index].collapsed;
-
-                    text.text = titleText(index);
-                    if (!allViews.children[index].collapsed) {
-                        ensureShowingList(index);
+                         text.text = titleText(index);
+                         if (!allViews.children[index].collapsed) {
+                             ensureShowingList(index);
+                         }
                     }
                 }
             }
+//            MouseArea {
+//                anchors.fill: parent
+
+//                onClicked: {
+//                    allViews.children[index].collapsed = !allViews.children[index].collapsed;
+
+//                    text.text = titleText(index);
+//                    if (!allViews.children[index].collapsed) {
+//                        ensureShowingList(index);
+//                    }
+//                }
+//            }
         }
     }
 
@@ -379,12 +379,14 @@ Item {
                     onFinished: {
                         privateData.selectedCategory = view.categoryIndex;
                         privateData.selectedRow = index;
-                        container.clickedAtRow(index, gesture.position.x, gesture.position.y,dinstance);
+                        var map = mapToItem(null, gesture.position.x, gesture.position.y);
+                        container.clickedAtRow(index, map.x, map.y,dinstance);
                     }
                 }
                 TapAndHold {
                     onFinished: {
-                        container.pressAndHoldAtRow(index, gesture.position.x, gesture.position.y, dinstance);
+                        var map = mapToItem(null, gesture.position.x, gesture.position.y);
+                        container.pressAndHoldAtRow(index, map.x, map.y, dinstance);
                     }
                 }
             }

@@ -132,39 +132,39 @@ Item {
             source: "image://themedimage/images/tasks/ln_grey_l"
         }
 
-//        GestureArea {
-//            anchors.fill: parent
-//            Tap {
-//                onFinished: {
-//                     view.collapsed = !view.collapsed;
-//                     text.text = getTitleText();
-//                     if (!view.collapsed) {
-//                       //  ensureShowingList(index);
-//                     }
-//                }
-//            }
-//            TapAndHold {
-//                onFinished: {
-//                    // test code, to be delted
-//                    mode = 2;
-//                }
-//            }
-//        }
-
-        MouseArea {
+        GestureArea {
             anchors.fill: parent
-            onClicked: {
-                view.collapsed = !view.collapsed;
-                internal.titleText = getTitleText();
-                if (!view.collapsed) {
-                  //  ensureShowingList(index);
+            Tap {
+                onFinished: {
+                     view.collapsed = !view.collapsed;
+                     text.text = getTitleText();
+                     if (!view.collapsed) {
+                       //  ensureShowingList(index);
+                     }
                 }
             }
-            onPressAndHold: {
+            TapAndHold {
+                onFinished: {
                     // test code, to be delted
                     mode = 2;
+                }
             }
         }
+
+//        MouseArea {
+//            anchors.fill: parent
+//            onClicked: {
+//                view.collapsed = !view.collapsed;
+//                internal.titleText = getTitleText();
+//                if (!view.collapsed) {
+//                  //  ensureShowingList(index);
+//                }
+//            }
+//            onPressAndHold: {
+//                    // test code, to be delted
+//                    mode = 2;
+//            }
+//        }
     }
 
     QtObject {
@@ -289,52 +289,54 @@ Item {
             }
 
 
-//            GestureArea {
-//                anchors.top: parent.top
-//                anchors.bottom: parent.bottom
-//                anchors.left: parent.left
-//                anchors.right: reorderBt.left
-//                Tap {
-//                    onFinished: {
-//                        privateData.selectedRow = index;
-//                        if (mode == 0) {
-//                            container.clickedAtRow(index, gesture.position.x, gesture.position.y,dinstance);
-//                        } else if (mode == 1) {
-//                            // adding mode, do nothing?
-//                        }else if (mode == 2){
-//                            toggleSelected(mTaskId);
-//                        }
-//                    }
-//                }
-//                TapAndHold {
-//                    onFinished: {
-//                        if (mode == 0) {
-//                            container.pressAndHoldAtRow(index, gesture.position.x, gesture.position.y, dinstance);
-//                        }
-//                    }
-//                }
-//            }
-
-            MouseArea {
-                anchors.fill: parent
-                onClicked: {
-                    privateData.selectedRow = index;
-                    if (mode == 0) {
-                        var map = mapToItem(null, mouseX, mouseY);
-                        container.clickedAtRow(index, map.x, map.y,dinstance);
-                    } else if (mode == 1) {
-                        // adding mode, do nothing?
-                    }else if (mode == 2){
-                        toggleSelected(mTaskId);
+            GestureArea {
+                anchors.top: parent.top
+                anchors.bottom: parent.bottom
+                anchors.left: parent.left
+                anchors.right: reorderBt.left
+                Tap {
+                    onFinished: {
+                        privateData.selectedRow = index;
+                        if (mode == 0) {
+                            var map = mapToItem(null, gesture.position.x, gesture.position.y);
+                            container.clickedAtRow(index, map.x, map.y,dinstance);
+                        } else if (mode == 1) {
+                            // adding mode, do nothing?
+                        }else if (mode == 2){
+                            toggleSelected(mTaskId);
+                        }
                     }
                 }
-                onPressAndHold: {
-                    if (mode == 0) {
-                        var map = mapToItem(null, mouseX, mouseY);
-                        container.pressAndHoldAtRow(index, map.x, map.y, dinstance);
+                TapAndHold {
+                    onFinished: {
+                        if (mode == 0) {
+                            var map = mapToItem(null, gesture.position.x, gesture.position.y);
+                            container.pressAndHoldAtRow(index, map.x, map.y, dinstance);
+                        }
                     }
                 }
             }
+
+//            MouseArea {
+//                anchors.fill: parent
+//                onClicked: {
+//                    privateData.selectedRow = index;
+//                    if (mode == 0) {
+//                        var map = mapToItem(null, mouseX, mouseY);
+//                        container.clickedAtRow(index, map.x, map.y,dinstance);
+//                    } else if (mode == 1) {
+//                        // adding mode, do nothing?
+//                    }else if (mode == 2){
+//                        toggleSelected(mTaskId);
+//                    }
+//                }
+//                onPressAndHold: {
+//                    if (mode == 0) {
+//                        var map = mapToItem(null, mouseX, mouseY);
+//                        container.pressAndHoldAtRow(index, map.x, map.y, dinstance);
+//                    }
+//                }
+//            }
 
             Checkbox {
                 id: selectBox

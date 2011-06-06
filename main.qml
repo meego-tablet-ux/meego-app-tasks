@@ -524,17 +524,17 @@ Window {
                             source: "image://themedimage/images/icn_forward_dn"
                         }
 
-//                        GestureArea {
-//                            anchors.fill: parent
-//                            Tap {
-//                                onFinished: window.addPage(allDueTasksPageComponent)
-//                            }
-//                        }
-
-                        MouseArea {
+                        GestureArea {
                             anchors.fill: parent
-                            onClicked: window.addPage(allDueTasksPageComponent)
+                            Tap {
+                                onFinished: window.addPage(allDueTasksPageComponent)
+                            }
                         }
+
+//                        MouseArea {
+//                            anchors.fill: parent
+//                            onClicked: window.addPage(allDueTasksPageComponent)
+//                        }
                     }
                 }
 

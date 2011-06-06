@@ -18,24 +18,24 @@ Image {
 
     smooth: true
 
-//    GestureArea {
-//        anchors.fill: parent
-//        Tap {
-//            onFinished: {
-//                if(box.enabled) {
-//                    box.clicked(box.checked);
-//                }
-//            }
-//        }
-//    }
-
-    MouseArea {
+    GestureArea {
         anchors.fill: parent
-        onClicked:  {
-            if(box.enabled)
-                box.clicked(box.checked);
+        Tap {
+            onFinished: {
+                if(box.enabled) {
+                    box.clicked(box.checked);
+                }
+            }
         }
     }
+
+//    MouseArea {
+//        anchors.fill: parent
+//        onClicked:  {
+//            if(box.enabled)
+//                box.clicked(box.checked);
+//        }
+//    }
 
     opacity: enabled ? 1 : 0.25
 
