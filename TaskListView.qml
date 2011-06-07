@@ -49,6 +49,7 @@ Item {
         var collapsed = view.collapsed;
         var tt = model.title;
         if (collapsed)
+            //: This line is used for indication amount of incompleted tasks when a list is collapsed.
            tt =  qsTr("%1 (%2)").arg(tt).arg(model.viewModel.icount);
         return tt;
     }

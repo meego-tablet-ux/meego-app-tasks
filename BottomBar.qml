@@ -20,7 +20,9 @@ BorderImage {
     border.bottom: 5
     property string labelSave: qsTr("Save")
     property string labelCancel: qsTr("Cancel")
+    //: This text is used for idication of an amount of selected items which will be moved to another list.
     property string labelMove: qsTr("Move to (%1)")
+    //: This text is used for idication of an amount of selected items which will be deleted.
     property string labelDelete: qsTr("Delete (%1)")
     property string labelOk: qsTr("OK")
     property alias saveButtonActive: saveBt.active
