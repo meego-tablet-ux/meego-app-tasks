@@ -24,19 +24,19 @@ Item {
         opacity: 0.5
     }
 
-//    GestureArea {
-//        anchors.fill: parent
-//        Tap {
-//            onFinished: {
-//                container.visible = false;
-//            }
-//        }
-//    }
-
-    MouseArea {
+    GestureArea {
         anchors.fill: parent
-        onClicked: container.visible = false
+        Tap {
+            onFinished: {
+                container.visible = false;
+            }
+        }
     }
+
+//    MouseArea {
+//        anchors.fill: parent
+//        onClicked: container.visible = false
+//    }
 
 
     TasksListModel {
@@ -69,23 +69,23 @@ Item {
                 horizontalAlignment: Text.AlignHCenter
             }
 
-//            GestureArea {
-//                anchors.fill: parent
-//                Tap {
-//                    onFinished: {
-//                        container.selected(listId);
-//                        container.visible = false;
-//                    }
-//                }
-//            }
-
-            MouseArea {
+            GestureArea {
                 anchors.fill: parent
-                onClicked: {
-                    container.selected(listId);
-                    container.visible = false;
+                Tap {
+                    onFinished: {
+                        container.selected(listId);
+                        container.visible = false;
+                    }
                 }
             }
+
+//            MouseArea {
+//                anchors.fill: parent
+//                onClicked: {
+//                    container.selected(listId);
+//                    container.visible = false;
+//                }
+//            }
         }
 
         footer:  Item {
@@ -104,19 +104,19 @@ Item {
                 elide: Text.ElideMiddle
             }
 
-//            GestureArea {
-//                anchors.fill: parent
-//                Tap {
-//                    onFinished: {
-//                        createDialog.show();
-//                    }
-//                }
-//            }
-
-            MouseArea {
+            GestureArea {
                 anchors.fill: parent
-                onClicked: createDialog.show()
+                Tap {
+                    onFinished: {
+                        createDialog.show();
+                    }
+                }
             }
+
+//            MouseArea {
+//                anchors.fill: parent
+//                onClicked: createDialog.show()
+//            }
         }
     }
 
