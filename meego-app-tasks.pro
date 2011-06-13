@@ -3,7 +3,10 @@ SUBDIRS += model
 qmlfiles.files += *.qml
 qmlfiles.path += $$INSTALL_ROOT/usr/share/$$TARGET
 
-INSTALLS += qmlfiles
+desktopfiles.files += *.desktop
+desktopfiles.path += $$INSTALL_ROOT/usr/share/applications
+
+INSTALLS += qmlfiles desktopfiles
 
 QML_FILES = *.qml
 LIB_SOURCES += model/*.cpp
