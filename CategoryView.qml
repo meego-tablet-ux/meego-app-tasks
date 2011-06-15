@@ -73,6 +73,8 @@ Item {
     }
     function titleText(index){
         //console.log()
+        if (!model.count)
+            return "";
         var collapsed = allViews.children[index].collapsed;
         var title = model[index].title;
         if (collapsed) {

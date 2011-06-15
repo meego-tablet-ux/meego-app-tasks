@@ -57,7 +57,7 @@ Window {
 
     QmlSetting {
         id: qmlSettings
-        isRunningFirstTime: saveRestore.value("isRunningFirstTime")
+        isRunningFirstTime: true//saveRestore.value("isRunningFirstTime")
     }
 
     SaveRestoreState {
@@ -550,24 +550,22 @@ Window {
                     buttonText: qsTr("Create a new task list")
 
                     viewModel: ListModel {
-                        ListElement {
-                            source: ""
-                            title: QT_TR_NOOP("What's a task list?")
-                            subTitle: QT_TR_NOOP("A task list is a collection of tasks. Use the default task list we have created for you, or make a new one.")
-                            buttonText: ""
-                        }
-                        ListElement {
-                            source: ""
-                            title: QT_TR_NOOP("How do I create tasks?")
-                            subTitle: QT_TR_NOOP("To create a task, start by selecting a task list. Then tap on the new task line.")
-                            buttonText: ""
-                        }
-                        ListElement {
-                            source: ""
-                            title: QT_TR_NOOP("How do I check completed tasks?")
-                            subTitle: QT_TR_NOOP("To mark a task as completed, tap the check box.")
-                            buttonText: ""
-                        }
+
+                    }
+
+                    Component.onCompleted: {
+                        viewModel.append({"title" : qsTr("What's a task list?"),
+                                         "source" : "",
+                                         "buttonText" : "",
+                                         "subTitle" : qsTr("A task list is a collection of tasks. Use the default task list we have created for you, or make a new one.")});
+                        viewModel.append({"title" : qsTr("How do I create tasks?"),
+                                         "source" : "",
+                                         "buttonText" : "",
+                                         "subTitle" : qsTr("To create a task, start by selecting a task list. Then tap on the new task line.")});
+                        viewModel.append({"title" : qsTr("How do I check completed tasks?"),
+                                         "source" : "",
+                                         "buttonText" : "",
+                                         "subTitle" : qsTr("To mark a task as completed, tap the check box.")});
                     }
 
                     onButtonClicked: newListDialog.show()
@@ -703,24 +701,19 @@ Window {
 
                 model: ListModel {
                     id: blankSlatesModel
-
-                    ListElement {
-                        title: QT_TR_NOOP("You have no due tasks")
-                        visible: false
-                    }
-                    ListElement {
-                        title: QT_TR_NOOP("You have no overdue tasks")
-                        visible: false
-                    }
-                    ListElement {
-                        title: QT_TR_NOOP("You have no upcoming tasks")
-                        visible: false
-                    }
-                    ListElement {
-                        title: QT_TR_NOOP("You have no someday tasks")
-                        visible: false
-                    }
                 }
+
+                Component.onCompleted: {
+                    model.append({"title" : qsTr("You have no due tasks"),
+                                    "visible" : false});
+                    model.append({"title" : qsTr("You have no overdue tasks"),
+                                    "visible" : false});
+                    model.append({"title" : qsTr("You have no upcoming tasks"),
+                                    "visible" : false});
+                    model.append({"title" : qsTr("You have no someday tasks"),
+                                    "visible" : false});
+                }
+
                 delegate: BlankSlate {
                     id: allDueTasksBlankSlate
                     anchors.topMargin: 20
@@ -735,12 +728,14 @@ Window {
 
                     viewVisible: qmlSettings.isRunningFirstTime
                     viewModel: ListModel {
-                        ListElement {
-                            source: ""
-                            title: QT_TR_NOOP("How do I create tasks?")
-                            subTitle: QT_TR_NOOP("To create a task, start by selecting a task list. Then tap on the new task line.")
-                            buttonText: QT_TR_NOOP("Select a task list")
-                        }
+
+                    }
+
+                    Component.onCompleted: {
+                        viewModel.append({"title" : qsTr("How do I create tasks?"),
+                                         "source" : "",
+                                         "buttonText" : qsTr("Select a task list"),
+                                         "subTitle" : qsTr("To create a task, start by selecting a task list. Then tap on the new task line.")});
                     }
 
                     onViewItemButtonClicked: picker.visible = true
