@@ -57,7 +57,7 @@ Window {
 
     QmlSetting {
         id: qmlSettings
-        isRunningFirstTime: true//saveRestore.value("isRunningFirstTime")
+        isRunningFirstTime: saveRestore.value("isRunningFirstTime")
     }
 
     SaveRestoreState {
