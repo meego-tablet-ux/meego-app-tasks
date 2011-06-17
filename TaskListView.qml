@@ -22,7 +22,7 @@ Item {
     height: 480
     property int titleHeight: 60
     property variant model
-    property int rowHeight: theme_listBackgroundPixelHeightOne
+    property int rowHeight: theme.listBackgroundPixelHeightOne
     property bool addNewRow: true
     property variant rowDelegate: cellComponent
     property int textHMargin: 20

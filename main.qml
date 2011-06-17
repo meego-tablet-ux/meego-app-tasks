@@ -50,22 +50,67 @@ Window {
         id: theme
     }
 
-    property int rowHeight: theme_listBackgroundPixelHeightOne
+    property int rowHeight: theme.listBackgroundPixelHeightOne
     property int horizontalMargin: 20
     property int verticalMargin: 10
     property int titleHeight: 50
 
     QmlSetting {
         id: qmlSettings
-        isRunningFirstTime: saveRestore.value("isRunningFirstTime")
+//        isRunningFirstTime: saveRestore.value("isRunningFirstTime")
     }
 
     SaveRestoreState {
         id: saveRestore
 
-        onSaveRequired: {
-            setValue("isRunningFirstTime", false);
-            sync();
+        onSaveRequired: internal.save()
+
+        Component.onCompleted: {
+            console.debug("---------------onCompleted");
+            if (!restoreRequired)
+                return;
+            internal.restore();
+        }
+
+        onRestoreRequiredChanged: { //NOTE: doesn't work
+            console.debug("---------------onRestoreRequiredChanged");
+            if (!restoreRequired)
+                return;
+            internal.restore();
+        }
+    }
+
+    QtObject {
+        id: internal
+
+        property string isRunningFirstTime: "isRunningFirstTime"
+        property string currentPage: "currentPage"
+
+        function save()
+        {
+            saveRestore.setValue(isRunningFirstTime, false);
+            saveRestore.setValue(currentPage, window.pageStack.currentPage.objectName);
+            window.pageStack.currentPage.save(saveRestore);
+            saveRestore.sync();
+        }
+
+        function restore()
+        {
+            qmlSettings.isRunningFirstTime = saveRestore.value(isRunningFirstTime);
+            restoreCurrentPage();
+        }
+
+        function restoreCurrentPage()
+        {
+            var cp = saveRestore.value(internal.currentPage);
+            if (cp == "landingScreenPage") {
+                window.addPage(landingScreenPageComponent)
+            } else if (cp == "allDueTasksPage") {
+                window.addPage(allDueTasksPageComponent)
+            } else if (cp == "customlistPage") {
+                window.addPage(customlistPageComponent)
+            }
+            window.pageStack.currentPage.restore(saveRestore);
         }
     }
 
@@ -253,11 +298,63 @@ Window {
                     newListDialog.show();
             }
 
+            function save(saveRestore)
+            {
+                //newListDialog
+                saveRestore.setValue("landingNewListDialogVisible", newListDialog.visible);
+                saveRestore.setValue("landingNewListDialogText", textinput.text);
+
+                //renameDialog
+                saveRestore.setValue("landingRenameDialogVisible", renameDialog.visible);
+                saveRestore.setValue("landingRenameDialogText", renameTextInput.text);
+                saveRestore.setValue("landingRenameDialogListId", renameDialog.listId);
+
+                //deleteListDialog
+                saveRestore.setValue("landingDeleteListDialogVisible", deleteListDialog.visible);
+                saveRestore.setValue("landingDeleteListDialogListId", deleteListDialog.listId);
+            }
+
+            function restore(saveRestore)
+            {
+                //newListDialog
+                if (saveRestore.value("landingNewListDialogVisible") == "true") {
+                    newListDialog.show();
+                    textinput.forceActiveFocus();
+                    textinput.focus = true;
+                } else {
+                    newListDialog.hide();
+                }
+                textinput.text = saveRestore.value("landingNewListDialogText");
+
+                //renameDialog
+                if (saveRestore.value("landingRenameDialogVisible") == "true") {
+                    renameDialog.show();
+                    renameTextInput.forceActiveFocus();
+                    renameTextInput.focus = true;
+                } else {
+                    renameDialog.hide();
+                }
+                renameTextInput.text = saveRestore.value("landingRenameDialogText");
+                renameDialog.listId = saveRestore.value("landingRenameDialogListId");
+
+                //deleteListDialog
+                if (saveRestore.value("landingDeleteListDialogVisible") == "true") {
+                    deleteListDialog.show();
+                } else {
+                    deleteListDialog.hide();
+                }
+                deleteListDialog.listId = saveRestore.value("landingDeleteListDialogListId");
+            }
+
             ModalDialog {
                 id: newListDialog
                 content: TextEntry {
                          id: textinput;
-                         anchors.fill: parent;
+                         anchors.verticalCenter: parent.verticalCenter
+                         anchors.left: parent.left
+                         anchors.right: parent.right
+                         anchors.leftMargin: 20
+                         anchors.rightMargin: anchors.leftMargin
                          defaultText: qsTr("List name")
                 }
                 title: labelNewList
@@ -297,7 +394,11 @@ Window {
                 property alias originalText: renameTextInput.text;
                 content: TextEntry {
                     id: renameTextInput;
-                    anchors.fill: parent;
+                    anchors.verticalCenter: parent.verticalCenter
+                    anchors.left: parent.left
+                    anchors.right: parent.right
+                    anchors.leftMargin: 20
+                    anchors.rightMargin: anchors.leftMargin
                     defaultText: qsTr("List name")
                 }
                 onAccepted: {
@@ -550,24 +651,22 @@ Window {
                     buttonText: qsTr("Create a new task list")
 
                     viewModel: ListModel {
-                        ListElement {
-                            source: ""
-                            title: QT_TR_NOOP("What's a task list?")
-                            subTitle: QT_TR_NOOP("A task list is a collection of tasks. Use the default task list we have created for you, or make a new one.")
-                            buttonText: ""
-                        }
-                        ListElement {
-                            source: ""
-                            title: QT_TR_NOOP("How do I create tasks?")
-                            subTitle: QT_TR_NOOP("To create a task, start by selecting a task list. Then tap on the new task line.")
-                            buttonText: ""
-                        }
-                        ListElement {
-                            source: ""
-                            title: QT_TR_NOOP("How do I check completed tasks?")
-                            subTitle: QT_TR_NOOP("To mark a task as completed, tap the check box.")
-                            buttonText: ""
-                        }
+
+                    }
+
+                    Component.onCompleted: {
+                        viewModel.append({"title" : qsTr("What's a task list?"),
+                                         "source" : "",
+                                         "buttonText" : "",
+                                         "subTitle" : qsTr("A task list is a collection of tasks. Use the default task list we have created for you, or make a new one.")});
+                        viewModel.append({"title" : qsTr("How do I create tasks?"),
+                                         "source" : "",
+                                         "buttonText" : "",
+                                         "subTitle" : qsTr("To create a task, start by selecting a task list. Then tap on the new task line.")});
+                        viewModel.append({"title" : qsTr("How do I check completed tasks?"),
+                                         "source" : "",
+                                         "buttonText" : "",
+                                         "subTitle" : qsTr("To mark a task as completed, tap the check box.")});
                     }
 
                     onButtonClicked: newListDialog.show()
@@ -584,9 +683,15 @@ Window {
             objectName: "allDueTasksPage"
             pageTitle: labelAllDueTasks
 
-//            onClose: {    //labs
-//                taskDetailContextMenu.hide();
-//            }
+            function save(saveRestore)
+            {
+
+            }
+
+            function restore(saveRestore)
+            {
+
+            }
 
             Connections {
                 target: window.pageStack
@@ -703,24 +808,19 @@ Window {
 
                 model: ListModel {
                     id: blankSlatesModel
-
-                    ListElement {
-                        title: QT_TR_NOOP("You have no due tasks")
-                        visible: false
-                    }
-                    ListElement {
-                        title: QT_TR_NOOP("You have no overdue tasks")
-                        visible: false
-                    }
-                    ListElement {
-                        title: QT_TR_NOOP("You have no upcoming tasks")
-                        visible: false
-                    }
-                    ListElement {
-                        title: QT_TR_NOOP("You have no someday tasks")
-                        visible: false
-                    }
                 }
+
+                Component.onCompleted: {
+                    model.append({"title" : qsTr("You have no due tasks"),
+                                    "visible" : false});
+                    model.append({"title" : qsTr("You have no overdue tasks"),
+                                    "visible" : false});
+                    model.append({"title" : qsTr("You have no upcoming tasks"),
+                                    "visible" : false});
+                    model.append({"title" : qsTr("You have no someday tasks"),
+                                    "visible" : false});
+                }
+
                 delegate: BlankSlate {
                     id: allDueTasksBlankSlate
                     anchors.topMargin: 20
@@ -735,12 +835,14 @@ Window {
 
                     viewVisible: qmlSettings.isRunningFirstTime
                     viewModel: ListModel {
-                        ListElement {
-                            source: ""
-                            title: QT_TR_NOOP("How do I create tasks?")
-                            subTitle: QT_TR_NOOP("To create a task, start by selecting a task list. Then tap on the new task line.")
-                            buttonText: QT_TR_NOOP("Select a task list")
-                        }
+
+                    }
+
+                    Component.onCompleted: {
+                        viewModel.append({"title" : qsTr("How do I create tasks?"),
+                                         "source" : "",
+                                         "buttonText" : qsTr("Select a task list"),
+                                         "subTitle" : qsTr("To create a task, start by selecting a task list. Then tap on the new task line.")});
                     }
 
                     onViewItemButtonClicked: picker.visible = true
@@ -879,9 +981,69 @@ Window {
             objectName: "customlistPage"
             pageTitle: labelTasks
 
-//            onClose: {  //labs
-//                taskDetailContextMenu.hide();
-//            }
+            function save(saveRestore)
+            {
+                //customlistModel
+                saveRestore.setValue("customCustomlistModelListId", customlistModel.listId);
+                saveRestore.setValue("customCustomlistModelListName", customlistModel.listName);
+
+                //confirmDelComTasksDialog
+                saveRestore.setValue("customConfirmDelComTasksDialogVisible", confirmDelComTasksDialog.visible);
+
+                //renameDialog
+                saveRestore.setValue("customRenameDialogVisible", renameDialog.visible);
+                saveRestore.setValue("customRenameDialogText", renameTextInput.text);
+
+                //deleteTaskDialog
+                saveRestore.setValue("customDeleteTaskDialogVisible", deleteTaskDialog.visible);
+
+                //deleteListDialog
+                saveRestore.setValue("customDeleteListDialogVisible", deleteListDialog.visible);
+
+                //taskListView.mode
+                saveRestore.setValue("customTaskListViewMode", taskListView.mode);
+            }
+
+            function restore(saveRestore)
+            {
+                //customlistModel
+                customlistModel.listId = saveRestore.value("customCustomlistModelListId");
+                customlistModel.listName = saveRestore.value("customCustomlistModelListName");
+
+                //confirmDelComTasksDialog
+                if (saveRestore.value("customConfirmDelComTasksDialogVisible") == "true") {
+                    confirmDelComTasksDialog.show();
+                } else {
+                    confirmDelComTasksDialog.hide();
+                }
+
+                //renameDialog
+                if (saveRestore.value("customRenameDialogVisible") == "true") {
+                    renameTextInput.forceActiveFocus();
+                    renameTextInput.focus = true;
+                    renameDialog.show();
+                } else {
+                    renameDialog.hide();
+                }
+                renameTextInput.text = saveRestore.value("customRenameDialogText");
+
+                //deleteTaskDialog
+                if (saveRestore.value("customDeleteTaskDialogVisible") == "true") {
+                    deleteTaskDialog.show();
+                } else {
+                    deleteTaskDialog.hide();
+                }
+
+                //deleteListDialog
+                if (saveRestore.value("customDeleteListDialogVisible") == "true") {
+                    deleteListDialog.show();
+                } else {
+                    deleteListDialog.hide();
+                }
+
+                //taskListView.mode
+                taskListView.mode = saveRestore.value("customTaskListViewMode");
+            }
 
             ContextMenu {
                 id: taskDetailContextMenu
@@ -1008,7 +1170,11 @@ Window {
                 property alias originalText: renameTextInput.text;
                 content: TextEntry {
                     id: renameTextInput;
-                    anchors.fill: parent;
+                    anchors.verticalCenter: parent.verticalCenter
+                    anchors.left: parent.left
+                    anchors.right: parent.right
+                    anchors.leftMargin: 20
+                    anchors.rightMargin: anchors.leftMargin
                     defaultText: qsTr("List name")
                 }
                 onAccepted: {
