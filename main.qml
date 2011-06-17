@@ -871,15 +871,18 @@ Window {
                 property int taskId: -1
 
                 content: Row {
-                    anchors.centerIn: parent
+                    anchors.fill: parent
                     spacing: 10
                     CheckBox {
                         id:checkBox
+                        anchors.verticalCenter: parent.verticalCenter
                     }
-
                     Text {
                         id: checkboxTextArea
                         text: qsTr("Don't ask to confirm deleting tasks.")
+                        wrapMode: Text.WordWrap
+                        anchors.verticalCenter: parent.verticalCenter
+                        width: parent.width - checkBox.width
                         font.pixelSize: theme.fontPixelSizeLarge
                     }
                 }
@@ -1229,15 +1232,18 @@ Window {
                 property int taskId: -1
 
                 content: Row {
-                    anchors.centerIn: parent
+                    anchors.fill: parent
                     spacing: 10
                     CheckBox {
                         id:checkBox
+                        anchors.verticalCenter: parent.verticalCenter
                     }
-
                     Text {
                         id: checkboxTextArea
                         text: qsTr("Don't ask to confirm deleting tasks.")
+                        wrapMode: Text.WordWrap
+                        anchors.verticalCenter: parent.verticalCenter
+                        width: parent.width - checkBox.width
                         font.pixelSize: theme.fontPixelSizeLarge
                     }
                 }
