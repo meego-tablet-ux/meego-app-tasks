@@ -101,6 +101,7 @@ Item {
                 id:  text
                 text: qsTr("Create a new list")
                 anchors.centerIn: parent
+                width: existingList.width
                 elide: Text.ElideMiddle
             }
 
