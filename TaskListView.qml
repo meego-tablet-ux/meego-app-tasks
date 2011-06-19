@@ -7,7 +7,7 @@
  */
 
 import Qt 4.7
-import MeeGo.Components 0.1
+import MeeGo.Ux.Components.Common 0.1
 import MeeGo.App.Tasks 0.1
 import MeeGo.Ux.Gestures 0.1
 
@@ -27,6 +27,9 @@ Item {
     property variant rowDelegate: cellComponent
     property int textHMargin: 20
     property bool listReorderable: true
+    property alias collapsed: view.collapsed
+    property alias contentX: view.contentX
+    property alias contentY: view.contentY
 
     property variant selectedIds: []
 
@@ -88,6 +91,7 @@ Item {
             model: container.model.viewModel
             delegate : rowDelegate
 
+            onCollapsedChanged: text.text = getTitleText()
         }
         CreateNewTaskRow {
             id: newrow
