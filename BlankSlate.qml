@@ -7,7 +7,7 @@
  */
 
 import QtQuick 1.0
-import MeeGo.Components 0.1
+import MeeGo.Ux.Components.Common 0.1
 
 Rectangle {
     id: slate

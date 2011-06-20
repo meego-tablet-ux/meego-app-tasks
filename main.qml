@@ -8,9 +8,9 @@
 
 import Qt 4.7
 import MeeGo.App.Tasks 0.1
-import MeeGo.Components 0.1
+import MeeGo.Ux.Components.Common 0.1
+import MeeGo.Ux.Kernel 0.1
 import MeeGo.Ux.Gestures 0.1
-//import MeeGo.Labs.Components 0.1 as Labs
 
 Window {
     id: window
@@ -66,14 +66,6 @@ Window {
         onSaveRequired: internal.save()
 
         Component.onCompleted: {
-            console.debug("---------------onCompleted");
-            if (!restoreRequired)
-                return;
-            internal.restore();
-        }
-
-        onRestoreRequiredChanged: { //NOTE: doesn't work
-            console.debug("---------------onRestoreRequiredChanged");
             if (!restoreRequired)
                 return;
             internal.restore();
@@ -685,12 +677,21 @@ Window {
 
             function save(saveRestore)
             {
-
+                saveRestore.setValue("alldueTasksListSortOrder", overdueModel.sortOrder);
+                for (var i = 0; i < 3; ++i)
+                    saveRestore.setValue("alldueTasksListCollapsed" + i, alldueTasksList.itemCollapsed(i));
+                saveRestore.setValue("alldueTasksListContentX", alldueTasksList.contentX);
+                saveRestore.setValue("alldueTasksListContentY", alldueTasksList.contentY);
             }
 
             function restore(saveRestore)
             {
-
+                overdueModel.sort(saveRestore.value("customSortOrder"));
+                upcomingModel.sort(saveRestore.value("customSortOrder"));
+                for (var i = 0; i < 3; ++i)
+                    alldueTasksList.collapseItem(i, saveRestore.value("alldueTasksListCollapsed" + i));
+                alldueTasksList.contentX = saveRestore.value("alldueTasksListContentX");
+                alldueTasksList.contentY = saveRestore.value("alldueTasksListContentY");
             }
 
             Connections {
@@ -871,15 +872,18 @@ Window {
                 property int taskId: -1
 
                 content: Row {
-                    anchors.centerIn: parent
+                    anchors.fill: parent
                     spacing: 10
                     CheckBox {
                         id:checkBox
+                        anchors.verticalCenter: parent.verticalCenter
                     }
-
                     Text {
                         id: checkboxTextArea
                         text: qsTr("Don't ask to confirm deleting tasks.")
+                        wrapMode: Text.WordWrap
+                        anchors.verticalCenter: parent.verticalCenter
+                        width: parent.width - checkBox.width
                         font.pixelSize: theme.fontPixelSizeLarge
                     }
                 }
@@ -1000,8 +1004,12 @@ Window {
                 //deleteListDialog
                 saveRestore.setValue("customDeleteListDialogVisible", deleteListDialog.visible);
 
-                //taskListView.mode
+                //taskListView
                 saveRestore.setValue("customTaskListViewMode", taskListView.mode);
+                saveRestore.setValue("customSortOrder", customlistModel.sortOrder);
+                saveRestore.setValue("customTaskListViewCollapsed", taskListView.collapsed);
+                saveRestore.setValue("customTaskListViewContentX", taskListView.contentX);
+                saveRestore.setValue("customTaskListViewContentY", taskListView.contentY);
             }
 
             function restore(saveRestore)
@@ -1041,8 +1049,13 @@ Window {
                     deleteListDialog.hide();
                 }
 
-                //taskListView.mode
+                //taskListView
                 taskListView.mode = saveRestore.value("customTaskListViewMode");
+                customlistModel.sort(saveRestore.value("customSortOrder"));
+                customlistPage.actionMenuModel = makeActionMenuModel();
+                taskListView.collapsed = saveRestore.value("customTaskListViewCollapsed");
+                taskListView.contentX = saveRestore.value("customTaskListViewContentX");
+                taskListView.contentY = saveRestore.value("customTaskListViewContentY");
             }
 
             ContextMenu {
@@ -1229,15 +1242,18 @@ Window {
                 property int taskId: -1
 
                 content: Row {
-                    anchors.centerIn: parent
+                    anchors.fill: parent
                     spacing: 10
                     CheckBox {
                         id:checkBox
+                        anchors.verticalCenter: parent.verticalCenter
                     }
-
                     Text {
                         id: checkboxTextArea
                         text: qsTr("Don't ask to confirm deleting tasks.")
+                        wrapMode: Text.WordWrap
+                        anchors.verticalCenter: parent.verticalCenter
+                        width: parent.width - checkBox.width
                         font.pixelSize: theme.fontPixelSizeLarge
                     }
                 }

@@ -8,7 +8,7 @@
 
 import Qt 4.7
 import MeeGo.App.Tasks 0.1
-import MeeGo.Components 0.1
+import MeeGo.Ux.Components.Common 0.1
 import MeeGo.Ux.Gestures 0.1
 
 Item {
@@ -20,6 +20,8 @@ Item {
     property int rowHeight: 70
     property int textHMargin: 20
     property bool forceShowTitle: false
+    property alias contentX: area.contentX
+    property alias contentY: area.contentY
 
    // signal clickedAtRow(int category, int row, bool repeat)
     signal clickedAtRow(int index, int x , int y, variant payload)
@@ -73,7 +75,7 @@ Item {
     }
     function titleText(index){
         //console.log()
-        if (!model.count)
+        if (!allViews.children.length)
             return "";
         var collapsed = allViews.children[index].collapsed;
         var title = model[index].title;
@@ -112,6 +114,14 @@ Item {
     {
         for (var i = 0; i < container.model.length; ++i)
             titles.children[i].updateTitleText();
+    }
+    function collapseItem(index, collapse)
+    {
+        allViews.children[index].collapsed = collapse;
+    }
+    function itemCollapsed(index)
+    {
+        return allViews.children[index].collapsed;
     }
 
     onVisibleChanged: {
@@ -251,6 +261,17 @@ Item {
                     }
                 }
             }
+
+            Connections {
+                target: allViews.children[index]
+                onCollapsedChanged: {
+                    text.text = titleText(index);
+                    if (!allViews.children[index].collapsed) {
+                        ensureShowingList(index);
+                    }
+                }
+            }
+
 //            MouseArea {
 //                anchors.fill: parent
 
