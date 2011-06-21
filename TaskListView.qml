@@ -10,6 +10,7 @@ import Qt 4.7
 import MeeGo.Ux.Components.Common 0.1
 import MeeGo.App.Tasks 0.1
 import MeeGo.Ux.Gestures 0.1
+import MeeGo.Ux.Kernel 0.1
 
 Item {
     id: container
@@ -293,6 +294,7 @@ Item {
                 visible: (index == privateData.selectedRow)
             }
 
+            TopItem{ id: top }
 
             GestureArea {
                 anchors.top: parent.top
@@ -303,7 +305,8 @@ Item {
                     onFinished: {
                         privateData.selectedRow = index;
                         if (mode == 0) {
-                            var map = mapToItem(null, gesture.position.x, gesture.position.y);
+                            top.calcTopParent()
+                            var map = mapToItem(top.topItem, gesture.position.x, gesture.position.y);
                             container.clickedAtRow(index, map.x, map.y,dinstance);
                         } else if (mode == 1) {
                             // adding mode, do nothing?
@@ -315,7 +318,8 @@ Item {
                 TapAndHold {
                     onFinished: {
                         if (mode == 0) {
-                            var map = mapToItem(null, gesture.position.x, gesture.position.y);
+                            top.calcTopParent()
+                            var map = mapToItem(top.topItem, gesture.position.x, gesture.position.y);
                             container.pressAndHoldAtRow(index, map.x, map.y, dinstance);
                         }
                     }
