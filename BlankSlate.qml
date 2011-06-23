@@ -9,6 +9,7 @@
 import QtQuick 1.0
 import MeeGo.Ux.Components.Common 0.1
 import MeeGo.Ux.Kernel 0.1
+import MeeGo.Ux.Components 0.1
 
 Rectangle {
     id: slate

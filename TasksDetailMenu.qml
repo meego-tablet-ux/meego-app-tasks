@@ -4,6 +4,7 @@ import MeeGo.Ux.Components.DateTime 0.1
 import MeeGo.App.Tasks 0.1
 import MeeGo.Ux.Gestures 0.1
 import MeeGo.Ux.Kernel 0.1
+import MeeGo.Ux.Components 0.1
 
 Column {
     id: detailMenu
