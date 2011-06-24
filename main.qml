@@ -517,6 +517,7 @@ Window {
                             source: "image://themedimage/images/icn_forward_dn"
                         }
 
+                        TopItem{ id: top }
 
                         MouseArea {
                             anchors.fill: parent
@@ -527,7 +528,8 @@ Window {
                             }
                             onPressAndHold: {
                                 if (listId != 0) {
-                                    var map = mapToItem(null, mouseX, mouseY);
+                                    top.calcTopParent()
+                                    var map = mapToItem(top.topItem, mouseX, mouseY);
                                     landingScreenContextMenu.payload = dinstance;
                                     landingScreenContextMenu.setPosition(map.x, map.y);
                                     landingScreenContextMenu.show();
@@ -785,8 +787,7 @@ Window {
                 rowHeight: window.rowHeight
 
                 onClickedAtRow: {
-                    var map = alldueTasksList.mapToItem(allDueTasksPage, x, y);
-                    taskDetailContextMenu.displayContextMenu(map.x,map.y,payload,false);
+                    taskDetailContextMenu.displayContextMenu(x,y,payload,false);
                 }
                 onCheckedAtRow: {
                     editorList.setCompleted(payload.mTaskId,checked);
@@ -797,8 +798,8 @@ Window {
                 onPressAndHoldAtRow : {
                     var map = alldueTasksList.mapToItem(allDueTasksPage, x, y);
                     allDueTasksPageContextMenu.payload = payload;
-                    allDueTasksPageContextMenu.mousePos = map;
-                    allDueTasksPageContextMenu.setPosition(map.x,map.y)
+                    allDueTasksPageContextMenu.mousePos = map;   // This position may be wrong now since mapping isn't necessary, please test
+                    allDueTasksPageContextMenu.setPosition(x, y)
                     allDueTasksPageContextMenu.show();
                 }
             }
@@ -1214,8 +1215,7 @@ Window {
 
                 onClickedAtRow: {
                     if (taskListView.mode == 0) {
-                        var map = taskListView.mapToItem(customlistPage, x, y);
-                        taskDetailContextMenu.displayContextMenu(map.x, map.y,payload,false);
+                        taskDetailContextMenu.displayContextMenu(x, y,payload,false);
                     }
 
                 }
@@ -1225,8 +1225,8 @@ Window {
                 onPressAndHoldAtRow: {
                     var map = taskListView.mapToItem(customlistPage, x, y);
                     customListPageContextMenu.payload = payload;
-                    customListPageContextMenu.mousePos = map;
-                    customListPageContextMenu.setPosition(map.x,map.y)
+                    customListPageContextMenu.mousePos = map;   // This position may be wrong now since mapping isn't necessary, please test
+                    customListPageContextMenu.setPosition(x, y)
                     customListPageContextMenu.show();
                 }
             }
