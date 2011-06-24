@@ -1024,7 +1024,7 @@ void TasksDatabase::setTaskUncomplited(TasksTaskItem *task)
 void TasksDatabase::load()
 {
     m_dbEngine->loadLists();
-    m_dbEngine->loadTasks();
+    m_dbEngine->startLoadingTasks();
 }
 
 void TasksDatabase::createList(const QString &name)
@@ -1131,26 +1131,69 @@ void TasksDatabase::insertTasks(const QList<TasksTaskItem *> &tasks)
         if (task->isComplete()) {
             continue;
         }
+        int listId = task->list()->id();
+
         //m_allTasks << task;
         insertTaskToAll(task);
+
+        TasksListModel::TimeGroups tg = TasksListModel::All;
+        int idx = -1;
         if (!task->hasDueDate()) {
-            //int idx = 0;
-            //while (idx < m_somedayTasks.count() && m_somedayTasks.at(idx)->createdDateTime() < task->createdDateTime())
-            //        idx++;
-            int idx = findIndexForSomeday(task);
-            m_somedayTasks.insert(idx, task);
-        } else if (task->dueDate() < m_currentDate) {
-            //int idx = 0;
-            //while (idx < m_overdueTasks.count() && m_overdueTasks.at(idx)->dueDate() < task->dueDate())
-            //        idx++;
-            int idx = findIndexForOverdue(task);
-            m_overdueTasks.insert(idx, task);
+            tg = TasksListModel::Someday;
+            idx = findIndexForSomeday(task);
+        }
+        else if (task->dueDate() < QDate::currentDate()) {
+            tg = TasksListModel::Overdue;
+            idx = findIndexForOverdue(task);
         } else {
-            //int idx = 0;
-            //while (idx < m_upcomingTasks.count() && m_upcomingTasks.at(idx)->dueDate() < task->dueDate())
-            //        idx++;
-            int idx = findIndexForUpcoming(task);
+            tg = TasksListModel::Upcoming;
+            idx = findIndexForUpcoming(task);
+        }
+
+        // Send begin insert row
+        foreach (TasksListModel *model, m_models) {
+            if (model->modelType() == TasksListModel::AllLists)
+                ;//
+            else if (model->modelType() == TasksListModel::Timeview) {
+                if (model->timeGroups() == TasksListModel::Someday && tg == TasksListModel::Someday)
+                    model->onBeginInsertRow(m_somedayTasks.count());
+                else if (model->timeGroups() == TasksListModel::Overdue && tg == TasksListModel::Overdue)
+                    model->onBeginInsertRow(idx);
+                else if (model->timeGroups() == TasksListModel::Upcoming && tg == TasksListModel::Upcoming)
+                    model->onBeginInsertRow(idx);
+            }
+            else if (model->modelType() == TasksListModel::List) {
+                if (model->listId() == listId)
+                    model->onBeginInsertRow(task->list()->tasks());
+            }
+        }
+        // Insert
+        if (tg == TasksListModel::Someday)
+            m_somedayTasks.insert(idx, task);
+        else if (tg == TasksListModel::Overdue)
+            m_overdueTasks.insert(idx, task);
+        else if (tg == TasksListModel::Upcoming)
             m_upcomingTasks.insert(idx, task);
+
+        // Send end insert row
+        int lidx = findList(listId);
+        foreach (TasksListModel *model, m_models) {
+            if (model->modelType() == TasksListModel::AllLists) {
+                if (lidx != -1)
+                    model->onUpdateRow(lidx);
+            }
+            else if (model->modelType() == TasksListModel::Timeview) {
+                if (model->timeGroups() == TasksListModel::Someday && tg == TasksListModel::Someday)
+                    model->onEndInsertRow();
+                else if (model->timeGroups() == TasksListModel::Overdue && tg == TasksListModel::Overdue)
+                    model->onEndInsertRow();
+                else if (model->timeGroups() == TasksListModel::Upcoming && tg == TasksListModel::Upcoming)
+                    model->onEndInsertRow();
+            }
+            else if (model->modelType() == TasksListModel::List) {
+                if (model->listId() == listId)
+                    model->onEndInsertRow();
+            }
         }
     }
 }
