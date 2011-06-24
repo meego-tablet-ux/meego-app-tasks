@@ -22,28 +22,13 @@ TasksDBEngine::TasksDBEngine(TasksDatabase *db)
 {
         m_settings = new QSettings("MeeGo", "meego-app-tasks");
 
-        m_calendar = new ExtendedCalendar(QLatin1String("UTC"));
-        m_calendarPtr = ExtendedCalendar::Ptr(m_calendar);
-        m_storage = m_calendar->defaultStorage(m_calendarPtr);
-        m_storage->open();
+        m_storage = eKCal::EStorage::localStorage(KCalCore::IncidenceBase::TypeTodo,
+                                                  tasksNotebook, true);
+        m_calendar = m_storage->calendar();
+        m_calendar->setTimeSpec(KDateTime::Spec::UTC());
 
-
-        m_notebook = 0;
-        Notebook::List nbList = m_storage->notebooks();
-        for (int i = 0; i < nbList.count(); i++) {
-                Notebook::Ptr nbPtr = nbList.at(i);
-                Notebook *notebook = nbPtr.data();
-                if (notebook->name() == tasksNotebook) {
-                        m_notebook = notebook;
-                        break;
-                }
-        }
-        if (!m_notebook) {
-                m_notebook = new Notebook(tasksNotebook, "");
-                Notebook::Ptr notebookPtr = Notebook::Ptr(m_notebook);
-                m_storage->addNotebook(notebookPtr);
-        }
-        m_nuid = m_notebook->uid();
+        // Register the observer
+        m_storage->registerObserver(this);
 }
 
 TasksDBEngine::~TasksDBEngine()
@@ -80,7 +65,6 @@ void TasksDBEngine::saveLists()
 
 void TasksDBEngine::loadTasks()
 {
-        m_storage->loadNotebookIncidences(m_nuid);
         QHash<QString, TasksListItem *> listsHash;
         foreach (TasksListItem *list, m_db->m_lists)
                 listsHash[list->name()] = list;
@@ -97,8 +81,10 @@ void TasksDBEngine::loadTasks()
                 int orderidx = order.toInt(&ok);
                 if (!ok)
                         orderidx = -1;
-                QString task = todo->description();
-                QString notes = todo->altDescription();
+                QString task = todo->summary();
+                qDebug() << "task:" << task;
+                QString notes = todo->description();
+                qDebug() << "notes:" << notes;
                 bool completed = todo->isCompleted();
                 bool hasDueDate = todo->hasDueDate();
                 QDate dueDate = todo->dtDue().date();
@@ -178,7 +164,7 @@ void TasksDBEngine::addTask(TasksTaskItem *task)
         KCalCore::Todo::Ptr todo = KCalCore::Todo::Ptr(new KCalCore::Todo());
         setTaskValues(task, todo);
         //m_tasks[task->id()] = todo;
-        m_calendar->addTodo(todo, m_nuid);
+        m_calendar->addTodo(todo);
 }
 
 void TasksDBEngine::updateTask(TasksTaskItem *task)
@@ -187,7 +173,6 @@ void TasksDBEngine::updateTask(TasksTaskItem *task)
         //        return;
         if (!m_uids.contains(task->id()))
                 return;
-        m_storage->loadNotebookIncidences(m_nuid);
         KCalCore::Todo::Ptr todo = m_calendar->todo(m_uids[task->id()]);
         setTaskValues(task, todo);
         todo->setRevision(todo->revision() + 1);
@@ -198,7 +183,6 @@ void TasksDBEngine::removeTask(TasksTaskItem *task)
 {
         if (!m_uids.contains(task->id()))
                 return;
-        m_storage->loadNotebookIncidences(m_nuid);
         KCalCore::Todo::Ptr todo = m_calendar->todo(m_uids[task->id()]);
         m_uids.remove(task->id());
         m_calendar->deleteTodo(todo);
@@ -207,7 +191,6 @@ void TasksDBEngine::removeTask(TasksTaskItem *task)
 
 void TasksDBEngine::removeTasks(QList<TasksTaskItem *> tasks)
 {
-        m_storage->loadNotebookIncidences(m_nuid);
         foreach (TasksTaskItem *task, tasks) {
                 if (!task)
                         continue;
@@ -221,7 +204,6 @@ void TasksDBEngine::removeTasks(QList<TasksTaskItem *> tasks)
 
 void TasksDBEngine::updateTasksOrder(TasksListItem *list)
 {
-        m_storage->loadNotebookIncidences(m_nuid);
         for (int idx = 0; idx < list->tasks(); idx++) {
                 TasksTaskItem *task = list->task(idx);
                 if (!task)
@@ -247,7 +229,6 @@ void TasksDBEngine::updateTasksList(TasksListItem *list)
 
 void TasksDBEngine::updateTasksList(QList<TasksTaskItem *> tasks)
 {
-        m_storage->loadNotebookIncidences(m_nuid);
         foreach (TasksTaskItem *task, tasks) {
                 if (!task)
                         continue;
@@ -266,8 +247,8 @@ void TasksDBEngine::commitTasks()
 
 void TasksDBEngine::setTaskValues(TasksTaskItem *task, const KCalCore::Todo::Ptr &todo)
 {
-        todo->setDescription(task->task());
-        todo->setAltDescription(task->notes());
+        todo->setSummary(task->task());
+        todo->setDescription(task->notes());
         //todo->setSummary(task->notes());
         todo->setCategories(QStringList(task->list()->name()));
         todo->setCompleted(task->isComplete());
@@ -323,4 +304,25 @@ void TasksDBEngine::setTaskValues(TasksTaskItem *task, const KCalCore::Todo::Ptr
                         alarm->setTime(alarmTime);
                 }
         }
+}
+
+/** \reimp */
+void TasksDBEngine::loadingComplete(bool success, const QString &error)
+{
+        qDebug() << Q_FUNC_INFO << "Success:" << success << error;
+        if (success) {
+                // The storage was successfuly loaded, now load the tasks
+                loadTasks();
+        }
+}
+
+/** \reimp */
+void TasksDBEngine::savingComplete(bool success, const QString &error)
+{
+        qDebug() << Q_FUNC_INFO << "Success:" << success << error;
+}
+
+void TasksDBEngine::startLoadingTasks()
+{
+        m_storage->startLoading();
 }

@@ -3,7 +3,7 @@ TARGET = Tasks
 QT += declarative
 CONFIG += qt plugin link_pkgconfig
 
-PKGCONFIG += libkcalcoren libmkcal
+PKGCONFIG += libekcal
 
 OBJECTS_DIR = .obj
 MOC_DIR = .moc

@@ -9,23 +9,25 @@
 #ifndef TASKSDBENGINE_H
 #define TASKSDBENGINE_H
 
-#include <extendedcalendar.h>
-#include <sqlitestorage.h>
+#include <ekcal/ekcal-storage.h>
+#include <QObject>
+#include <QMap>
+
 class TasksDatabase;
 class QSettings;
 class TasksTaskItem;
 class TasksListItem;
-using namespace mKCal;
 
-class TasksDBEngine
+class TasksDBEngine: public eKCal::StorageObserver
 {
+
 public:
         TasksDBEngine(TasksDatabase *db);
         ~TasksDBEngine();
 
         void loadLists();
         void saveLists();
-        void loadTasks();
+        void startLoadingTasks();
         void addTask(TasksTaskItem *task);
         void updateTask(TasksTaskItem *task);
         void removeTask(TasksTaskItem *task);
@@ -35,19 +37,20 @@ public:
         void updateTasksList(QList<TasksTaskItem *> tasks);
         void commitTasks();
 
+protected:
+        virtual void loadingComplete(bool success, const QString &error);
+        virtual void savingComplete(bool success, const QString &error);
+
 private:
         void setTaskValues(TasksTaskItem *task, const KCalCore::Todo::Ptr &todo);
+        void loadTasks();
 
 private:
         static const QString tasksNotebook;
         TasksDatabase *m_db;
         QSettings *m_settings;
-        ExtendedCalendar *m_calendar;
-        ExtendedCalendar::Ptr m_calendarPtr;
-        //SqliteStorage *m_storage;
-        ExtendedStorage::Ptr m_storage;
-        Notebook *m_notebook;
-        QString m_nuid;
+        eKCal::EStorage::Ptr m_storage;
+        KCalCore::Calendar::Ptr m_calendar;
         QMap<int, KCalCore::Todo::Ptr> m_tasks;
         QMap<int, QString> m_uids;
 };
