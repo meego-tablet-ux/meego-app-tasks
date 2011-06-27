@@ -50,7 +50,6 @@ private:
         QSettings *m_settings;
         eKCal::EStorage::Ptr m_storage;
         KCalCore::Calendar::Ptr m_calendar;
-        QMap<int, KCalCore::Todo::Ptr> m_tasks;
         QMap<int, QString> m_uids;
 };
 
