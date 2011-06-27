@@ -184,12 +184,6 @@ void TasksDBEngine::updateTasksOrder(TasksListItem *list)
 
 void TasksDBEngine::updateTasksList(TasksListItem *list)
 {
-        /*for (int idx = 0; idx < list->tasks(); idx++) {
-                TasksTaskItem *task = list->task(idx);
-                if (!task)
-                        continue;
-                updateTask(task);
-        }*/
         updateTasksList(list->m_tasks);
 }
 
