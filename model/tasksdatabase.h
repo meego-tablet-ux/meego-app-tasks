@@ -54,7 +54,7 @@ public:
         void rollbackAddedTasks();
 
 signals:
-        void listAdded(TasksListItem *list);
+        void listAdded(const TasksListItem &list);
         void beginInsertRow(int r);
         void endInsertRow();
         void beginRemoveRow(int r);
@@ -66,19 +66,19 @@ protected:
 
 private:
         int findList(int listId);
-        void setTaskComplited(TasksTaskItem *task);
-        void setTaskUncomplited(TasksTaskItem *task);
+        void setTaskComplited(TasksTaskItem &task);
+        void setTaskUncomplited(TasksTaskItem &task);
         void load();
         void createList(const QString &name);
-        TasksTaskItem *createTask(TasksListItem *list, const QString &task, const QString &notes, bool complete,
+        TasksTaskItem createTask(const TasksListItem &list, const QString &task, const QString &notes, bool complete,
                                   bool hasDueDate, const QDate &dueDate,
                                   TasksListModel::ReminderType reminderType, const QDate &reminderDate,
                                   const QStringList &urls, const QStringList &attachments, const QDateTime &createdDateTime);
-        int findIndexForUpcoming(TasksTaskItem *t);
-        int findIndexForOverdue(TasksTaskItem *t);
-        int findIndexForSomeday(TasksTaskItem *t);
-        void insertTaskToAll(TasksTaskItem *t);
-        void insertTasks(const QList<TasksTaskItem *> &tasks);
+        int findIndexForUpcoming(const TasksTaskItem &t) const;
+        int findIndexForOverdue(const TasksTaskItem &t) const;
+        int findIndexForSomeday(const TasksTaskItem &t) const;
+        void insertTaskToAll(const TasksTaskItem &t);
+        void insertTasks(const QList<TasksTaskItem> &tasks);
         void updateDueTasks(bool topast = false);
 
 private:
@@ -92,23 +92,23 @@ private:
         // List of lists objects
         // First is "Default List"
         // Others sorted by datetime of creation
-        QList<TasksListItem *> m_lists;
+        QList<TasksListItem> m_lists;
         // List of all tasks with due date
         // Sorted from earliest to latest due date
         //QList<TasksTaskItem *> m_dueTasks;
-        QList<TasksTaskItem *> m_overdueTasks;
-        QList<TasksTaskItem *> m_upcomingTasks;
+        QList<TasksTaskItem> m_overdueTasks;
+        QList<TasksTaskItem> m_upcomingTasks;
         // List of all tasks without due date
         // Sorted by datetime of creation
-        QList<TasksTaskItem *> m_somedayTasks;
+        QList<TasksTaskItem> m_somedayTasks;
         // New tasks list. First add tasks to list
         // and save after.
-        QList<TasksTaskItem *> m_newTasks;
+        QList<TasksTaskItem> m_newTasks;
         // Id maps
-        QMap<int, TasksListItem *> m_listsMap;
-        QMap<int, TasksTaskItem *> m_tasksMap;
+        QMap<int, TasksListItem> m_listsMap;
+        QMap<int, TasksTaskItem> m_tasksMap;
         // All tasks
-        QList<TasksTaskItem *> m_allTasks;
+        QList<TasksTaskItem> m_allTasks;
 };
 
 #define Database TasksDatabase::instance()

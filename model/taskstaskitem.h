@@ -9,31 +9,37 @@
 #ifndef TASKSTASKITEM_H
 #define TASKSTASKITEM_H
 
-
 #include "taskslistmodel.h"
 #include <QStringList>
+#include <QExplicitlySharedDataPointer>
 
 class TasksListItem;
+class TasksTaskItemData;
 
 class TasksTaskItem
 {
 public:
-        TasksTaskItem(TasksListItem *list);
+        TasksTaskItem(const TasksListItem &list = TasksListItem());
+        TasksTaskItem(const TasksTaskItem &other);
+        ~TasksTaskItem();
+        TasksTaskItem& operator=(const TasksTaskItem& other);
+        bool operator==(const TasksTaskItem& other) const;
 
-        TasksListItem *list() const {return m_list; }
-        int id() const {return m_id; }
-        QString task() const {return m_task; }
-        QString notes() const {return m_notes; }
-        bool isComplete() const {return m_complete; }
-        bool hasDueDate() const {return m_hasDueDate; }
-        QDate dueDate() const {return m_dueDate; }
-        TasksListModel::ReminderType reminderType() const {return m_reminderType; }
-        QDate reminderDate() const {return m_reminderDate; }
-        QDateTime createdDateTime() const {return m_createdDateTime; }
-        const QStringList &urls() const {return m_urls; }
-        const QStringList &attachments() const {return m_attachments; }
+        bool isValid() const;
+        TasksListItem list() const;
+        int id() const;
+        QString task() const;
+        QString notes() const;
+        bool isComplete() const;
+        bool hasDueDate() const;
+        QDate dueDate() const;
+        TasksListModel::ReminderType reminderType() const;
+        QDate reminderDate() const;
+        QDateTime createdDateTime() const;
+        const QStringList &urls() const;
+        const QStringList &attachments() const;
 
-        void setList(TasksListItem *list);
+        void setList(const TasksListItem &list);
         void setTask(const QString &task);
         void setNotes(const QString &notes);
         void setComplete(bool complete);
@@ -45,19 +51,9 @@ public:
         void setUrls(const QStringList &urls);
         void setAttachments(const QStringList &attachments);
 private:
-        static int ids;
-        TasksListItem *m_list;
-        int m_id;
-        QString m_task;
-        QString m_notes;
-        bool m_complete;
-        bool m_hasDueDate;
-        QDate m_dueDate;
-        TasksListModel::ReminderType m_reminderType;
-        QDate m_reminderDate;
-        QDateTime m_createdDateTime;
-        QStringList m_urls;
-        QStringList m_attachments;
+        QExplicitlySharedDataPointer<TasksTaskItemData> d;
 };
+
+uint qHash(const TasksTaskItem &key);
 
 #endif // TASKITEM_H

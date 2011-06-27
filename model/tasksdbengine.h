@@ -28,20 +28,20 @@ public:
         void loadLists();
         void saveLists();
         void startLoadingTasks();
-        void addTasks(const QList<TasksTaskItem *> &tasks);
-        void updateTask(TasksTaskItem *task);
-        void removeTask(TasksTaskItem *task);
-        void removeTasks(const QList<TasksTaskItem *> &tasks);
-        void updateTasksOrder(TasksListItem *list);
-        void updateTasksList(TasksListItem *list);
-        void updateTasksList(const QList<TasksTaskItem *> &tasks);
+        void addTasks(const QList<TasksTaskItem> &tasks);
+        void updateTask(const TasksTaskItem &task);
+        void removeTask(const TasksTaskItem &task);
+        void removeTasks(const QList<TasksTaskItem> &tasks);
+        void updateTasksOrder(const TasksListItem &list);
+        void updateTasksList(const TasksListItem &list);
+        void updateTasksList(const QList<TasksTaskItem> &tasks);
 
 protected:
         virtual void loadingComplete(bool success, const QString &error);
         virtual void savingComplete(bool success, const QString &error);
 
 private:
-        void setTaskValues(TasksTaskItem *task, const KCalCore::Todo::Ptr &todo);
+        void setTaskValues(const TasksTaskItem &task, const KCalCore::Todo::Ptr &todo);
         void loadTasks();
 
 private:

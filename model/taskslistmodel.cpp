@@ -88,17 +88,17 @@ void TasksListModel::doFiltering()
 
     if (m_modelType == AllLists)  { //list of task lists
         m_taskListsFiltered.clear();
-        foreach(TasksListItem *item,Database->m_lists) {
-            if(item->name().contains(m_filter,Qt::CaseInsensitive)) {
+        foreach(const TasksListItem &item, Database->m_lists) {
+            if(item.name().contains(m_filter,Qt::CaseInsensitive)) {
                 m_taskListsFiltered.append(item);
             }
         }
     } else { //a list of tasks of some kind...
-        QList<TasksTaskItem *> filterMe;
+        QList<TasksTaskItem> filterMe;
 
         if (m_modelType == List) {
-            TasksListItem *list = Database->m_listsMap[m_listId];
-            filterMe= list->taskList();
+            const TasksListItem &list = Database->m_listsMap[m_listId];
+            filterMe = list.taskList();
         }
         else if (m_modelType == Timeview) {
             if (m_timeGroups == Someday)
@@ -113,8 +113,8 @@ void TasksListModel::doFiltering()
         }
 
         m_tasksFiltered.clear();
-        foreach(TasksTaskItem *item, filterMe) {
-            if(item->task().contains(m_filter,Qt::CaseInsensitive)) {
+        foreach(const TasksTaskItem &item, filterMe) {
+            if(item.task().contains(m_filter,Qt::CaseInsensitive)) {
                 m_tasksFiltered.append(item);
             }
         }
@@ -127,8 +127,8 @@ int TasksListModel::icount() const
     if (m_modelType == List) {
         if (!Database->m_listsMap.contains(m_listId))
             return 0;
-        TasksListItem *list = Database->m_listsMap[m_listId];
-        return list->incompleted();
+        TasksListItem list = Database->m_listsMap[m_listId];
+        return list.incompleted();
     } else if (m_modelType == Timeview) {
         return count();
     }
@@ -155,8 +155,8 @@ int TasksListModel::rowCount(const QModelIndex &parent) const
     else if (m_modelType == List) {
         if (!Database->m_listsMap.contains(m_listId))
             return 0;
-        TasksListItem *list = Database->m_listsMap[m_listId];
-        return list->tasks();
+        TasksListItem list = Database->m_listsMap[m_listId];
+        return list.count();
     }
     else if (m_modelType == Timeview) {
         if (m_timeGroups == Someday)
@@ -181,20 +181,20 @@ int TasksListModel::columnCount(const QModelIndex &parent) const
 QVariant TasksListModel::data(const QModelIndex &index, int role) const
 {
     if (m_modelType == AllLists) {
-        QList<TasksListItem *> lookAtMe= Database->m_lists;
+        QList<TasksListItem> lookAtMe = Database->m_lists;
         if(!m_filter.isEmpty()) {
             lookAtMe = m_taskListsFiltered;
         }
         if (index.row() < 0 || index.row() >= lookAtMe.count())
             return QVariant();
         if (role == ListName) {
-            return QVariant(lookAtMe[index.row()]->name());
+            return QVariant(lookAtMe[index.row()].name());
         }
 
         else if (role == ListID)
-            return QVariant(lookAtMe[index.row()]->id());
+            return QVariant(lookAtMe[index.row()].id());
         else if (role == ListIncompletedCount)
-            return QVariant(lookAtMe[index.row()]->incompleted());
+            return QVariant(lookAtMe[index.row()].incompleted());
     }
     else if (m_modelType == AllTimeView) {
         //
@@ -205,14 +205,14 @@ QVariant TasksListModel::data(const QModelIndex &index, int role) const
     else if (m_modelType == List) {
         if (!Database->m_listsMap.contains(m_listId))
             return QVariant();
-        TasksListItem *list = Database->m_listsMap[m_listId];
-        TasksTaskItem *task = list->task(index.row());
+        const TasksListItem &list = Database->m_listsMap[m_listId];
+        TasksTaskItem task = list.task(index.row());
         return taskRole(task, role);
     }
     else if (m_modelType == Timeview) {
         if (index.row() < 0)
             return QVariant();
-        TasksTaskItem *task = 0;
+        TasksTaskItem task;
         if (m_timeGroups == Someday && index.row() < Database->m_somedayTasks.count())
             task = Database->m_somedayTasks[index.row()];
         else if (m_timeGroups == Overdue && index.row() < Database->m_overdueTasks.count())
@@ -226,12 +226,10 @@ QVariant TasksListModel::data(const QModelIndex &index, int role) const
     else if (m_modelType == AllTasks) {
         if (index.row() < 0)
             return QVariant();
-        TasksTaskItem *task = 0;
-        /*if (Database->isFiltered() && index.row() < Database->m_allTasksFiltered.count())
-                        task = Database->m_allTasksFiltered[index.row()];
-                else*/ if(index.row() < Database->m_allTasks.count())
+        TasksTaskItem task;
+        if(index.row() < Database->m_allTasks.count())
             task = Database->m_allTasks[index.row()];
-        if (!task)
+        if (!task.isValid())
             return QVariant();
         return taskRole(task, role);
     }
@@ -444,52 +442,52 @@ void TasksListModel::onIcountChanged()
     emit icountChanged();
 }
 
-QVariant TasksListModel::taskRole(TasksTaskItem *task, int role) const
+QVariant TasksListModel::taskRole(const TasksTaskItem &task, int role) const
 {
-    if (!task)
+    if (!task.isValid())
         return QVariant();
     if (role == TaskID)
-        return QVariant(task->id());
+        return QVariant(task.id());
     else if (role == Task)
-        return QVariant(task->task());
+        return QVariant(task.task());
     else if (role == Notes)
-        return QVariant(task->notes());
+        return QVariant(task.notes());
     else if (role == Complete)
-        return QVariant(task->isComplete());
+        return QVariant(task.isComplete());
     else if (role == HasDueDate)
-        return QVariant(task->hasDueDate());
+        return QVariant(task.hasDueDate());
     else if (role == DueDate)
-        return QVariant(task->dueDate());
+        return QVariant(task.dueDate());
     else if (role == Reminder)
-        return QVariant(task->reminderType());
+        return QVariant(task.reminderType());
     else if (role == ReminderDate)
-        return QVariant(task->reminderDate());
+        return QVariant(task.reminderDate());
     else if (role == Urls)
-        return QVariant(task->urls());
+        return QVariant(task.urls());
     else if (role == Attachments)
-        return QVariant(task->attachments());
+        return QVariant(task.attachments());
     else if (role == ListName)
-        return QVariant(task->list()->name());
+        return QVariant(task.list().name());
     else if (role == ListID)
-        return QVariant(task->list()->id());
+        return QVariant(task.list().id());
     return QVariant();
 }
 
-static bool lessThen(const QPair<TasksTaskItem *, int> &a, const QPair<TasksTaskItem *, int> &b)
+static bool lessThen(const QPair<TasksTaskItem, int> &a, const QPair<TasksTaskItem, int> &b)
 {
-    return a.first->dueDate() < b.first->dueDate();
+    return a.first.dueDate() < b.first.dueDate();
 }
 
-static bool greaterThen(const QPair<TasksTaskItem *, int> &a, const QPair<TasksTaskItem *, int> &b)
+static bool greaterThen(const QPair<TasksTaskItem, int> &a, const QPair<TasksTaskItem, int> &b)
 {
-    return a.first->dueDate() > b.first->dueDate();
+    return a.first.dueDate() > b.first.dueDate();
 }
 
 void TasksListModel::sort(int column, Qt::SortOrder order)
 {
     Q_UNUSED(column);
 
-    QList<TasksTaskItem *> *tasks = 0;
+    QList<TasksTaskItem> *tasks = 0;
     if (m_modelType == Timeview) {
         if (m_timeGroups == Someday)
             tasks = &Database->m_somedayTasks;
@@ -498,8 +496,8 @@ void TasksListModel::sort(int column, Qt::SortOrder order)
         else if (m_timeGroups == Upcoming)
            tasks = &Database->m_upcomingTasks;
     } else if (m_modelType == List && Database->m_listsMap.contains(m_listId)) {
-        TasksListItem *list = Database->m_listsMap[m_listId];
-        tasks = &list->taskList();
+        TasksListItem list = Database->m_listsMap[m_listId];
+        tasks = &list.taskList();
     }
 
     if (!tasks)
@@ -507,7 +505,7 @@ void TasksListModel::sort(int column, Qt::SortOrder order)
 
     emit layoutAboutToBeChanged();
 
-    QList<QPair<TasksTaskItem *, int> > list;
+    QList<QPair<TasksTaskItem, int> > list;
     for (int i = 0; i < tasks->count(); ++i)
         list << qMakePair(tasks->at(i), i);
 

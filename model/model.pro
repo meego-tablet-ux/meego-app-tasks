@@ -25,7 +25,9 @@ HEADERS += tasks.h \
     tasksdatabase.h \
     taskslistmodel.h \
     tasksdbengine.h \
-    qsettingsbackend.h
+    qsettingsbackend.h \
+    taskslistitem_p.h \
+    taskstaskitem_p.h
 
 QMAKE_POST_LINK = cp qmldir $$DESTDIR
 

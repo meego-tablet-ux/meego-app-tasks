@@ -152,7 +152,7 @@ private slots:
         void onIcountChanged();
 
 private:
-        QVariant taskRole(TasksTaskItem *task, int role) const;
+        QVariant taskRole(const TasksTaskItem& task, int role) const;
         void doFiltering();
 
         friend class TasksDatabase;
@@ -161,8 +161,8 @@ private:
         int m_listId;
         QString m_filter;
 
-        QList<TasksListItem *> m_taskListsFiltered;
-        QList<TasksTaskItem *> m_tasksFiltered;
+        QList<TasksListItem> m_taskListsFiltered;
+        QList<TasksTaskItem> m_tasksFiltered;
 
         SortOrder m_sortOrder;
 };

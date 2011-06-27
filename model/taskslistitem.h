@@ -12,47 +12,45 @@
 #include <QString>
 #include <QDateTime>
 #include <QList>
-#include <QMap>
+#include <QExplicitlySharedDataPointer>
 
+class TasksListItemData;
 class TasksTaskItem;
 
 class TasksListItem
 {
 public:
-        TasksListItem(const QString &name, QDateTime createdDateTime = QDateTime());
+        TasksListItem(const QString &name = QString(), const QDateTime &createdDateTime = QDateTime());
+        TasksListItem(const TasksListItem &other);
+        ~TasksListItem();
+        TasksListItem& operator=(const TasksListItem& other);
+        bool operator==(const TasksTaskItem& other) const;
 
-        static const int defaultListId;
-        int id() const {return m_id; }
-        QString name() const {return m_name; }
+        bool isValid() const;
+        int id() const;
+        QString name() const;
         void setName(const QString &name);
-
-        QDateTime createdDateTime() const {return m_createdDateTime; }
-
-        int incompleted() const {return m_incompleted; }
-        int tasks() const;
+        QDateTime createdDateTime() const;
+        void incrementIncompleted();
+        void decrementIncompleted();
+        int incompleted() const;
+        QList<TasksTaskItem> tasks() const;
+        int count() const;
         int hiddenTasks() const;
-        TasksTaskItem *task(int i);
-        void addTask(TasksTaskItem *task);
-        void insertTask(TasksTaskItem *task, int idx);
-        void removeTask(TasksTaskItem *task);
+        TasksTaskItem task(int i) const;
+        void addTask(const TasksTaskItem &task);
+        void insertTask(const TasksTaskItem &task, int idx);
+        void removeTask(const TasksTaskItem &task);
         void removeTask(int idx);
         void removeTasks();
-        int indexOfTask(TasksTaskItem *task);
+        int indexOfTask(const TasksTaskItem &task) const;
         void swapTasks(int src, int dest);
         void hideTask(int index, int oldIndex);
         void showHiddenTasks(int startIndex);
         void showHiddenTasks();
-        QList<TasksTaskItem *> &taskList();
+        QList<TasksTaskItem> &taskList() const;
 private:
-        friend class TasksDatabase;
-        friend class TasksDBEngine;
-        static int ids;
-        int m_id;
-        QString m_name;
-        QDateTime m_createdDateTime;
-        QList<TasksTaskItem *> m_tasks;
-        QMap<int, TasksTaskItem *> m_hiddenTasks;
-        int m_incompleted;
+        QExplicitlySharedDataPointer<TasksListItemData> d;
 };
 
 #endif // TASKSLISTITEM_H

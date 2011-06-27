@@ -49,7 +49,7 @@ void TasksDBEngine::saveLists()
         QStringList list_names;
         // NOTE: we do not save the first list (default one)
         for (int i=1; i<m_db->m_lists.count(); ++i) {
-          list_names << m_db->m_lists[i]->name();
+          list_names << m_db->m_lists[i].name();
         }
 
         m_settings->setValue("TaskLists", list_names);
@@ -57,12 +57,12 @@ void TasksDBEngine::saveLists()
 
 void TasksDBEngine::loadTasks()
 {
-        QHash<QString, TasksListItem *> listsHash;
-        foreach (TasksListItem *list, m_db->m_lists)
-                listsHash[list->name()] = list;
+        QHash<QString, TasksListItem> listsHash;
+        foreach (const TasksListItem &list, m_db->m_lists)
+                listsHash[list.name()] = list;
 
-        QList<TasksTaskItem *> tasks;
-        QList<TasksTaskItem *> taskswoo;
+        QList<TasksTaskItem> tasks;
+        QList<TasksTaskItem> taskswoo;
         QList<int> orders;
         foreach (const KCalCore::Todo::Ptr &todo, m_calendar->rawTodos()) {
                 bool ok;
@@ -104,12 +104,12 @@ void TasksDBEngine::loadTasks()
                 QStringList cats = todo->categories();
                 if (cats.isEmpty() || !listsHash.contains(cats.first()))
                   continue;
-                TasksListItem *list = listsHash[cats.first()];
+                const TasksListItem &list = listsHash[cats.first()];
 
-                TasksTaskItem *tsk = m_db->createTask(list, task, notes, completed, hasDueDate, dueDate,
-                                                      reminderType, reminderDate, urls, attachments, created);
+                TasksTaskItem tsk = m_db->createTask(list, task, notes, completed, hasDueDate, dueDate,
+                                                     reminderType, reminderDate, urls, attachments, created);
 
-                m_uids[tsk->id()] = todo->uid();
+                m_uids[tsk.id()] = todo->uid();
                 if (orderidx == -1){
                         taskswoo << tsk;
                 } else {
@@ -123,10 +123,10 @@ void TasksDBEngine::loadTasks()
         m_db->insertTasks(taskswoo);
 }
 
-void TasksDBEngine::addTasks(const QList<TasksTaskItem *> &tasks)
+void TasksDBEngine::addTasks(const QList<TasksTaskItem> &tasks)
 {
-        foreach (TasksTaskItem *task, tasks) {
-                if (m_uids.contains(task->id()))
+        foreach (const TasksTaskItem &task, tasks) {
+                if (m_uids.contains(task.id()))
                         continue;
                 KCalCore::Todo::Ptr todo = KCalCore::Todo::Ptr(new KCalCore::Todo());
                 setTaskValues(task, todo);
@@ -135,117 +135,117 @@ void TasksDBEngine::addTasks(const QList<TasksTaskItem *> &tasks)
         m_storage->save();
 }
 
-void TasksDBEngine::updateTask(TasksTaskItem *task)
+void TasksDBEngine::updateTask(const TasksTaskItem &task)
 {
-        if (!m_uids.contains(task->id()))
+        if (!m_uids.contains(task.id()))
                 return;
-        KCalCore::Todo::Ptr todo = m_calendar->todo(m_uids[task->id()]);
+        KCalCore::Todo::Ptr todo = m_calendar->todo(m_uids[task.id()]);
         setTaskValues(task, todo);
         todo->setRevision(todo->revision() + 1);
         m_storage->save();
 }
 
-void TasksDBEngine::removeTask(TasksTaskItem *task)
+void TasksDBEngine::removeTask(const TasksTaskItem &task)
 {
-       removeTasks(QList<TasksTaskItem *>() << task);
+       removeTasks(QList<TasksTaskItem>() << task);
 }
 
-void TasksDBEngine::removeTasks(const QList<TasksTaskItem *> &tasks)
+void TasksDBEngine::removeTasks(const QList<TasksTaskItem> &tasks)
 {
-        foreach (TasksTaskItem *task, tasks) {
-                if (!task || !m_uids.contains(task->id()))
+        foreach (const TasksTaskItem &task, tasks) {
+                if (!task.isValid() || !m_uids.contains(task.id()))
                         continue;
-                KCalCore::Todo::Ptr todo = m_calendar->todo(m_uids.take(task->id()));
+                KCalCore::Todo::Ptr todo = m_calendar->todo(m_uids.take(task.id()));
                 m_calendar->deleteTodo(todo);
         }
         m_storage->save();
 }
 
-void TasksDBEngine::updateTasksOrder(TasksListItem *list)
+void TasksDBEngine::updateTasksOrder(const TasksListItem &list)
 {
-        for (int idx = 0; idx < list->tasks(); idx++) {
-                TasksTaskItem *task = list->task(idx);
-                if (!task)
+        for (int idx = 0; idx < list.count(); idx++) {
+                TasksTaskItem task = list.task(idx);
+                if (!task.isValid())
                         continue;
-                if (!m_uids.contains(task->id()))
+                if (!m_uids.contains(task.id()))
                         continue;
-                KCalCore::Todo::Ptr todo = m_calendar->todo(m_uids[task->id()]);
+                KCalCore::Todo::Ptr todo = m_calendar->todo(m_uids[task.id()]);
                 todo->setCustomProperty("Tasks", "Order", QString::number(idx));
         }
         m_storage->save();
 }
 
-void TasksDBEngine::updateTasksList(TasksListItem *list)
+void TasksDBEngine::updateTasksList(const TasksListItem &list)
 {
-        updateTasksList(list->m_tasks);
+        updateTasksList(list.tasks());
 }
 
-void TasksDBEngine::updateTasksList(const QList<TasksTaskItem *> &tasks)
+void TasksDBEngine::updateTasksList(const QList<TasksTaskItem> &tasks)
 {
-        foreach (TasksTaskItem *task, tasks) {
-                if (!task)
+        foreach (const TasksTaskItem &task, tasks) {
+                if (!task.isValid())
                         continue;
-                if (!m_uids.contains(task->id()))
+                if (!m_uids.contains(task.id()))
                         continue;
-                KCalCore::Todo::Ptr todo = m_calendar->todo(m_uids[task->id()]);
-                todo->setCategories(QStringList(task->list()->name()));
+                KCalCore::Todo::Ptr todo = m_calendar->todo(m_uids[task.id()]);
+                todo->setCategories(QStringList(task.list().name()));
         }
         m_storage->save();
 }
 
-void TasksDBEngine::setTaskValues(TasksTaskItem *task, const KCalCore::Todo::Ptr &todo)
+void TasksDBEngine::setTaskValues(const TasksTaskItem &task, const KCalCore::Todo::Ptr &todo)
 {
-        todo->setSummary(task->task());
-        todo->setDescription(task->notes());
-        todo->setCategories(QStringList(task->list()->name()));
-        todo->setCompleted(task->isComplete());
-        todo->setHasDueDate(task->hasDueDate());
-        if (task->hasDueDate()) {
-                todo->setDtDue(KDateTime(task->dueDate()));
+        todo->setSummary(task.task());
+        todo->setDescription(task.notes());
+        todo->setCategories(QStringList(task.list().name()));
+        todo->setCompleted(task.isComplete());
+        todo->setHasDueDate(task.hasDueDate());
+        if (task.hasDueDate()) {
+                todo->setDtDue(KDateTime(task.dueDate()));
         }
-        KDateTime createdDateTime(task->createdDateTime());
+        KDateTime createdDateTime(task.createdDateTime());
         todo->setCreated(createdDateTime);
         todo->clearComments();
         // use attachments with mime?
-        foreach (const QString &url, task->urls()) {
+        foreach (const QString &url, task.urls()) {
                 qDebug() << "URL: " << url;
                 todo->addComment(url);
         }
         todo->clearAttachments();
-        foreach (const QString &auri, task->attachments()) {
+        foreach (const QString &auri, task.attachments()) {
                 qDebug() << "ATTACH URI: " << auri;
                 KCalCore::Attachment::Ptr attachmentPtr(new KCalCore::Attachment(auri));
                 todo->addAttachment(attachmentPtr);
         }
-        int ordidx = task->list()->indexOfTask(task);
+        int ordidx = task.list().indexOfTask(task);
         todo->setCustomProperty("Tasks", "Order", QString::number(ordidx));
         // Save reminder
         todo->clearAlarms();
-        if (task->reminderType() != TasksListModel::NoReminder) {
+        if (task.reminderType() != TasksListModel::NoReminder) {
                 KCalCore::Alarm::Ptr alarm(todo->newAlarm());
                 alarm->setText("Reminder");
                 alarm->setDisplayAlarm("Reminder");
                 alarm->setEnabled(true);
-                if (task->reminderType() == TasksListModel::OnDueDate) {
+                if (task.reminderType() == TasksListModel::OnDueDate) {
                         alarm->setSnoozeTime(KCalCore::Duration(60 * 5));
                         alarm->setRepeatCount(1);
                         alarm->setStartOffset(KCalCore::Duration(0));
-                } else if (task->reminderType() == TasksListModel::OneDayBefore) {
+                } else if (task.reminderType() == TasksListModel::OneDayBefore) {
                         alarm->setSnoozeTime(KCalCore::Duration(60 * 5));
                         alarm->setRepeatCount(1);
                         alarm->setStartOffset(KCalCore::Duration(-1, KCalCore::Duration::Days));
-                } else if (task->reminderType() == TasksListModel::TwoDaysBefore) {
+                } else if (task.reminderType() == TasksListModel::TwoDaysBefore) {
                         alarm->setSnoozeTime(KCalCore::Duration(60 * 5));
                         alarm->setRepeatCount(1);
                         alarm->setStartOffset(KCalCore::Duration(-2, KCalCore::Duration::Days));
-                } else if (task->reminderType() == TasksListModel::OneWeekBefore) {
+                } else if (task.reminderType() == TasksListModel::OneWeekBefore) {
                         alarm->setSnoozeTime(KCalCore::Duration(60 * 5));
                         alarm->setRepeatCount(1);
                         alarm->setStartOffset(KCalCore::Duration(-7, KCalCore::Duration::Days));
-                } else if (task->reminderType() == TasksListModel::DateReminder) {
+                } else if (task.reminderType() == TasksListModel::DateReminder) {
                         alarm->setSnoozeTime(KCalCore::Duration(60 * 5));
                         alarm->setRepeatCount(1);
-                        KDateTime alarmTime(task->reminderDate());
+                        KDateTime alarmTime(task.reminderDate());
                         alarm->setTime(alarmTime);
                 }
         }

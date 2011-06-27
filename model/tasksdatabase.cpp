@@ -15,6 +15,8 @@
 #include <QDebug>
 #include <QTimerEvent>
 
+const int DefaultListId = 0;
+
 TasksDatabase *TasksDatabase::tasksDatabaseInstance = 0;
 TasksDatabase *TasksDatabase::instance()
 {
@@ -23,47 +25,47 @@ TasksDatabase *TasksDatabase::instance()
     return tasksDatabaseInstance;
 }
 
-static int duedate_comp(TasksTaskItem *t1, TasksTaskItem *t2)
+static int duedate_comp(const TasksTaskItem &t1, const TasksTaskItem &t2)
 {
-    if (t1->hasDueDate() && t2->hasDueDate()) {
-        if (t1->dueDate() < t2->dueDate())
+    if (t1.hasDueDate() && t2.hasDueDate()) {
+        if (t1.dueDate() < t2.dueDate())
             return 1;
-        else if (t1->dueDate() > t2->dueDate())
+        else if (t1.dueDate() > t2.dueDate())
             return -1;
         return 0;
     }
-    if (t1->hasDueDate())
+    if (t1.hasDueDate())
         return 1;
-    if (t2->hasDueDate())
+    if (t2.hasDueDate())
         return -1;
     return 0;
 }
 
-static int someday_comp(TasksTaskItem *t1, TasksTaskItem *t2)
+static int someday_comp(const TasksTaskItem &t1, const TasksTaskItem &t2)
 {
-    if (t1->createdDateTime() < t2->createdDateTime())
+    if (t1.createdDateTime() < t2.createdDateTime())
         return 1;
-    else if (t1->createdDateTime() > t2->createdDateTime())
+    else if (t1.createdDateTime() > t2.createdDateTime())
         return -1;
     return 0;
 }
 
-static int all_comp(TasksTaskItem *t1, TasksTaskItem *t2)
+static int all_comp(const TasksTaskItem &t1, const TasksTaskItem &t2)
 {
-    if (t1->hasDueDate() && t2->hasDueDate()) {
-        if (t1->dueDate() < t2->dueDate())
+    if (t1.hasDueDate() && t2.hasDueDate()) {
+        if (t1.dueDate() < t2.dueDate())
             return 1;
-        else if (t1->dueDate() > t2->dueDate())
+        else if (t1.dueDate() > t2.dueDate())
             return -1;
         return 0;
     }
-    if (t1->hasDueDate())
+    if (t1.hasDueDate())
         return 1;
-    if (t2->hasDueDate())
+    if (t2.hasDueDate())
         return -1;
-    if (t1->createdDateTime() < t2->createdDateTime())
+    if (t1.createdDateTime() < t2.createdDateTime())
         return 1;
-    else if (t1->createdDateTime() > t2->createdDateTime())
+    else if (t1.createdDateTime() > t2.createdDateTime())
         return -1;
     return 0;
 }
@@ -94,13 +96,14 @@ void TasksDatabase::renameList(int listId, const QString &name)
 {
     if (!m_listsMap.contains(listId))
         return;
-    if (listId == TasksListItem::defaultListId)
+    // Cannot rename the default list
+    if (listId == DefaultListId)
         return;
-    foreach (TasksListItem *list, m_lists)
-        if (list->id() != listId && list->name() == name)
+    foreach (const TasksListItem &list, m_lists)
+        if (list.id() != listId && list.name() == name)
             return;
-    TasksListItem *list = m_listsMap[listId];
-    list->setName(name);
+    TasksListItem &list = m_listsMap[listId];
+    list.setName(name);
     // store
     m_dbEngine->saveLists();
     m_dbEngine->updateTasksList(list);
@@ -117,8 +120,8 @@ void TasksDatabase::addList(const QString &name)
     foreach (TasksListModel *model, m_models)
         if (model->modelType() == TasksListModel::AllLists)
             model->onBeginInsertRow(m_lists.count());
-    TasksListItem *list = new TasksListItem(name);
-    m_listsMap[list->id()] = list;
+    TasksListItem list(name);
+    m_listsMap[list.id()] = list;
     m_lists << list;
     ////
     // store
@@ -130,18 +133,19 @@ void TasksDatabase::addList(const QString &name)
 
 void TasksDatabase::removeList(int listId)
 {
-    if (listId == TasksListItem::defaultListId)
+    // Cannot remove the default list
+    if (listId == DefaultListId)
         return;
     if (!m_listsMap.contains(listId))
         return;
-    TasksListItem *list = m_listsMap[listId];
+    TasksListItem &list = m_listsMap[listId];
     int idx = m_lists.indexOf(list);
     if (idx == -1)
         return;
     // find rows
-    QSet<TasksTaskItem *> removeTasks;
-    for (int i = 0; i < list->tasks(); i++) {
-        removeTasks << list->task(i);
+    QSet<TasksTaskItem> removeTasks;
+    foreach(const TasksTaskItem &task, list.tasks()) {
+          removeTasks.insert(task);
     }
     QList<int> removeSomedayRows;
     for (int r = 0; r < m_somedayTasks.count(); r++)
@@ -243,19 +247,18 @@ void TasksDatabase::removeList(int listId)
             model->onBeginRemoveRow(idx);
         else if (model->modelType() == TasksListModel::List) {
             if (model->listId() == listId)
-                model->onBeginRemoveRows(0, list->tasks());
+                model->onBeginRemoveRows(0, list.count());
         }
     }
 
     m_dbEngine->removeTasks(removeTasks.toList());
     // remove item and all tasks
-    list->removeTasks();
+    list.removeTasks();
     //foreach (TasksTaskItem *ti, removeTasks)
     //        delete ti;
     // remove list
     m_lists.removeAt(idx);
     m_listsMap.remove(listId);
-    delete list;
     // store
     m_dbEngine->saveLists();
     //////////////////
@@ -277,18 +280,18 @@ void TasksDatabase::addTask(int listId, const QString &task, const QString &note
     qDebug() << m_listsMap.contains(listId);
     if (!m_listsMap.contains(listId))
         return;
-    TasksListItem *list = m_listsMap[listId];
-    TasksTaskItem *tsk = new TasksTaskItem(list);
-    m_tasksMap[tsk->id()] = tsk;
-    tsk->setTask(task);
-    tsk->setNotes(notes);
-    tsk->setComplete(complete);
-    tsk->setHasDueDate(hasDueDate);
-    tsk->setDueDate(dueDate);
-    tsk->setReminderType(reminderType);
-    tsk->setReminderDate(reminderDate);
-    tsk->setUrls(urls);
-    tsk->setAttachments(attachments);
+    TasksListItem &list = m_listsMap[listId];
+    TasksTaskItem tsk(list);
+    m_tasksMap[tsk.id()] = tsk;
+    tsk.setTask(task);
+    tsk.setNotes(notes);
+    tsk.setComplete(complete);
+    tsk.setHasDueDate(hasDueDate);
+    tsk.setDueDate(dueDate);
+    tsk.setReminderType(reminderType);
+    tsk.setReminderDate(reminderDate);
+    tsk.setUrls(urls);
+    tsk.setAttachments(attachments);
 
     TasksListModel::TimeGroups tg = TasksListModel::All; // not at any timeview
     int idx = -1;
@@ -323,11 +326,11 @@ void TasksDatabase::addTask(int listId, const QString &task, const QString &note
         }
         else if (model->modelType() == TasksListModel::List) {
             if (model->listId() == listId)
-                model->onBeginInsertRow(list->tasks());
+                model->onBeginInsertRow(list.count());
         }
     }
     ///////////
-    list->addTask(tsk);
+    list.addTask(tsk);
     if (tg == TasksListModel::Someday)
         m_somedayTasks << tsk;
     else if (tg == TasksListModel::Overdue)
@@ -372,30 +375,30 @@ void TasksDatabase::editTask(int taskId, int listId, const QString &task, const 
     //        dueDate = QDate();
     if (!m_tasksMap.contains(taskId))
         return;
-    TasksTaskItem *tsk = m_tasksMap[taskId];
-    bool dueupdated = tsk->hasDueDate() == hasDueDate && tsk->dueDate() == dueDate;
-    tsk->setTask(task);
-    tsk->setNotes(notes);
-    tsk->setHasDueDate(hasDueDate);
-    tsk->setDueDate(dueDate);
-    //tsk->setReminderType(reminderType);
-    //tsk->setReminderDate(reminderDate);
-    //tsk->setUrls(urls);
-    //tsk->setAttachments(attachments);
+    TasksTaskItem &tsk = m_tasksMap[taskId];
+    bool dueupdated = tsk.hasDueDate() == hasDueDate && tsk.dueDate() == dueDate;
+    tsk.setTask(task);
+    tsk.setNotes(notes);
+    tsk.setHasDueDate(hasDueDate);
+    tsk.setDueDate(dueDate);
+    //tsk.setReminderType(reminderType);
+    //tsk.setReminderDate(reminderDate);
+    //tsk.setUrls(urls);
+    //tsk.setAttachments(attachments);
     m_dbEngine->updateTask(tsk);
     //////
-    int listIndex = tsk->list()->indexOfTask(tsk);
+    int listIndex = tsk.list().indexOfTask(tsk);
     foreach (TasksListModel *model, m_models) {
         if (model->modelType() == TasksListModel::List && listIndex != -1) {
-            if (model->listId() == tsk->list()->id())
+            if (model->listId() == tsk.list().id())
                 model->onUpdateRow(listIndex);
         }
     }
     //////
 
-    if (tsk->list()->id() != listId) {
+    if (tsk.list().id() != listId) {
         qDebug("Database: Moving task to a new id");
-        QStringList ids(QString::number(tsk->id()));
+        QStringList ids(QString::number(tsk.id()));
         moveTasksToList(ids, listId);
         qDebug("Database: Done moving task to a new id");
     }
@@ -450,7 +453,7 @@ void TasksDatabase::editTask(int taskId, int listId, const QString &task, const 
     if (!hasDueDate) {
         tg = TasksListModel::Someday;
         //idx = 0;
-        //while (idx < m_somedayTasks.count() && m_somedayTasks.at(idx)->createdDateTime() < tsk->createdDateTime())
+        //while (idx < m_somedayTasks.count() && m_somedayTasks.at(idx)->createdDateTime() < tsk.createdDateTime())
         //        idx++;
         idx = findIndexForSomeday(tsk);
     }
@@ -501,13 +504,13 @@ void TasksDatabase::removeCompletedTasksInList(int listId)
 {
     if (!m_listsMap.contains(listId))
         return;
-    TasksListItem *list = m_listsMap[listId];
+    TasksListItem &list = m_listsMap[listId];
     QList<int> rows;
-    QList<TasksTaskItem *> tasks;
-    for (int r = 0; r < list->tasks(); r++)
-        if (list->task(r)->isComplete()) {
+    QList<TasksTaskItem> tasks;
+    for (int r = 0; r < list.count(); r++)
+        if (list.task(r).isComplete()) {
             rows << r;
-            tasks << list->task(r);
+            tasks << list.task(r);
         }
 
     QList <TasksListModel *> models;
@@ -528,7 +531,7 @@ void TasksDatabase::removeCompletedTasksInList(int listId)
             model->onBeginRemoveRows(rows[idx] - c, n);
 
         for (int i = 0; i < n; i++) {
-            list->removeTask(rows[idx] - c + i);
+            list.removeTask(rows[idx] - c + i);
             c++;
         }
 
@@ -540,24 +543,21 @@ void TasksDatabase::removeCompletedTasksInList(int listId)
     // store
     m_dbEngine->removeTasks(tasks);
     // clear
-    while (!tasks.isEmpty()) {
-        TasksTaskItem *task = tasks.takeFirst();
-        delete task;
-    }
+    tasks.clear();
 }
 
 void TasksDatabase::removeAllCompletedTasks()
 {
-    foreach (TasksListItem *list, m_lists)
-        removeCompletedTasksInList(list->id());
+    foreach (const TasksListItem &list, m_lists)
+        removeCompletedTasksInList(list.id());
 }
 
 void TasksDatabase::setCompleted(int taskId, bool completed)
 {
     if (!m_tasksMap.contains(taskId))
         return;
-    TasksTaskItem *tsk = m_tasksMap[taskId];
-    if (tsk->isComplete() == completed)
+    TasksTaskItem &tsk = m_tasksMap[taskId];
+    if (tsk.isComplete() == completed)
         return;
     if (completed)
         setTaskComplited(tsk);
@@ -569,9 +569,9 @@ void TasksDatabase::removeTask(int taskId, bool store)
 {
     if (!m_tasksMap.contains(taskId))
         return;
-    TasksTaskItem *tsk = m_tasksMap[taskId];
-    //bool complete = tsk->isComplete();
-    int listIndex = tsk->list()->indexOfTask(tsk);
+    const TasksTaskItem &tsk = m_tasksMap[taskId];
+    //bool complete = tsk.isComplete();
+    int listIndex = tsk.list().indexOfTask(tsk);
     int somedayIndex = m_somedayTasks.indexOf(tsk);
     int overdueIndex = m_overdueTasks.indexOf(tsk);
     int upcomingIndex = m_upcomingTasks.indexOf(tsk);
@@ -597,15 +597,15 @@ void TasksDatabase::removeTask(int taskId, bool store)
             }
         }
         else if (model->modelType() == TasksListModel::List && listIndex != -1) {
-            if (model->listId() == tsk->list()->id()) {
+            if (model->listId() == tsk.list().id()) {
                 model->onBeginRemoveRow(listIndex);
                 models << model;
             }
         }
     }
     ///////
-    int lidx = findList(tsk->list()->id());
-    tsk->list()->removeTask(tsk);
+    int lidx = findList(tsk.list().id());
+    tsk.list().removeTask(tsk);
     if (store)
         m_dbEngine->removeTask(tsk);
     if (somedayIndex != -1)
@@ -615,7 +615,6 @@ void TasksDatabase::removeTask(int taskId, bool store)
     if (upcomingIndex != -1)
         m_upcomingTasks.removeAt(upcomingIndex);
     m_tasksMap.remove(taskId);
-    delete tsk;
     ///////
     foreach (TasksListModel *model, models)
         model->onEndRemoveRow();
@@ -638,54 +637,54 @@ void TasksDatabase::reorderTask(int taskId, int destidx)
 {
     if (!m_tasksMap.contains(taskId))
         return;
-    TasksTaskItem *tsk = m_tasksMap[taskId];
-    TasksListItem *list = tsk->list();
-    int listIndex = list->indexOfTask(tsk);
+    const TasksTaskItem &tsk = m_tasksMap[taskId];
+    TasksListItem list = tsk.list();
+    int listIndex = list.indexOfTask(tsk);
     if (listIndex == -1 || destidx == listIndex)
         return;
     foreach (TasksListModel *model, m_models)
         if (model->modelType() == TasksListModel::List)
-            if (model->listId() == tsk->list()->id()) {
+            if (model->listId() == tsk.list().id()) {
                 model->onBeginMoveRow(listIndex, destidx);
             }
-    list->swapTasks(listIndex, destidx);
+    list.swapTasks(listIndex, destidx);
     //m_dbEngine->updateTasksOrder(list);
     foreach (TasksListModel *model, m_models)
         if (model->modelType() == TasksListModel::List)
-            if (model->listId() == tsk->list()->id()) {
+            if (model->listId() == tsk.list().id()) {
                 model->onEndMoveRow();
             }
 }
 
 void TasksDatabase::hideTasks(const QStringList &taskIds)
 {
-    QList<TasksTaskItem *> tasks;
+    QList<TasksTaskItem> tasks;
     QList<int> oldIndexes;
     for (int i=0; i<taskIds.count(); ++i) {
         if (!m_tasksMap.contains(taskIds.at(i).toInt()))
             return;
-        TasksTaskItem *tsk = m_tasksMap[taskIds.at(i).toInt()];
+        const TasksTaskItem &tsk = m_tasksMap[taskIds.at(i).toInt()];
         tasks.append(tsk);
-        TasksListItem *list = tsk->list();
-        oldIndexes.append(list->indexOfTask(tsk));
+        TasksListItem list = tsk.list();
+        oldIndexes.append(list.indexOfTask(tsk));
     }
     for (int i=0; i<taskIds.count(); ++i) {
         //        TasksTaskItem *tsk = m_tasksMap[taskIds.at(i).toInt()];
-        TasksListItem *list = tasks.at(i)->list();
-        int listIndex = list->indexOfTask(tasks.at(i));
+        TasksListItem list = tasks.at(i).list();
+        int listIndex = list.indexOfTask(tasks.at(i));
         if (listIndex == -1)
             return;
 
         foreach (TasksListModel *model, m_models)
             if (model->modelType() == TasksListModel::List)
-                if (model->listId() == tasks.at(i)->list()->id()) {
+                if (model->listId() == tasks.at(i).list().id()) {
                     model->onBeginRemoveRow(listIndex);
                 }
-        list->hideTask(listIndex, oldIndexes.at(i));
+        list.hideTask(listIndex, oldIndexes.at(i));
         //m_dbEngine->updateTasksOrder(list);
         foreach (TasksListModel *model, m_models)
             if (model->modelType() == TasksListModel::List)
-                if (model->listId() == tasks.at(i)->list()->id()) {
+                if (model->listId() == tasks.at(i).list().id()) {
                     model->onEndRemoveRow();
                 }
     }
@@ -693,34 +692,34 @@ void TasksDatabase::hideTasks(const QStringList &taskIds)
 
 void TasksDatabase::showHiddenTasks(int listId, int startIndex)
 {
-    TasksListItem *list = m_listsMap[listId];
+    TasksListItem &list = m_listsMap[listId];
     foreach (TasksListModel *model, m_models)
         if (model->modelType() == TasksListModel::List)
-            if (model->listId() == list->id()) {
-                model->onBeginInsertRows(startIndex, list->hiddenTasks());
+            if (model->listId() == list.id()) {
+                model->onBeginInsertRows(startIndex, list.hiddenTasks());
             }
-    list->showHiddenTasks(startIndex);
+    list.showHiddenTasks(startIndex);
     //m_dbEngine->updateTasksOrder(list);
     foreach (TasksListModel *model, m_models)
         if (model->modelType() == TasksListModel::List)
-            if (model->listId() == list->id()) {
+            if (model->listId() == list.id()) {
                 model->onEndInsertRow();
             }
 }
 
 void TasksDatabase::showHiddenTasksOldPositions(int listId)
 {
-    TasksListItem *list = m_listsMap[listId];
+    TasksListItem &list = m_listsMap[listId];
     foreach (TasksListModel *model, m_models)
         if (model->modelType() == TasksListModel::List)
-            if (model->listId() == list->id()) {
+            if (model->listId() == list.id()) {
                 model->onBeginReset();
             }
-    list->showHiddenTasks();
+    list.showHiddenTasks();
     //m_dbEngine->updateTasksOrder(list);
     foreach (TasksListModel *model, m_models)
         if (model->modelType() == TasksListModel::List)
-            if (model->listId() == list->id()) {
+            if (model->listId() == list.id()) {
                 model->onEndReset();
             }
 }
@@ -729,7 +728,7 @@ void TasksDatabase::saveReorder(int listId)
 {
     if (!m_listsMap.contains(listId))
         return;
-    TasksListItem *list = m_listsMap[listId];
+    const TasksListItem &list = m_listsMap[listId];
     m_dbEngine->updateTasksOrder(list);
 }
 
@@ -737,7 +736,7 @@ void TasksDatabase::moveTasksToList(const QStringList &staskIds, int destListId)
 {
     if (!m_listsMap.contains(destListId))
         return;
-    TasksListItem *list = m_listsMap[destListId];
+    TasksListItem &list = m_listsMap[destListId];
     QSet<int> idsSet;
     foreach (const QString &sid, staskIds) {
         bool ok;
@@ -745,19 +744,19 @@ void TasksDatabase::moveTasksToList(const QStringList &staskIds, int destListId)
         if (ok)
             idsSet << id;
     }
-    QList<TasksTaskItem *> tsks;
+    QList<TasksTaskItem> tsks;
     foreach (int taskId, idsSet)
         if (m_tasksMap.contains(taskId))
             tsks << m_tasksMap[taskId];
     if (tsks.isEmpty())
         return;
-    TasksListItem *slist = tsks.first()->list();
-    int srcListId = slist->id();
+    TasksListItem slist = tsks.first().list();
+    int srcListId = slist.id();
     int lidx1 = findList(srcListId);
     int lidx2 = findList(destListId);
     QList<int> rows;
-    for (int i = 0; i < slist->tasks(); i++)
-        if (idsSet.contains(slist->task(i)->id())) {
+    for (int i = 0; i < slist.count(); i++)
+        if (idsSet.contains(slist.task(i).id())) {
             rows << i;
         }
     QList <TasksListModel *> models;
@@ -777,7 +776,7 @@ void TasksDatabase::moveTasksToList(const QStringList &staskIds, int destListId)
             model->onBeginRemoveRows(rows[idx] - c, n);
 
         for (int i = 0; i < n; i++) {
-            slist->removeTask(rows[idx] - c + i);
+            slist.removeTask(rows[idx] - c + i);
             c++;
         }
 
@@ -793,11 +792,11 @@ void TasksDatabase::moveTasksToList(const QStringList &staskIds, int destListId)
     foreach (TasksListModel *model, m_models)
         if (model->modelType() == TasksListModel::List)
             if (model->listId() == destListId)
-                model->onBeginInsertRows(list->tasks(), tsks.count());
+                model->onBeginInsertRows(list.count(), tsks.count());
     ////
-    foreach (TasksTaskItem *tsk, tsks) {
-        tsk->setList(list);
-        list->addTask(tsk);
+    foreach (TasksTaskItem tsk, tsks) {
+        tsk.setList(list);
+        list.addTask(tsk);
     }
     ////
     foreach (TasksListModel *model, m_models) {
@@ -823,8 +822,8 @@ void TasksDatabase::commitAddedTasks()
 
 void TasksDatabase::rollbackAddedTasks()
 {
-    foreach (TasksTaskItem *task, m_newTasks)
-        removeTask(task->id(), false);
+    foreach (const TasksTaskItem &task, m_newTasks)
+        removeTask(task.id(), false);
     m_newTasks.clear();
 }
 
@@ -844,18 +843,18 @@ void TasksDatabase::timerEvent(QTimerEvent *event)
 int TasksDatabase::findList(int listId)
 {
     for (int idx = 0; idx < m_lists.count(); idx++)
-        if (m_lists[idx]->id() == listId)
+        if (m_lists[idx].id() == listId)
             return idx;
     return -1;
 }
 
-void TasksDatabase::setTaskComplited(TasksTaskItem *task)
+void TasksDatabase::setTaskComplited(TasksTaskItem &task)
 {
-    int listIndex = task->list()->indexOfTask(task);
+    int listIndex = task.list().indexOfTask(task);
     int somedayIndex = m_somedayTasks.indexOf(task);
     int overdueIndex = m_overdueTasks.indexOf(task);
     int upcomingIndex = m_upcomingTasks.indexOf(task);
-    int lidx = findList(task->list()->id());
+    int lidx = findList(task.list().id());
     ////
     foreach (TasksListModel *model, m_models) {
         if (model->modelType() == TasksListModel::AllLists)
@@ -870,8 +869,8 @@ void TasksDatabase::setTaskComplited(TasksTaskItem *task)
         }
     }
     ////
-    task->setComplete(true);
-    task->list()->m_incompleted--;
+    task.setComplete(true);
+    task.list().decrementIncompleted();
     m_dbEngine->updateTask(task);
     // remove from timeview list
     if (somedayIndex != -1)
@@ -901,7 +900,7 @@ void TasksDatabase::setTaskComplited(TasksTaskItem *task)
             }
         }
         else if (model->modelType() == TasksListModel::List && listIndex != -1) {
-            if (model->listId() == task->list()->id()){
+            if (model->listId() == task.list().id()){
                 model->onUpdateRow(listIndex);
                 model->onIcountChanged();
             }
@@ -909,30 +908,30 @@ void TasksDatabase::setTaskComplited(TasksTaskItem *task)
     }
 }
 
-void TasksDatabase::setTaskUncomplited(TasksTaskItem *task)
+void TasksDatabase::setTaskUncomplited(TasksTaskItem &task)
 {
-    int lidx = findList(task->list()->id());
+    int lidx = findList(task.list().id());
     // Find positions
-    int listIndex = task->list()->indexOfTask(task);
+    int listIndex = task.list().indexOfTask(task);
     TasksListModel::TimeGroups tg = TasksListModel::All;
     int idx = -1;
-    if (!task->hasDueDate()) {
+    if (!task.hasDueDate()) {
         tg = TasksListModel::Someday;
         //idx = 0;
-        //while (idx < m_somedayTasks.count() && m_somedayTasks.at(idx)->createdDateTime() < task->createdDateTime())
+        //while (idx < m_somedayTasks.count() && m_somedayTasks.at(idx)->createdDateTime() < task.createdDateTime())
         //        idx++;
         idx = findIndexForSomeday(task);
     }
-    else if (task->dueDate() < m_currentDate) {
+    else if (task.dueDate() < m_currentDate) {
         tg = TasksListModel::Overdue;
         //idx = 0;
-        //while (idx < m_overdueTasks.count() && m_overdueTasks.at(idx)->dueDate() < task->dueDate())
+        //while (idx < m_overdueTasks.count() && m_overdueTasks.at(idx)->dueDate() < task.dueDate())
         //        idx++;
         idx = findIndexForOverdue(task);
     } else {
         tg = TasksListModel::Upcoming;
         //idx = 0;
-        //while (idx < m_upcomingTasks.count() && m_upcomingTasks.at(idx)->dueDate() < task->dueDate())
+        //while (idx < m_upcomingTasks.count() && m_upcomingTasks.at(idx)->dueDate() < task.dueDate())
         //        idx++;
         idx = findIndexForUpcoming(task);
     }
@@ -949,8 +948,8 @@ void TasksDatabase::setTaskUncomplited(TasksTaskItem *task)
                 model->onBeginInsertRow(idx);
         }
     }
-    task->setComplete(false);
-    task->list()->m_incompleted++;
+    task.setComplete(false);
+    task.list().incrementIncompleted();
     m_dbEngine->updateTask(task);
     // Add to timeview
     if (tg == TasksListModel::Someday)
@@ -980,7 +979,7 @@ void TasksDatabase::setTaskUncomplited(TasksTaskItem *task)
             }
         }
         else if (model->modelType() == TasksListModel::List && listIndex != -1) {
-            if (model->listId() == task->list()->id()) {
+            if (model->listId() == task.list().id()) {
                 model->onUpdateRow(listIndex);
                 model->onIcountChanged();
             }
@@ -996,33 +995,33 @@ void TasksDatabase::load()
 
 void TasksDatabase::createList(const QString &name)
 {
-    TasksListItem *list = new TasksListItem(name);
-    m_listsMap[list->id()] = list;
+    TasksListItem list(name);
+    m_listsMap[list.id()] = list;
     m_lists << list;
 }
 
-TasksTaskItem *TasksDatabase::createTask(TasksListItem *list, const QString &task, const QString &notes, bool complete,
+TasksTaskItem TasksDatabase::createTask(const TasksListItem &list, const QString &task, const QString &notes, bool complete,
                                          bool hasDueDate, const QDate &dueDate,
                                          TasksListModel::ReminderType reminderType, const QDate &reminderDate,
                                          const QStringList &urls, const QStringList &attachments, const QDateTime &createdDateTime)
 {
-    TasksTaskItem *tsk = new TasksTaskItem(list);
-    m_tasksMap[tsk->id()] = tsk;
-    tsk->setTask(task);
-    tsk->setNotes(notes);
-    tsk->setComplete(complete);
-    tsk->setHasDueDate(hasDueDate);
-    tsk->setDueDate(dueDate);
-    tsk->setReminderType(reminderType);
-    tsk->setReminderDate(reminderDate);
-    tsk->setUrls(urls);
-    tsk->setAttachments(attachments);
-    tsk->setCreatedDateTime(createdDateTime);
+    TasksTaskItem tsk(list);
+    m_tasksMap[tsk.id()] = tsk;
+    tsk.setTask(task);
+    tsk.setNotes(notes);
+    tsk.setComplete(complete);
+    tsk.setHasDueDate(hasDueDate);
+    tsk.setDueDate(dueDate);
+    tsk.setReminderType(reminderType);
+    tsk.setReminderDate(reminderDate);
+    tsk.setUrls(urls);
+    tsk.setAttachments(attachments);
+    tsk.setCreatedDateTime(createdDateTime);
     return tsk;
 }
 
 
-int TasksDatabase::findIndexForUpcoming(TasksTaskItem *t)
+int TasksDatabase::findIndexForUpcoming(const TasksTaskItem &t) const
 {
     int b = -1;
     int e = m_upcomingTasks.count();
@@ -1039,7 +1038,7 @@ int TasksDatabase::findIndexForUpcoming(TasksTaskItem *t)
     return r;
 }
 
-int TasksDatabase::findIndexForOverdue(TasksTaskItem *t)
+int TasksDatabase::findIndexForOverdue(const TasksTaskItem &t) const
 {
     int b = -1;
     int e = m_overdueTasks.count();
@@ -1056,7 +1055,7 @@ int TasksDatabase::findIndexForOverdue(TasksTaskItem *t)
     return r;
 }
 
-int TasksDatabase::findIndexForSomeday(TasksTaskItem *t)
+int TasksDatabase::findIndexForSomeday(const TasksTaskItem &t) const
 {
     int b = -1;
     int e = m_somedayTasks.count();
@@ -1073,7 +1072,7 @@ int TasksDatabase::findIndexForSomeday(TasksTaskItem *t)
     return r;
 }
 
-void TasksDatabase::insertTaskToAll(TasksTaskItem *t)
+void TasksDatabase::insertTaskToAll(const TasksTaskItem &t)
 {
     int b = -1;
     int e = m_allTasks.count();
@@ -1091,25 +1090,25 @@ void TasksDatabase::insertTaskToAll(TasksTaskItem *t)
     m_allTasks.insert(r, t);
 }
 
-void TasksDatabase::insertTasks(const QList<TasksTaskItem *> &tasks)
+void TasksDatabase::insertTasks(const QList<TasksTaskItem> &tasks)
 {
-    foreach (TasksTaskItem *task, tasks) {
-        task->list()->addTask(task);
-        if (task->isComplete()) {
+    foreach (const TasksTaskItem &task, tasks) {
+        task.list().addTask(task);
+        if (task.isComplete()) {
             continue;
         }
-        int listId = task->list()->id();
+        int listId = task.list().id();
 
         //m_allTasks << task;
         insertTaskToAll(task);
 
         TasksListModel::TimeGroups tg = TasksListModel::All;
         int idx = -1;
-        if (!task->hasDueDate()) {
+        if (!task.hasDueDate()) {
             tg = TasksListModel::Someday;
             idx = findIndexForSomeday(task);
         }
-        else if (task->dueDate() < QDate::currentDate()) {
+        else if (task.dueDate() < QDate::currentDate()) {
             tg = TasksListModel::Overdue;
             idx = findIndexForOverdue(task);
         } else {
@@ -1131,7 +1130,7 @@ void TasksDatabase::insertTasks(const QList<TasksTaskItem *> &tasks)
             }
             else if (model->modelType() == TasksListModel::List) {
                 if (model->listId() == listId)
-                    model->onBeginInsertRow(task->list()->tasks());
+                    model->onBeginInsertRow(task.list().count());
             }
         }
         // Insert
@@ -1171,7 +1170,7 @@ void TasksDatabase::updateDueTasks(bool topast)
     if (topast) {
         int n = m_overdueTasks.count();
         for (; n > 0; n--)
-            if (m_overdueTasks[n - 1]->dueDate() < m_currentDate)
+            if (m_overdueTasks[n - 1].dueDate() < m_currentDate)
                 break;
         n = m_overdueTasks.count() - n;
         foreach (TasksListModel *model, m_models) {
@@ -1185,7 +1184,7 @@ void TasksDatabase::updateDueTasks(bool topast)
             }
         }
         for (int nn = 0; nn < n; nn++) {
-            TasksTaskItem *task = m_upcomingTasks.takeLast();
+            TasksTaskItem task = m_upcomingTasks.takeLast();
             m_overdueTasks.push_front(task);
         }
         foreach (TasksListModel *model, m_models) {
@@ -1201,7 +1200,7 @@ void TasksDatabase::updateDueTasks(bool topast)
     } else {
         int n = 0;
         for (; n < m_upcomingTasks.count(); n++)
-            if (m_upcomingTasks[n]->dueDate() >= m_currentDate)
+            if (m_upcomingTasks[n].dueDate() >= m_currentDate)
                 break;
         foreach (TasksListModel *model, m_models) {
             if (model->modelType() == TasksListModel::Timeview) {
@@ -1215,7 +1214,7 @@ void TasksDatabase::updateDueTasks(bool topast)
             }
         }
         for (int nn = 0; nn < n; nn++) {
-            TasksTaskItem *task = m_upcomingTasks.takeFirst();
+            TasksTaskItem task = m_upcomingTasks.takeFirst();
             m_overdueTasks << task;
         }
         foreach (TasksListModel *model, m_models) {

@@ -7,127 +7,176 @@
  */
 
 #include "taskslistitem.h"
-
+#include "taskslistitem_p.h"
 #include "taskstaskitem.h"
 
-const int TasksListItem::defaultListId = 0;
-int TasksListItem::ids = TasksListItem::defaultListId;
 
-TasksListItem::TasksListItem(const QString &name, QDateTime createdDateTime)
-        : m_name(name)
-        , m_createdDateTime(createdDateTime)
-        , m_incompleted(0)
+TasksListItem::TasksListItem(const QString &name, const QDateTime &createdDateTime):
+  d(new TasksListItemData(name))
 {
-        m_id = ids;
-        ids++;
-        if (m_createdDateTime.isNull())
-                m_createdDateTime = QDateTime::currentDateTime();
+        d->name = name;
+        d->createdDateTime = createdDateTime.isNull() ? QDateTime::currentDateTime() : createdDateTime;
+}
+
+TasksListItem::TasksListItem(const TasksListItem &other): d(other.d) {}
+
+TasksListItem::~TasksListItem() {}
+
+TasksListItem& TasksListItem::operator=(const TasksListItem& other)
+{
+  d = other.d;
+  return *this;
 }
 
 void TasksListItem::setName(const QString &name)
 {
-        m_name = name;
+        d->name = name;
 }
 
-int TasksListItem::tasks() const
+QList<TasksTaskItem> TasksListItem::tasks() const
 {
-        return m_tasks.count();
+        return d->tasks;
+}
+
+/** Returns the number of tasks in the list */
+int TasksListItem::count() const
+{
+  return d->tasks.count();
 }
 
 int TasksListItem::hiddenTasks() const
 {
-    return m_hiddenTasks.count();
+    return d->hiddenTasks.count();
 }
 
-TasksTaskItem *TasksListItem::task(int i)
+TasksTaskItem TasksListItem::task(int i) const
 {
-        if (i < 0 || i >= m_tasks.count())
-                return 0;
-        return m_tasks[i];
+        if (i < 0 || i >= d->tasks.count())
+                return TasksTaskItem();
+        return d->tasks[i];
 }
 
-void TasksListItem::addTask(TasksTaskItem *task)
+void TasksListItem::addTask(const TasksTaskItem& task)
 {
-        m_tasks << task;
-        if (!task->isComplete())
-                m_incompleted++;
+        d->tasks << task;
+        if (!task.isComplete())
+                d->incompleted++;
 }
 
-void TasksListItem::insertTask(TasksTaskItem *task, int idx)
+void TasksListItem::insertTask(const TasksTaskItem &task, int idx)
 {
-        m_tasks.insert(idx, task);
-        if (!task->isComplete())
-                m_incompleted++;
+        d->tasks.insert(idx, task);
+        if (!task.isComplete())
+                d->incompleted++;
 }
 
-void TasksListItem::removeTask(TasksTaskItem *task)
+void TasksListItem::removeTask(const TasksTaskItem &task)
 {
-        int idx = m_tasks.indexOf(task);
+        int idx = d->tasks.indexOf(task);
         if (idx == -1)
                 return;
-        if (!task->isComplete())
-                m_incompleted--;
-        m_tasks.removeAt(idx);
+        if (!task.isComplete())
+                d->incompleted--;
+        d->tasks.removeAt(idx);
 }
 
 void TasksListItem::removeTask(int idx)
 {
-        if (idx < 0 || idx >= m_tasks.count())
+        if (idx < 0 || idx >= d->tasks.count())
                 return;
-        if (!m_tasks[idx]->isComplete())
-                m_incompleted--;
-        m_tasks.removeAt(idx);
+        if (!d->tasks[idx].isComplete())
+                d->incompleted--;
+        d->tasks.removeAt(idx);
 }
 
 void TasksListItem::removeTasks()
 {
-        while (!m_tasks.isEmpty()) {
-                TasksTaskItem * task = m_tasks.takeLast();
-                if (!task->isComplete())
-                        m_incompleted--;
-                delete task;
+        while (!d->tasks.isEmpty()) {
+                TasksTaskItem task = d->tasks.takeLast();
+                if (!task.isComplete())
+                        d->incompleted--;
         }
 }
 
-int TasksListItem::indexOfTask(TasksTaskItem *task)
+int TasksListItem::indexOfTask(const TasksTaskItem &task) const
 {
-        return m_tasks.indexOf(task);
+        return d->tasks.indexOf(task);
 }
 
 void TasksListItem::swapTasks(int src, int dest)
 {
-     m_tasks.swap(src, dest);
+     d->tasks.swap(src, dest);
 }
 
 void TasksListItem::hideTask(int index, int oldIndex)
 {
-    m_hiddenTasks[oldIndex] = m_tasks.takeAt(index);
+    d->hiddenTasks[oldIndex] = d->tasks.takeAt(index);
 }
 
 void TasksListItem::showHiddenTasks(int startIndex)
 {
-    const int count = m_hiddenTasks.count();
-    QList<TasksTaskItem *> values = m_hiddenTasks.values();
+    const int count = d->hiddenTasks.count();
+    QList<TasksTaskItem> values = d->hiddenTasks.values();
 
     for (int i=count-1; i>=0; --i) {
-        m_tasks.insert(startIndex, values.at(i));
+        d->tasks.insert(startIndex, values.at(i));
     }
 
-    m_hiddenTasks.clear();
+    d->hiddenTasks.clear();
 }
 
 void TasksListItem::showHiddenTasks()
 {
-    QMapIterator<int, TasksTaskItem *> i(m_hiddenTasks);
+    QMapIterator<int, TasksTaskItem> i(d->hiddenTasks);
      while (i.hasNext()) {
          i.next();
-         m_tasks.insert(i.key(), i.value());
+         d->tasks.insert(i.key(), i.value());
      }
 
-     m_hiddenTasks.clear();
+     d->hiddenTasks.clear();
 }
 
-QList<TasksTaskItem *> &TasksListItem::taskList()
+QList<TasksTaskItem> &TasksListItem::taskList() const
 {
-    return m_tasks;
+        return d->tasks;
+}
+
+int TasksListItem::incompleted() const
+{
+        return d->incompleted;
+}
+
+int TasksListItem::id() const
+{
+        return d->id;
+}
+
+QDateTime TasksListItem::createdDateTime() const
+{
+        return d->createdDateTime;
+}
+
+QString TasksListItem::name() const
+{
+        return d->name;
+}
+
+void TasksListItem::incrementIncompleted()
+{
+        ++(d->incompleted);
+}
+
+void TasksListItem::decrementIncompleted()
+{
+        --(d->incompleted);
+}
+
+bool TasksListItem::isValid() const
+{
+        return !d->name.isEmpty();
+}
+
+bool TasksListItem::operator ==(const TasksTaskItem &other) const
+{
+        return d->id == other.id();
 }

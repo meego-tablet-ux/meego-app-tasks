@@ -7,67 +7,148 @@
  */
 
 #include "taskstaskitem.h"
+#include "taskstaskitem_p.h"
 
-int TasksTaskItem::ids = 0;
-
-TasksTaskItem::TasksTaskItem(TasksListItem *list)
-      : m_list(list)
+TasksTaskItem::TasksTaskItem(const TasksListItem &list): d(new TasksTaskItemData(list))
 {
-        m_id = ids;
-        ids++;
 }
 
-void TasksTaskItem::setList(TasksListItem *list)
+TasksTaskItem::TasksTaskItem(const TasksTaskItem &other): d(other.d) {}
+
+TasksTaskItem::~TasksTaskItem() {}
+
+TasksTaskItem& TasksTaskItem::operator=(const TasksTaskItem& other)
 {
-        m_list = list;
+        d = other.d;
+        return *this;
+}
+
+void TasksTaskItem::setList(const TasksListItem &list)
+{
+        d->list = list;
 }
 
 void TasksTaskItem::setTask(const QString &task)
 {
-        m_task = task;
+        d->task = task;
 }
 
 void TasksTaskItem::setNotes(const QString &notes)
 {
-        m_notes = notes;
+        d->notes = notes;
 }
 
 void TasksTaskItem::setComplete(bool complete)
 {
-        m_complete = complete;
+        d->complete = complete;
 }
 
 void TasksTaskItem::setHasDueDate(bool hasDueDate)
 {
-        m_hasDueDate = hasDueDate;
+        d->hasDueDate = hasDueDate;
 }
 
 void TasksTaskItem::setDueDate(const QDate &dueDate)
 {
-        m_dueDate = dueDate;
+        d->dueDate = dueDate;
 }
 
 void TasksTaskItem::setReminderType(TasksListModel::ReminderType reminderType)
 {
-        m_reminderType = reminderType;
+        d->reminderType = reminderType;
 }
 
 void TasksTaskItem::setReminderDate(const QDate &reminderDate)
 {
-        m_reminderDate = reminderDate;
+        d->reminderDate = reminderDate;
 }
 
 void TasksTaskItem::setCreatedDateTime(const QDateTime &createdDateTime)
 {
-        m_createdDateTime = createdDateTime;
+        d->createdDateTime = createdDateTime;
 }
 
 void TasksTaskItem::setUrls(const QStringList &urls)
 {
-        m_urls = urls;
+        d->urls = urls;
 }
 
 void TasksTaskItem::setAttachments(const QStringList &attachments)
 {
-        m_attachments = attachments;
+        d->attachments = attachments;
+}
+
+int TasksTaskItem::id() const
+{
+        return d->id;
+}
+
+QString TasksTaskItem::task() const
+{
+        return d->task;
+}
+
+QString TasksTaskItem::notes() const
+{
+        return d->notes;
+}
+
+bool TasksTaskItem::isComplete() const
+{
+        return d->complete;
+}
+
+bool TasksTaskItem::hasDueDate() const
+{
+        return d->hasDueDate;
+}
+
+QDate TasksTaskItem::dueDate() const
+{
+        return d->dueDate;
+}
+
+TasksListModel::ReminderType TasksTaskItem::reminderType() const
+{
+        return d->reminderType;
+}
+
+QDate TasksTaskItem::reminderDate() const
+{
+        return d->reminderDate;
+}
+
+QDateTime TasksTaskItem::createdDateTime() const
+{
+        return d->createdDateTime;
+}
+
+const QStringList & TasksTaskItem::urls() const
+{
+        return d->urls;
+}
+
+const QStringList & TasksTaskItem::attachments() const
+{
+        return d->attachments;
+}
+
+TasksListItem TasksTaskItem::list() const
+{
+        return d->list;
+}
+
+bool TasksTaskItem::isValid() const
+{
+        return d->list.isValid();
+}
+
+bool TasksTaskItem::operator ==(const TasksTaskItem &other) const
+{
+        return d->id == other.d->id;
+}
+
+uint qHash(const TasksTaskItem &key)
+{
+  return qHash(key.id());
 }
