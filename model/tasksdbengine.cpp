@@ -209,13 +209,11 @@ void TasksDBEngine::setTaskValues(TasksTaskItem *task, const KCalCore::Todo::Ptr
 {
         todo->setSummary(task->task());
         todo->setDescription(task->notes());
-        //todo->setSummary(task->notes());
         todo->setCategories(QStringList(task->list()->name()));
         todo->setCompleted(task->isComplete());
         todo->setHasDueDate(task->hasDueDate());
         if (task->hasDueDate()) {
-                KDateTime dueDate(task->dueDate());
-                todo->setDtDue(dueDate);
+                todo->setDtDue(KDateTime(task->dueDate()));
         }
         KDateTime createdDateTime(task->createdDateTime());
         todo->setCreated(createdDateTime);
@@ -228,8 +226,7 @@ void TasksDBEngine::setTaskValues(TasksTaskItem *task, const KCalCore::Todo::Ptr
         todo->clearAttachments();
         foreach (const QString &auri, task->attachments()) {
                 qDebug() << "ATTACH URI: " << auri;
-                KCalCore::Attachment *attachment = new KCalCore::Attachment(auri);
-                KCalCore::Attachment::Ptr attachmentPtr = KCalCore::Attachment::Ptr(attachment);
+                KCalCore::Attachment::Ptr attachmentPtr(new KCalCore::Attachment(auri));
                 todo->addAttachment(attachmentPtr);
         }
         int ordidx = task->list()->indexOfTask(task);
