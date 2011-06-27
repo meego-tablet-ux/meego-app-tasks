@@ -147,22 +147,15 @@ void TasksDBEngine::updateTask(TasksTaskItem *task)
 
 void TasksDBEngine::removeTask(TasksTaskItem *task)
 {
-        if (!m_uids.contains(task->id()))
-                return;
-        KCalCore::Todo::Ptr todo = m_calendar->todo(m_uids[task->id()]);
-        m_uids.remove(task->id());
-        m_calendar->deleteTodo(todo);
-        m_storage->save();
+       removeTasks(QList<TasksTaskItem *>() << task);
 }
 
-void TasksDBEngine::removeTasks(QList<TasksTaskItem *> tasks)
+void TasksDBEngine::removeTasks(const QList<TasksTaskItem *> &tasks)
 {
         foreach (TasksTaskItem *task, tasks) {
-                if (!task)
+                if (!task || !m_uids.contains(task->id()))
                         continue;
-                if (!m_uids.contains(task->id()))
-                        continue;
-                KCalCore::Todo::Ptr todo = m_calendar->todo(m_uids[task->id()]);
+                KCalCore::Todo::Ptr todo = m_calendar->todo(m_uids.take(task->id()));
                 m_calendar->deleteTodo(todo);
         }
         m_storage->save();

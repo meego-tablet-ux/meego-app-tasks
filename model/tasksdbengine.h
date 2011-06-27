@@ -31,7 +31,7 @@ public:
         void addTask(TasksTaskItem *task);
         void updateTask(TasksTaskItem *task);
         void removeTask(TasksTaskItem *task);
-        void removeTasks(QList<TasksTaskItem *> tasks);
+        void removeTasks(const QList<TasksTaskItem *> &tasks);
         void updateTasksOrder(TasksListItem *list);
         void updateTasksList(TasksListItem *list);
         void updateTasksList(const QList<TasksTaskItem *> &tasks);
