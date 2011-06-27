@@ -34,7 +34,7 @@ public:
         void removeTasks(QList<TasksTaskItem *> tasks);
         void updateTasksOrder(TasksListItem *list);
         void updateTasksList(TasksListItem *list);
-        void updateTasksList(QList<TasksTaskItem *> tasks);
+        void updateTasksList(const QList<TasksTaskItem *> &tasks);
         void commitTasks();
 
 protected:

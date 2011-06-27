@@ -187,7 +187,7 @@ void TasksDBEngine::updateTasksList(TasksListItem *list)
         updateTasksList(list->m_tasks);
 }
 
-void TasksDBEngine::updateTasksList(QList<TasksTaskItem *> tasks)
+void TasksDBEngine::updateTasksList(const QList<TasksTaskItem *> &tasks)
 {
         foreach (TasksTaskItem *task, tasks) {
                 if (!task)
