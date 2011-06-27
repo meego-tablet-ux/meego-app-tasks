@@ -123,20 +123,20 @@ void TasksDBEngine::loadTasks()
         m_db->insertTasks(taskswoo);
 }
 
-void TasksDBEngine::addTask(TasksTaskItem *task)
+void TasksDBEngine::addTasks(const QList<TasksTaskItem *> &tasks)
 {
-        if (m_uids.contains(task->id()))
-                return;
-        KCalCore::Todo::Ptr todo = KCalCore::Todo::Ptr(new KCalCore::Todo());
-        setTaskValues(task, todo);
-        //m_tasks[task->id()] = todo;
-        m_calendar->addTodo(todo);
+        foreach (TasksTaskItem *task, tasks) {
+                if (m_uids.contains(task->id()))
+                        continue;
+                KCalCore::Todo::Ptr todo = KCalCore::Todo::Ptr(new KCalCore::Todo());
+                setTaskValues(task, todo);
+                m_calendar->addTodo(todo);
+        }
+        m_storage->save();
 }
 
 void TasksDBEngine::updateTask(TasksTaskItem *task)
 {
-        //if (!m_tasks.contains(task->id()))
-        //        return;
         if (!m_uids.contains(task->id()))
                 return;
         KCalCore::Todo::Ptr todo = m_calendar->todo(m_uids[task->id()]);
@@ -190,11 +190,6 @@ void TasksDBEngine::updateTasksList(const QList<TasksTaskItem *> &tasks)
                 KCalCore::Todo::Ptr todo = m_calendar->todo(m_uids[task->id()]);
                 todo->setCategories(QStringList(task->list()->name()));
         }
-        m_storage->save();
-}
-
-void TasksDBEngine::commitTasks()
-{
         m_storage->save();
 }
 

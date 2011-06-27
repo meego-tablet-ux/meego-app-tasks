@@ -848,9 +848,7 @@ void TasksDatabase::moveTasksToList(const QStringList &staskIds, int destListId)
 void TasksDatabase::commitAddedTasks()
 {
     qDebug() << "commit " << m_newTasks.count();
-    foreach (TasksTaskItem *task, m_newTasks)
-        m_dbEngine->addTask(task);
-    m_dbEngine->commitTasks();
+    m_dbEngine->addTasks(m_newTasks);
     m_newTasks.clear();
 }
 

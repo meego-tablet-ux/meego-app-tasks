@@ -28,14 +28,13 @@ public:
         void loadLists();
         void saveLists();
         void startLoadingTasks();
-        void addTask(TasksTaskItem *task);
+        void addTasks(const QList<TasksTaskItem *> &tasks);
         void updateTask(TasksTaskItem *task);
         void removeTask(TasksTaskItem *task);
         void removeTasks(const QList<TasksTaskItem *> &tasks);
         void updateTasksOrder(TasksListItem *list);
         void updateTasksList(TasksListItem *list);
         void updateTasksList(const QList<TasksTaskItem *> &tasks);
-        void commitTasks();
 
 protected:
         virtual void loadingComplete(bool success, const QString &error);
