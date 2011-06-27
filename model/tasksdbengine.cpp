@@ -64,85 +64,59 @@ void TasksDBEngine::loadTasks()
         QList<TasksTaskItem *> tasks;
         QList<TasksTaskItem *> taskswoo;
         QList<int> orders;
-        KCalCore::Todo::List todos = m_calendar->rawTodos();
-        for (int i = 0; i < todos.count(); i++){
-                //KCalCore::Todo *todo = todos.at(i).data();
-                KCalCore::Todo::Ptr todo = todos.at(i);
-                QString order = todo->customProperty("Tasks", "Order");
+        foreach (const KCalCore::Todo::Ptr &todo, m_calendar->rawTodos()) {
                 bool ok;
-                int orderidx = order.toInt(&ok);
-                if (!ok)
-                        orderidx = -1;
+                int orderidx = todo->customProperty("Tasks", "Order").toInt(&ok);
+                if (!ok) orderidx = -1;
+
                 QString task = todo->summary();
-                qDebug() << "task:" << task;
                 QString notes = todo->description();
-                qDebug() << "notes:" << notes;
                 bool completed = todo->isCompleted();
                 bool hasDueDate = todo->hasDueDate();
                 QDate dueDate = todo->dtDue().date();
                 QDateTime created = todo->created().dateTime();
                 TasksListModel::ReminderType reminderType = TasksListModel::NoReminder;
                 QDate reminderDate;
-                //qDebug() << "parse alarms";
                 if (todo->hasEnabledAlarms()) {
-                        KCalCore::Alarm::List alarms = todo->alarms();
-                        //qDebug() << "count " << alarms.count();
-                        if (alarms.count() > 0) {
-                                KCalCore::Alarm::Ptr alarm = alarms.at(0);
+                        const KCalCore::Alarm::Ptr &alarm = todo->alarms().first();
 
-                                if (alarm->hasStartOffset()) {
-                                        if (alarm->startOffset().asSeconds() == 0)
-                                                reminderType = TasksListModel::OnDueDate;
-                                        else if (alarm->startOffset().asDays() == -1)
-                                                reminderType = TasksListModel::OneDayBefore;
-                                        else if (alarm->startOffset().asDays() == -2)
-                                                reminderType = TasksListModel::TwoDaysBefore;
-                                        else if (alarm->startOffset().asDays() == -7)
-                                                reminderType = TasksListModel::OneWeekBefore;
-                                }
-                                else if (alarm->hasTime()) {
-                                        reminderType = TasksListModel::DateReminder;
-                                        KDateTime alarmTime = alarm->time();
-                                        reminderDate = alarmTime.date();
-                                }
+                        if (alarm->hasStartOffset()) {
+                                if (alarm->startOffset().asSeconds() == 0)
+                                        reminderType = TasksListModel::OnDueDate;
+                                else if (alarm->startOffset().asDays() == -1)
+                                        reminderType = TasksListModel::OneDayBefore;
+                                else if (alarm->startOffset().asDays() == -2)
+                                        reminderType = TasksListModel::TwoDaysBefore;
+                                else if (alarm->startOffset().asDays() == -7)
+                                        reminderType = TasksListModel::OneWeekBefore;
+                        } else if (alarm->hasTime()) {
+                                reminderType = TasksListModel::DateReminder;
+                                reminderDate = alarm->time().date();
                         }
                 }
                 QStringList urls = todo->comments();
-                //qDebug() << "comments: " << urls;
                 QStringList attachments;
-                KCalCore::Attachment::List attlst = todo->attachments();
-                for (int j = 0; j < attlst.count(); j++) {
-                        KCalCore::Attachment *attch = attlst.at(j).data();
+                foreach (const KCalCore::Attachment::Ptr &attch, todo->attachments()) {
                         if (attch->isUri())
                                 attachments << attch->uri();
                 }
 
                 QStringList cats = todo->categories();
-                TasksListItem *list = 0;
-                foreach (const QString &cat, cats) {
-                        if (listsHash.contains(cat)) {
-                                list = listsHash[cat];
-                                break;
-                        }
-                }
-                if (!list)
-                        continue;
+                if (cats.isEmpty() || !listsHash.contains(cats.first()))
+                  continue;
+                TasksListItem *list = listsHash[cats.first()];
+
                 TasksTaskItem *tsk = m_db->createTask(list, task, notes, completed, hasDueDate, dueDate,
                                                       reminderType, reminderDate, urls, attachments, created);
-                //m_tasks[tsk->id()] = todo;
+
                 m_uids[tsk->id()] = todo->uid();
                 if (orderidx == -1){
                         taskswoo << tsk;
                 } else {
                         QList<int>::iterator it = qLowerBound(orders.begin(), orders.end(), orderidx);
                         int idx = it - orders.begin();
-                        //orders.insert(it, orderidx);
-                        //int idx = 0;
-                        //while (idx < tasks.count() && orders.at(idx) < orderidx)
-                        //        idx++;
                         tasks.insert(idx, tsk);
                         orders.insert(idx, orderidx);
-                        //qDebug() << "idx " << idx << "  " << idx1;
                 }
         }
         m_db->insertTasks(tasks);
