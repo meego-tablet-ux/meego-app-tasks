@@ -38,29 +38,21 @@ TasksDBEngine::~TasksDBEngine()
 
 void TasksDBEngine::loadLists()
 {
-        m_settings->beginGroup("Lists");
-        int count = m_settings->value("count", 0).toInt();
-        for (int idx = 1; idx < count; idx++) {
-                QString name = m_settings->value(QString("list%1").arg(QString::number(idx)), "").toString();
-                qDebug() << name;
-                m_db->createList(name);
+        QStringList list_names = m_settings->value("TaskLists").toStringList();
+        foreach (const QString &list_name, list_names) {
+                m_db->createList(list_name);
         }
-        m_settings->endGroup();
 }
 
 void TasksDBEngine::saveLists()
 {
-        m_settings->beginGroup("Lists");
-        m_settings->remove("");
-        m_settings->setValue("count", m_db->m_lists.count());
-        int idx = 0;
-        foreach (TasksListItem *list, m_db->m_lists) {
-                m_settings->setValue(QString("list%1").arg(QString::number(idx)), list->name());
-                idx++;
+        QStringList list_names;
+        // NOTE: we do not save the first list (default one)
+        for (int i=1; i<m_db->m_lists.count(); ++i) {
+          list_names << m_db->m_lists[i]->name();
         }
-        m_settings->endGroup();
 
-        //m_settings->sync();
+        m_settings->setValue("TaskLists", list_names);
 }
 
 void TasksDBEngine::loadTasks()
