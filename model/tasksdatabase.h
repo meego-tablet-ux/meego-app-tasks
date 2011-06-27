@@ -88,7 +88,6 @@ private:
         TasksDBEngine *m_dbEngine;
         int m_timerId;
         QDate m_currentDate;
-        QMutex m_lock;
         QList <TasksListModel *> m_models;
         // List of lists objects
         // First is "Default List"

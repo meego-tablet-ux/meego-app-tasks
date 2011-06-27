@@ -99,7 +99,6 @@ void TasksDatabase::renameList(int listId, const QString &name)
     foreach (TasksListItem *list, m_lists)
         if (list->id() != listId && list->name() == name)
             return;
-    m_lock.lock();
     TasksListItem *list = m_listsMap[listId];
     list->setName(name);
     // store
@@ -111,12 +110,10 @@ void TasksDatabase::renameList(int listId, const QString &name)
     foreach (TasksListModel *model, m_models)
         if (model->modelType() == TasksListModel::AllLists)
             model->onUpdateRow(idx);
-    m_lock.unlock();
 }
 
 void TasksDatabase::addList(const QString &name)
 {
-    m_lock.lock();
     foreach (TasksListModel *model, m_models)
         if (model->modelType() == TasksListModel::AllLists)
             model->onBeginInsertRow(m_lists.count());
@@ -129,7 +126,6 @@ void TasksDatabase::addList(const QString &name)
     foreach (TasksListModel *model, m_models)
         if (model->modelType() == TasksListModel::AllLists)
             model->onEndInsertRow();
-    m_lock.unlock();
 }
 
 void TasksDatabase::removeList(int listId)
@@ -142,7 +138,6 @@ void TasksDatabase::removeList(int listId)
     int idx = m_lists.indexOf(list);
     if (idx == -1)
         return;
-    m_lock.lock();
     // find rows
     QSet<TasksTaskItem *> removeTasks;
     for (int i = 0; i < list->tasks(); i++) {
@@ -272,7 +267,6 @@ void TasksDatabase::removeList(int listId)
                 model->onEndRemoveRow();
         }
     }
-    m_lock.unlock();
 }
 
 void TasksDatabase::addTask(int listId, const QString &task, const QString &notes, bool complete,
@@ -283,7 +277,6 @@ void TasksDatabase::addTask(int listId, const QString &task, const QString &note
     qDebug() << m_listsMap.contains(listId);
     if (!m_listsMap.contains(listId))
         return;
-    m_lock.lock();
     TasksListItem *list = m_listsMap[listId];
     TasksTaskItem *tsk = new TasksTaskItem(list);
     m_tasksMap[tsk->id()] = tsk;
@@ -363,7 +356,6 @@ void TasksDatabase::addTask(int listId, const QString &task, const QString &note
                 model->onEndInsertRow();
         }
     }
-    m_lock.unlock();
 }
 
 void TasksDatabase::editTask(int taskId, int listId, const QString &task, const QString &notes,
@@ -380,7 +372,6 @@ void TasksDatabase::editTask(int taskId, int listId, const QString &task, const 
     //        dueDate = QDate();
     if (!m_tasksMap.contains(taskId))
         return;
-    m_lock.lock();
     TasksTaskItem *tsk = m_tasksMap[taskId];
     bool dueupdated = tsk->hasDueDate() == hasDueDate && tsk->dueDate() == dueDate;
     tsk->setTask(task);
@@ -403,12 +394,10 @@ void TasksDatabase::editTask(int taskId, int listId, const QString &task, const 
     //////
 
     if (tsk->list()->id() != listId) {
-        m_lock.unlock();
         qDebug("Database: Moving task to a new id");
         QStringList ids(QString::number(tsk->id()));
         moveTasksToList(ids, listId);
         qDebug("Database: Done moving task to a new id");
-        m_lock.lock();
     }
 
     int somedayIndex = m_somedayTasks.indexOf(tsk);
@@ -425,7 +414,6 @@ void TasksDatabase::editTask(int taskId, int listId, const QString &task, const 
                 else if (model->timeGroups() == TasksListModel::Upcoming && upcomingIndex != -1)
                     model->onUpdateRow(upcomingIndex);
             }
-        m_lock.unlock();
         return;
     }
     // Update timeview
@@ -507,14 +495,12 @@ void TasksDatabase::editTask(int taskId, int listId, const QString &task, const 
                 model->onEndInsertRow();
         }
     }
-    m_lock.unlock();
 }
 
 void TasksDatabase::removeCompletedTasksInList(int listId)
 {
     if (!m_listsMap.contains(listId))
         return;
-    m_lock.lock();
     TasksListItem *list = m_listsMap[listId];
     QList<int> rows;
     QList<TasksTaskItem *> tasks;
@@ -558,7 +544,6 @@ void TasksDatabase::removeCompletedTasksInList(int listId)
         TasksTaskItem *task = tasks.takeFirst();
         delete task;
     }
-    m_lock.unlock();
 }
 
 void TasksDatabase::removeAllCompletedTasks()
@@ -574,19 +559,16 @@ void TasksDatabase::setCompleted(int taskId, bool completed)
     TasksTaskItem *tsk = m_tasksMap[taskId];
     if (tsk->isComplete() == completed)
         return;
-    m_lock.lock();
     if (completed)
         setTaskComplited(tsk);
     else
         setTaskUncomplited(tsk);
-    m_lock.unlock();
 }
 
 void TasksDatabase::removeTask(int taskId, bool store)
 {
     if (!m_tasksMap.contains(taskId))
         return;
-    m_lock.lock();
     TasksTaskItem *tsk = m_tasksMap[taskId];
     //bool complete = tsk->isComplete();
     int listIndex = tsk->list()->indexOfTask(tsk);
@@ -640,7 +622,6 @@ void TasksDatabase::removeTask(int taskId, bool store)
     if (lidx != -1)
         foreach (TasksListModel *model, almodels)
             model->onUpdateRow(lidx);
-    m_lock.unlock();
 }
 
 void TasksDatabase::removeTasks(const QStringList &staskIds)
@@ -662,7 +643,6 @@ void TasksDatabase::reorderTask(int taskId, int destidx)
     int listIndex = list->indexOfTask(tsk);
     if (listIndex == -1 || destidx == listIndex)
         return;
-    m_lock.lock();
     foreach (TasksListModel *model, m_models)
         if (model->modelType() == TasksListModel::List)
             if (model->listId() == tsk->list()->id()) {
@@ -675,7 +655,6 @@ void TasksDatabase::reorderTask(int taskId, int destidx)
             if (model->listId() == tsk->list()->id()) {
                 model->onEndMoveRow();
             }
-    m_lock.unlock();
 }
 
 void TasksDatabase::hideTasks(const QStringList &taskIds)
@@ -697,7 +676,6 @@ void TasksDatabase::hideTasks(const QStringList &taskIds)
         if (listIndex == -1)
             return;
 
-        m_lock.lock();
         foreach (TasksListModel *model, m_models)
             if (model->modelType() == TasksListModel::List)
                 if (model->listId() == tasks.at(i)->list()->id()) {
@@ -710,14 +688,12 @@ void TasksDatabase::hideTasks(const QStringList &taskIds)
                 if (model->listId() == tasks.at(i)->list()->id()) {
                     model->onEndRemoveRow();
                 }
-        m_lock.unlock();
     }
 }
 
 void TasksDatabase::showHiddenTasks(int listId, int startIndex)
 {
     TasksListItem *list = m_listsMap[listId];
-    m_lock.lock();
     foreach (TasksListModel *model, m_models)
         if (model->modelType() == TasksListModel::List)
             if (model->listId() == list->id()) {
@@ -730,13 +706,11 @@ void TasksDatabase::showHiddenTasks(int listId, int startIndex)
             if (model->listId() == list->id()) {
                 model->onEndInsertRow();
             }
-    m_lock.unlock();
 }
 
 void TasksDatabase::showHiddenTasksOldPositions(int listId)
 {
     TasksListItem *list = m_listsMap[listId];
-    m_lock.lock();
     foreach (TasksListModel *model, m_models)
         if (model->modelType() == TasksListModel::List)
             if (model->listId() == list->id()) {
@@ -749,17 +723,14 @@ void TasksDatabase::showHiddenTasksOldPositions(int listId)
             if (model->listId() == list->id()) {
                 model->onEndReset();
             }
-    m_lock.unlock();
 }
 
 void TasksDatabase::saveReorder(int listId)
 {
     if (!m_listsMap.contains(listId))
         return;
-    m_lock.lock();
     TasksListItem *list = m_listsMap[listId];
     m_dbEngine->updateTasksOrder(list);
-    m_lock.unlock();
 }
 
 void TasksDatabase::moveTasksToList(const QStringList &staskIds, int destListId)
@@ -780,7 +751,6 @@ void TasksDatabase::moveTasksToList(const QStringList &staskIds, int destListId)
             tsks << m_tasksMap[taskId];
     if (tsks.isEmpty())
         return;
-    m_lock.lock();
     TasksListItem *slist = tsks.first()->list();
     int srcListId = slist->id();
     int lidx1 = findList(srcListId);
@@ -842,7 +812,6 @@ void TasksDatabase::moveTasksToList(const QStringList &staskIds, int destListId)
                 model->onEndInsertRow();
     }
     m_dbEngine->updateTasksList(tsks);
-    m_lock.unlock();
 }
 
 void TasksDatabase::commitAddedTasks()
@@ -1198,7 +1167,6 @@ void TasksDatabase::insertTasks(const QList<TasksTaskItem *> &tasks)
 
 void TasksDatabase::updateDueTasks(bool topast)
 {
-    m_lock.lock();
     // update after current date changed
     if (topast) {
         int n = m_overdueTasks.count();
@@ -1261,6 +1229,5 @@ void TasksDatabase::updateDueTasks(bool topast)
             }
         }
     }
-    m_lock.unlock();
 }
 
