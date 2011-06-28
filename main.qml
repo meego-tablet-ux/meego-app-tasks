@@ -356,6 +356,7 @@ Window {
                     allListsModel.addList(textinput.text);
                     textinput.text = "";
                     listsViewBlankSlate.visible = false;
+                    qmlSettings.isRunningFirstTime = false;
                 }
                 onRejected: {
                     textinput.text = "";
