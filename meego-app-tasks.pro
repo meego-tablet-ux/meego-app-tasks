@@ -11,7 +11,7 @@ INSTALLS += qmlfiles desktopfiles
 QML_FILES = *.qml
 LIB_SOURCES += model/*.cpp
 LIB_HEADERS += model/*.h
-VERSION = 0.2.10
+VERSION = 0.2.12
 PROJECT_NAME = meego-app-tasks
 
 TRANSLATIONS += $${QML_FILES} $${LIB_SOURCES} $${LIB_HEADERS}

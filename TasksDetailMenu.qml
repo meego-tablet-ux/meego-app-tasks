@@ -157,13 +157,19 @@ Column {
                 id:datePicker
                 selectedDate: task.mDueDate
                 onDateSelected: {
-                    task.mDueDate = datePicker.selectedDate;
+                    internal.newDate = datePicker.selectedDate;
                 }
             }
             onClicked: {
                 datePicker.show();
             }
         }
+    }
+
+    QtObject {
+        id: internal
+
+        property variant newDate: null
     }
 
     Row {
@@ -224,6 +230,7 @@ Column {
             bgSourceDn:"image://themedimage/images/btn_blue_dn"
             visible: editing
             onClicked: {
+                 task.mDueDate = internal.newDate;
                 saveTaskFromInput();
                 detailMenu.save(task);
                 detailMenu.editing = false;

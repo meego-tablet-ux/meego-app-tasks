@@ -74,7 +74,8 @@ Rectangle {
                 anchors.rightMargin: 40
                 anchors.verticalCenter: parent.verticalCenter
 
-                width: 300
+                elideText: false
+                minWidth: 300
                 height: 60
 
                 onClicked: slate.buttonClicked()
@@ -122,7 +123,7 @@ Rectangle {
                                 anchors.bottom: parent.bottom
                                 anchors.bottomMargin: 10
 
-                                width: parent.width - 60
+                                minWidth: parent.width - 60
                                 height: 60
 
                                 visible: text.length > 0
