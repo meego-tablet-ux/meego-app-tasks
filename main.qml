@@ -960,7 +960,7 @@ Window {
                             // view in list
                             customlistModel.listId = allDueTasksPageContextMenu.payload.mListId;
                             customlistModel.listName = allDueTasksPageContextMenu.payload.mListName;
-                            allDueTasksPage.close();
+                            window.popPage()
                             window.addPage(customlistPageComponent);
                         }else if (index == 3) {
                             // delete task
