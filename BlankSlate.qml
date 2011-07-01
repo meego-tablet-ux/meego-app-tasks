@@ -51,12 +51,14 @@ Rectangle {
                 anchors.left: parent.left
                 anchors.leftMargin: 40
                 anchors.verticalCenter: parent.verticalCenter
+                width: parent.width /2
 
                 Text {
                     id: headerTitle
 
                     font.pixelSize: theme.fontPixelSizeLargest
                     font.bold: true
+                    wrapMode: Text.WordWrap
                 }
 
                 Text {
@@ -64,6 +66,8 @@ Rectangle {
 
                     font.pixelSize: theme.fontPixelSizeMedium
                     font.bold: true
+                    wrapMode: Text.WordWrap
+
                 }
             }
 
@@ -75,8 +79,8 @@ Rectangle {
                 anchors.verticalCenter: parent.verticalCenter
 
                 elideText: false
-                minWidth: 300
                 height: 60
+                maxWidth: parent.width /2
 
                 onClicked: slate.buttonClicked()
             }
