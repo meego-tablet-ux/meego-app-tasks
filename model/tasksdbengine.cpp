@@ -269,5 +269,19 @@ void TasksDBEngine::savingComplete(bool success, const QString &error)
 
 void TasksDBEngine::startLoadingTasks()
 {
-        m_storage->startLoading();
+    m_storage->startLoading();
+}
+
+int TasksDBEngine::taskIdByUid(const QString &uid)
+{
+    QMap<int, QString>::const_iterator i = m_uids.constBegin();
+
+    while (i != m_uids.constEnd()) {
+        if (i.value() == uid)
+            return i.key();
+
+        ++i;
+    }
+
+    return -1;
 }

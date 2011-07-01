@@ -35,6 +35,7 @@ public:
         void updateTasksOrder(const TasksListItem &list);
         void updateTasksList(const TasksListItem &list);
         void updateTasksList(const QList<TasksTaskItem> &tasks);
+        int taskIdByUid(const QString &uid);
 
 protected:
         virtual void loadingComplete(bool success, const QString &error);

@@ -56,7 +56,7 @@ Window {
 
     QmlSetting {
         id: qmlSettings
-//        isRunningFirstTime: saveRestore.value("isRunningFirstTime")
+        //        isRunningFirstTime: saveRestore.value("isRunningFirstTime")
     }
 
     SaveRestoreState {
@@ -68,6 +68,68 @@ Window {
             if (!restoreRequired)
                 return;
             internal.restore();
+        }
+    }
+
+    Connections {
+        target: mainWindow
+        onCall: {
+            console.log("cmd call");
+            var cmd = parameters[0];
+            var cdata = parameters[1];
+            if (cmd == "openTasks") {
+                console.log("opentasks");
+                var uid = cdata;
+                var taskId = tasksDatabase.taskIdByUid(uid);
+                dueTaskObject.mTaskId = taskId;
+                dueTaskObject.mTask = tasksDatabase.taskValue(taskId, "Task");
+                dueTaskObject.mNotes = tasksDatabase.taskValue(taskId, "Notes");
+                dueTaskObject.mCompleted = tasksDatabase.taskValue(taskId, "Complete");
+                dueTaskObject.mHasDueDate =  tasksDatabase.taskValue(taskId, "HasDueDate");
+                dueTaskObject.mDueDate = tasksDatabase.taskValue(taskId, "DueDate");
+                dueTaskObject.mReminderType = tasksDatabase.taskValue(taskId, "Reminder");
+                dueTaskObject.mReminderDate = tasksDatabase.taskValue(taskId, "ReminderDate");
+                dueTaskObject.mUrls = tasksDatabase.taskValue(taskId, "Urls");
+                dueTaskObject.mAttachments = tasksDatabase.taskValue(taskId, "Attachments");
+                dueTaskObject.mListId = tasksDatabase.taskValue(taskId, "ListID");
+
+                dueTaskDetail.task = dueTaskObject;
+                dueTaskDetail.listNames = listsGroupItem.getAllListsNames();
+                dueTaskDetail.editing = false;
+                dueTaskDetail.visible = true;
+            }
+        }
+    }
+
+    QtObject {
+        id: dueTaskObject
+        property string mTask
+        property date mDueDate
+        property bool mHasDueDate
+        property bool mCompleted
+        property variant mReminderType
+        property variant mReminderDate
+        property variant mUrls
+        property variant mAttachments
+        property string mNotes
+        property int mTaskId
+        property int mListId
+    }
+
+    TasksDetailMenu {
+        id: dueTaskDetail
+        z: 10
+        anchors.centerIn: parent
+        task: taskDetailMenu.setTask;
+        listNames: taskDetailMenu.setListnames;
+        editing:taskDetailMenu.setEditing;
+        deleteButtonVisible: false
+        editButtonVisible: false
+        saveButtonVisible: false
+        visible: false
+
+        onClose: {
+            visible = false;
         }
     }
 
@@ -105,9 +167,9 @@ Window {
         }
     }
 
-//    Labs.LocaleHelper {
-//        id: localeHelper
-//    }
+    //    Labs.LocaleHelper {
+    //        id: localeHelper
+    //    }
 
     toolBarTitle: labelTasks
 
@@ -340,13 +402,13 @@ Window {
             ModalDialog {
                 id: newListDialog
                 content: TextEntry {
-                         id: textinput;
-                         anchors.verticalCenter: parent.verticalCenter
-                         anchors.left: parent.left
-                         anchors.right: parent.right
-                         anchors.leftMargin: 20
-                         anchors.rightMargin: anchors.leftMargin
-                         defaultText: qsTr("List name")
+                    id: textinput;
+                    anchors.verticalCenter: parent.verticalCenter
+                    anchors.left: parent.left
+                    anchors.right: parent.right
+                    anchors.leftMargin: 20
+                    anchors.rightMargin: anchors.leftMargin
+                    defaultText: qsTr("List name")
                 }
                 title: labelNewList
                 cancelButtonText: labelCancel
@@ -626,10 +688,10 @@ Window {
                             }
                         }
 
-//                        MouseArea {
-//                            anchors.fill: parent
-//                            onClicked: window.addPage(allDueTasksPageComponent)
-//                        }
+                        //                        MouseArea {
+                        //                            anchors.fill: parent
+                        //                            onClicked: window.addPage(allDueTasksPageComponent)
+                        //                        }
                     }
                 }
 
@@ -708,10 +770,10 @@ Window {
             }
 
             actionMenuModel: [ labelAllDueTasks,
-                                labelOverdue,
-                                labelUpComing,
-                                labelSomeday,
-                                currentSortOrderText(overdueModel) ]
+                labelOverdue,
+                labelUpComing,
+                labelSomeday,
+                currentSortOrderText(overdueModel) ]
             actionMenuPayload: [ 0, 1, 2, 3, 4 ]
 
             property int prevSelectedItem: 0
@@ -726,8 +788,8 @@ Window {
                     alldueTasksList.visible = true;
                     return;
                 } else if ((index == 1 && overdueModel.count > 0)
-                    || (index == 2 && upcomingModel.count > 0)
-                    || (index == 3 && somedayModel.count > 0)) {
+                           || (index == 2 && upcomingModel.count > 0)
+                           || (index == 3 && somedayModel.count > 0)) {
                     alldueTasksList.visible = true;
                     return;
                 }
@@ -814,13 +876,13 @@ Window {
 
                 Component.onCompleted: {
                     model.append({"title" : qsTr("You have no due tasks"),
-                                    "visible" : false});
+                                 "visible" : false});
                     model.append({"title" : qsTr("You have no overdue tasks"),
-                                    "visible" : false});
+                                 "visible" : false});
                     model.append({"title" : qsTr("You have no upcoming tasks"),
-                                    "visible" : false});
+                                 "visible" : false});
                     model.append({"title" : qsTr("You have no someday tasks"),
-                                    "visible" : false});
+                                 "visible" : false});
                 }
 
                 delegate: BlankSlate {
@@ -952,9 +1014,9 @@ Window {
                         else if (index == 1)
                         {
                             // edit task
-                         taskDetailContextMenu.displayContextMenu(allDueTasksPageContextMenu.mousePos.x,
-                                                                  allDueTasksPageContextMenu.mousePos.y,
-                                                                  allDueTasksPageContextMenu.payload,true);
+                            taskDetailContextMenu.displayContextMenu(allDueTasksPageContextMenu.mousePos.x,
+                                                                     allDueTasksPageContextMenu.mousePos.y,
+                                                                     allDueTasksPageContextMenu.payload,true);
                         }
                         else if (index == 2) {
                             // view in list
@@ -971,7 +1033,7 @@ Window {
                                 deleteTaskDialog.show();
                             }
                         }
-                         allDueTasksPageContextMenu.hide();
+                        allDueTasksPageContextMenu.hide();
                     }
                 }
             }
@@ -1076,7 +1138,7 @@ Window {
                     }
                     onSave: {
                         taskDetailContextMenu.setTask = taskToSave;
-                        saveChanges(taskDetailContextMenu.setTask);
+                        (taskDetailContextMenu.setTask);
                     }
                     onDeleteTask:  {
                         // delete task
@@ -1284,35 +1346,35 @@ Window {
                 property variant mousePos
                 property variant payload
                 content: ActionMenu {
-                     model: {
-                         if(customlistModel.count > 1) {
-                             return [labelViewDetail,labelEditTask, labelDeleteTask,labelSelectMultiple];
-                         } else {
-                             return [labelViewDetail,labelEditTask, labelDeleteTask];
-                         }
-                     }
-                     onTriggered: {
-                         if (index == 0) { // view detail
-                             taskDetailContextMenu.displayContextMenu(customListPageContextMenu.mousePos.x,
-                                                                      customListPageContextMenu.mousePos.y,
-                                                                      customListPageContextMenu.payload,false);
-                         } else if (index == 1) { // edit task
+                    model: {
+                        if(customlistModel.count > 1) {
+                            return [labelViewDetail,labelEditTask, labelDeleteTask,labelSelectMultiple];
+                        } else {
+                            return [labelViewDetail,labelEditTask, labelDeleteTask];
+                        }
+                    }
+                    onTriggered: {
+                        if (index == 0) { // view detail
                             taskDetailContextMenu.displayContextMenu(customListPageContextMenu.mousePos.x,
-                                                                  customListPageContextMenu.mousePos.y,
-                                                                  customListPageContextMenu.payload,true);
-                         } else if (index ==2) {  // delete task
-                             if(qmlSettings.get("task_auto_delete")){
-                                 editorList.removeTask(customListPageContextMenu.payload.mTaskId);
-                             } else {
-                                 deleteTaskDialog.taskId = customListPageContextMenu.payload.mTaskId;
-                                 deleteTaskDialog.show();
-                             }
-                         } else if (index == 3) { // multiple selection mode
-                             taskListView.mode = 2;
-                         }
-                         customListPageContextMenu.hide();
-                     }
-                 }
+                                                                     customListPageContextMenu.mousePos.y,
+                                                                     customListPageContextMenu.payload,false);
+                        } else if (index == 1) { // edit task
+                            taskDetailContextMenu.displayContextMenu(customListPageContextMenu.mousePos.x,
+                                                                     customListPageContextMenu.mousePos.y,
+                                                                     customListPageContextMenu.payload,true);
+                        } else if (index ==2) {  // delete task
+                            if(qmlSettings.get("task_auto_delete")){
+                                editorList.removeTask(customListPageContextMenu.payload.mTaskId);
+                            } else {
+                                deleteTaskDialog.taskId = customListPageContextMenu.payload.mTaskId;
+                                deleteTaskDialog.show();
+                            }
+                        } else if (index == 3) { // multiple selection mode
+                            taskListView.mode = 2;
+                        }
+                        customListPageContextMenu.hide();
+                    }
+                }
             }
         }
     }
