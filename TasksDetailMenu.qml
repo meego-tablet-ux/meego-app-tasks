@@ -233,7 +233,11 @@ Column {
             bgSourceDn:"image://themedimage/images/btn_blue_dn"
             visible: editing
             onClicked: {
-                 task.mDueDate = internal.newDate;
+                task.mHasDueDate = duedateSelector.on
+                if (internal.newDate != null)
+                    task.mDueDate = internal.newDate;
+                else
+                    task.mHasDueDate = false
                 saveTaskFromInput();
                 detailMenu.save(task);
                 detailMenu.editing = false;

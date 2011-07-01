@@ -680,6 +680,10 @@ Item {
                 selectedRow: -1
 
             }
+            PropertyChanges {
+                target: newrow.textinput
+                focus: true
+            }
         },
         State {
             name: "multiSelectionMode"
