@@ -10,6 +10,8 @@
 #include "taskstaskitem.h"
 #include "taskslistmodel.h"
 #include "qsettingsbackend.h"
+#include "tasksdatabase.h"
+#include <QtDeclarative>
 
 void tasks::registerTypes(const char *uri)
 {
@@ -20,7 +22,8 @@ void tasks::registerTypes(const char *uri)
 void tasks::initializeEngine(QDeclarativeEngine *engine, const char *uri)
 {
     Q_UNUSED(uri);
-    Q_UNUSED(engine);
+//    Q_UNUSED(engine);
+    engine->rootContext()->setContextProperty("tasksDatabase", TasksDatabase::instance());
 }
 
 Q_EXPORT_PLUGIN(tasks);

@@ -12,6 +12,9 @@ Column {
     property bool editing: false
     property variant  task
     property variant listNames
+    property alias deleteButtonVisible: deleteButton.visible
+    property alias editButtonVisible: editButton.visible
+    property alias saveButtonVisible: saveButton.visible
 
     signal close()
     signal save(variant taskToSave)

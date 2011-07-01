@@ -52,6 +52,8 @@ public:
         void moveTasksToList(const QStringList &staskIds, int destListId);
         void commitAddedTasks();
         void rollbackAddedTasks();
+        Q_INVOKABLE int taskIdByUid(const QString &uid);
+        Q_INVOKABLE QVariant taskValue(int taskId, const QString &valueName);
 
 signals:
         void listAdded(const TasksListItem &list);
