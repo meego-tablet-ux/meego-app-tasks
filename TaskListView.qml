@@ -130,13 +130,13 @@ Item {
             id: separator_top
             width: parent.width
             anchors.bottom: parent.top
-            source: "image://themedimage/images/tasks/ln_grey_l"
+            source: "image://themedimage/widgets/common/dividers/divider-horizontal-single"
         }
         Image {
             id: separator_bt
             width: parent.width
             anchors.top: parent.bottom
-            source: "image://themedimage/images/tasks/ln_grey_l"
+            source: "image://themedimage/widgets/common/dividers/divider-horizontal-single"
         }
 
         GestureArea {
@@ -221,16 +221,12 @@ Item {
 
             property bool isMultipleDragActive: false
 
-            Rectangle { //the "wrong" way to make the background
-                color: "white"
+            Image {
+                id: backimage
+                source: index == privateData.selectedRow ? "image://themedimage/widgets/common/list/list-active"
+                                                         : "image://themedimage/widgets/common/list/list"
                 anchors.fill: parent
             }
-
-            /*Image { //The "proper" way that makes it look ugly
-                id: backimage
-                source: "image://themedimage/widgets/common/list/list-single-inactive"
-                anchors.fill: parent
-            }*/
 
             Text {
                 id: titleText
@@ -276,7 +272,7 @@ Item {
 
             Image {
                 id: reminderIcon
-                source: "image://themedimage/images/tasks/icn_alarmclock"
+                source: "image://themedimage/icons/internal/tasks-alarm"
                 anchors.right: duedateText.left
                 anchors.rightMargin:textHMargin
                 visible: mHasDueDate && (mReminderType!= TasksListModel.NoReminder)
@@ -286,13 +282,7 @@ Item {
                 id: separator
                 width: parent.width
                 anchors.bottom: parent.bottom
-                source: "image://themedimage/images/tasks/ln_grey_l"
-            }
-            Image {
-                id: highlight
-                source: "image://themedimage/images/tasks/bg_highlightedpanel_l"
-                anchors.fill: parent
-                visible: (index == privateData.selectedRow)
+                source: "image://themedimage/widgets/common/dividers/divider-horizontal-single"
             }
 
             TopItem{ id: top }
@@ -318,6 +308,7 @@ Item {
                 }
                 TapAndHold {
                     onFinished: {
+                        privateData.selectedRow = index;
                         if (mode == 0) {
                             top.calcTopParent()
                             var map = mapToItem(top.topItem, gesture.position.x, gesture.position.y);
@@ -353,16 +344,16 @@ Item {
 
             Image {
                 id: vDivider
-                source: "image://themedimage/images/tasks/ln_grey_p"
+                source: "image://themedimage/widgets/common/dividers/divider-vertical-single"
                 height: parent.height
-                width: 1
+//                width: 1
                 anchors.left: box.right
                 anchors.leftMargin: 20
             }
 
             Image {
                 id: overdueIcon
-                source: "image://themedimage/images/tasks/icn_overdue_red"
+                source: "image://themedimage/icons/alerts/alert-important"
                 anchors.verticalCenter: parent.verticalCenter
                 x: titleText.x + titleText.paintedWidth + 20
                 visible: isOverdue(mDueDate) && mHasDueDate
@@ -539,8 +530,8 @@ Item {
         showAcceptButton: true
         cancelButtonText:  qsTr( "No" )
         acceptButtonText: qsTr( "Yes" )
-        acceptButtonImage: "image://themedimage/images/btn_red_up"
-        acceptButtonImagePressed:"image://themedimage/images/btn_red_dn"
+        acceptButtonImage: "image://themedimage/widgets/common/button/button-negative"
+        acceptButtonImagePressed:"image://themedimage/widgets/common/button/button-negative-pressed"
         title: {
             if(container.selectedIds.length > 1) {
                 return qsTr("Are you sure you want to delete these %1 tasks?").arg(container.selectedIds.length);

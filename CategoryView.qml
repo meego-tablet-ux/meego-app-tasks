@@ -242,13 +242,13 @@ Item {
                 id: separator_top
                 width: parent.width
                 anchors.bottom: parent.top
-                source: "image://themedimage/images/tasks/ln_grey_l"
+                source: "image://themedimage/widgets/common/dividers/divider-horizontal-single"
             }
             Image {
                 id: separator_bt
                 width: parent.width
                 anchors.top: parent.bottom
-                source: "image://themedimage/images/tasks/ln_grey_l"
+                source: "image://themedimage/widgets/common/dividers/divider-horizontal-single"
             }
             GestureArea {
                 anchors.fill: parent
@@ -346,8 +346,10 @@ Item {
             property int mListId: listId
             property string mListName: listName;
 
-            Rectangle {
-                color: "white"
+            Image {
+                source: (view.categoryIndex == privateData.selectedCategory) && (index == privateData.selectedRow)
+                        ? "image://themedimage/widgets/common/list/list-active"
+                        : "image://themedimage/widgets/common/list/list"
                 anchors.fill: parent
             }
 
@@ -379,7 +381,7 @@ Item {
 
             Image {
                 id: reminderIcon
-                source: "image://themedimage/images/tasks/icn_alarmclock"
+                source: "image://themedimage/icons/internal/tasks-alarm"
                 anchors.right: duedateText.left
                 anchors.rightMargin:textHMargin
                 visible: mHasDueDate && (mReminderType!= TasksListModel.NoReminder)
@@ -390,14 +392,7 @@ Item {
                 id: separator
                 width: parent.width
                 anchors.bottom: parent.bottom
-                source: "image://themedimage/images/tasks/ln_grey_l"
-            }
-            Image {
-                id: highlight
-                source: "image://themedimage/images/tasks/bg_highlightedpanel_l"
-                anchors.fill: parent
-                visible: (view.categoryIndex == privateData.selectedCategory ) &&
-                         (index == privateData.selectedRow)
+                source: "image://themedimage/widgets/common/dividers/divider-horizontal-single"
             }
 
             TopItem{ id: top }
@@ -446,16 +441,16 @@ Item {
 
             Image {
                 id: vDivider
-                source: "image://themedimage/images/tasks/ln_grey_p"
+                source: "image://themedimage/widgets/common/dividers/divider-vertical-single"
                 height: parent.height
-                width: 1
+//                width: 1
                 anchors.left: box.right
                 anchors.leftMargin: 20
             }
 
             Image {
                 id: overdueIcon
-                source: "image://themedimage/images/tasks/icn_overdue_red"
+                source: "image://themedimage/icons/alerts/alert-important"
                 anchors.verticalCenter: parent.verticalCenter
                 x: titleText.x + titleText.paintedWidth + 20
                 visible: isOverdue(mDueDate) && mHasDueDate

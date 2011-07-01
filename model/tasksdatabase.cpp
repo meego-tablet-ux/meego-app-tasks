@@ -827,6 +827,44 @@ void TasksDatabase::rollbackAddedTasks()
     m_newTasks.clear();
 }
 
+int TasksDatabase::taskIdByUid(const QString &uid)
+{
+    return m_dbEngine->taskIdByUid(uid);
+}
+
+QVariant TasksDatabase::taskValue(int taskId, const QString &valueName)
+{
+    TasksTaskItem task = m_tasksMap.value(taskId);
+
+    if (!task.isValid())
+        return QVariant();
+
+    if (valueName == "Task")
+        return QVariant(task.task());
+    else if (valueName == "Notes")
+        return QVariant(task.notes());
+    else if (valueName == "Complete")
+        return QVariant(task.isComplete());
+    else if (valueName == "HasDueDate")
+        return QVariant(task.hasDueDate());
+    else if (valueName == "DueDate")
+        return QVariant(task.dueDate());
+    else if (valueName == "Reminder")
+        return QVariant(task.reminderType());
+    else if (valueName == "ReminderDate")
+        return QVariant(task.reminderDate());
+    else if (valueName == "Urls")
+        return QVariant(task.urls());
+    else if (valueName == "Attachments")
+        return QVariant(task.attachments());
+    else if (valueName == "ListName")
+        return QVariant(task.list().name());
+    else if (valueName == "ListID")
+        return QVariant(task.list().id());
+
+    return QVariant();
+}
+
 void TasksDatabase::timerEvent(QTimerEvent *event)
 {
     QObject::timerEvent(event);
