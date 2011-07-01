@@ -450,8 +450,6 @@ Item {
 //                    }
 //                }
 
-                TopItem{ id: top }
-
                 MouseArea {
                     property int start: 0
                     property bool isPositionChanged: false
