@@ -400,37 +400,26 @@ Item {
                          (index == privateData.selectedRow)
             }
 
+            TopItem{ id: top }
+
             GestureArea {
                 anchors.fill: parent
                 Tap {
                     onFinished: {
                         privateData.selectedCategory = view.categoryIndex;
                         privateData.selectedRow = index;
-                        var map = mapToItem(null, gesture.position.x, gesture.position.y);
+                        top.calcTopParent();
+                        var map = mapToItem(top.topItem, gesture.position.x, gesture.position.y);
                         container.clickedAtRow(index, map.x, map.y,dinstance);
                     }
                 }
                 TapAndHold {
                     onFinished: {
-                        var map = mapToItem(null, gesture.position.x, gesture.position.y);
+                        var map = mapToItem(top.topItem, gesture.position.x, gesture.position.y);
                         container.pressAndHoldAtRow(index, map.x, map.y, dinstance);
                     }
                 }
             }
-
-//            MouseArea {
-//                anchors.fill: parent
-//                onClicked:  {
-//                    privateData.selectedCategory = view.categoryIndex;
-//                    privateData.selectedRow = index;
-//                    var map = mapToItem(null, mouseX, mouseY);
-//                    container.clickedAtRow(index, map.x, map.y,dinstance);
-//                }
-//                onPressAndHold: {
-//                    var map = mapToItem(null, mouseX, mouseY);
-//                    container.pressAndHoldAtRow(index, map.x, map.y,dinstance);
-//                }
-//            }
 
             Checkbox {
                 id: box

@@ -71,6 +71,8 @@ Window {
         }
     }
 
+    TopItem{ id: topItem }
+
     QtObject {
         id: internal
 
@@ -529,9 +531,9 @@ Window {
                             }
                             onPressAndHold: {
                                 if (listId != 0) {
-                                    top.calcTopParent()
-                                    var map = mapToItem(top.topItem, mouseX, mouseY);
+                                    top.calcTopParent();
                                     landingScreenContextMenu.payload = dinstance;
+                                    var map = mapToItem(top.topItem, mouseX, mouseY);
                                     landingScreenContextMenu.setPosition(map.x, map.y);
                                     landingScreenContextMenu.show();
                                 }
@@ -797,9 +799,7 @@ Window {
                     closeDetailWindowWithId(taskId);
                 }
                 onPressAndHoldAtRow : {
-                    var map = alldueTasksList.mapToItem(allDueTasksPage, x, y);
                     allDueTasksPageContextMenu.payload = payload;
-                    allDueTasksPageContextMenu.mousePos = map;   // This position may be wrong now since mapping isn't necessary, please test
                     allDueTasksPageContextMenu.setPosition(x, y)
                     allDueTasksPageContextMenu.show();
                 }
@@ -1224,9 +1224,7 @@ Window {
                     editorList.setCompleted(payload.mTaskId,checked);
                 }
                 onPressAndHoldAtRow: {
-                    var map = taskListView.mapToItem(customlistPage, x, y);
                     customListPageContextMenu.payload = payload;
-                    customListPageContextMenu.mousePos = map;   // This position may be wrong now since mapping isn't necessary, please test
                     customListPageContextMenu.setPosition(x, y)
                     customListPageContextMenu.show();
                 }

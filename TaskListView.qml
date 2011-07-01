@@ -327,27 +327,6 @@ Item {
                 }
             }
 
-//            MouseArea {
-//                anchors.fill: parent
-//                onClicked: {
-//                    privateData.selectedRow = index;
-//                    if (mode == 0) {
-//                        var map = mapToItem(null, mouseX, mouseY);
-//                        container.clickedAtRow(index, map.x, map.y,dinstance);
-//                    } else if (mode == 1) {
-//                        // adding mode, do nothing?
-//                    }else if (mode == 2){
-//                        toggleSelected(mTaskId);
-//                    }
-//                }
-//                onPressAndHold: {
-//                    if (mode == 0) {
-//                        var map = mapToItem(null, mouseX, mouseY);
-//                        container.pressAndHoldAtRow(index, map.x, map.y, dinstance);
-//                    }
-//                }
-//            }
-
             Checkbox {
                 id: selectBox
                 x: (rowHeight - width)/2
@@ -479,6 +458,8 @@ Item {
 //                        }
 //                    }
 //                }
+
+                TopItem{ id: top }
 
                 MouseArea {
                     property int start: 0
