@@ -44,7 +44,7 @@ Rectangle {
                 anchors.top: parent.top
                 anchors.left: parent.left
                 anchors.right: parent.right
-                source: "image://themedimage/images/tasks/ln_grey_l"
+                source: "image://themedimage/widgets/common/dividers/divider-horizontal-single"
             }
 
             Column {
@@ -89,7 +89,7 @@ Rectangle {
                 anchors.bottom: parent.bottom
                 anchors.left: parent.left
                 anchors.right: parent.right
-                source: "image://themedimage/images/tasks/ln_grey_l"
+                source: "image://themedimage/widgets/common/dividers/divider-horizontal-single"
             }
         }
 

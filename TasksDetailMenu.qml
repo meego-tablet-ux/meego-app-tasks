@@ -197,8 +197,8 @@ Column {
         id: deleteButton
         text: qsTr("Delete task")
         anchors.horizontalCenter: parent.horizontalCenter
-        bgSourceUp:"image://themedimage/images/btn_red_up"
-        bgSourceDn:"image://themedimage/images/btn_red_dn"
+        bgSourceUp:"image://themedimage/widgets/common/button/button-negative"
+        bgSourceDn:"image://themedimage/widgets/common/button/button-negative-pressed"
         onClicked: {
             detailMenu.deleteTask(task.mTaskId);
         }
@@ -217,8 +217,8 @@ Column {
         Button {
             id: editButton
             text: qsTr("Edit")
-            bgSourceUp:"image://themedimage/images/btn_blue_up"
-            bgSourceDn:"image://themedimage/images/btn_blue_dn"
+            bgSourceUp:"image://themedimage/widgets/common/button/button-default"
+            bgSourceDn:"image://themedimage/widgets/common/button/button-default-pressed"
             visible: !editing
             onClicked: {
                 detailMenu.editing = true;
@@ -229,8 +229,8 @@ Column {
             id: saveButton
             active: taskName.text != ""
             text: qsTr("Save")
-            bgSourceUp:"image://themedimage/images/btn_blue_up"
-            bgSourceDn:"image://themedimage/images/btn_blue_dn"
+            bgSourceUp:"image://themedimage/widgets/common/button/button-default"
+            bgSourceDn:"image://themedimage/widgets/common/button/button-default-pressed"
             visible: editing
             onClicked: {
                 task.mHasDueDate = duedateSelector.on
