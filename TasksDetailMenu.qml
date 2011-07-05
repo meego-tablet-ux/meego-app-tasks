@@ -10,7 +10,7 @@ Column {
     id: detailMenu
 
     property bool editing: false
-    property variant  task
+    property variant  task: null
     property variant listNames
     property alias deleteButtonVisible: deleteButton.visible
     property alias editButtonVisible: editButton.visible
@@ -122,7 +122,7 @@ Column {
         }
         Text {
             id: listText
-            text: task ? listNames[task.mListId] : ""
+            text: task != null ? listNames[task.mListId] : ""
             visible: !editing
             font.pixelSize: theme.fontPixelSizeLarge
         }
