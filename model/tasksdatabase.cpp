@@ -139,7 +139,14 @@ void TasksDatabase::removeList(int listId)
     if (!m_listsMap.contains(listId))
         return;
     TasksListItem &list = m_listsMap[listId];
-    int idx = m_lists.indexOf(list);
+    int idx = -1;
+
+    for (int i = 1; i < m_lists.count(); i++) {
+        if (m_lists.at(i).name() == list.name() && m_lists.at(i).id() == list.id()) {
+            idx = i;
+            break;
+        }
+    }
     if (idx == -1)
         return;
     // find rows
