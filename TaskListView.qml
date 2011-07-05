@@ -576,7 +576,7 @@ Item {
         onClickedMove: {
            // container.model.viewModel.moveTasksToList(selectedIds, 0);
            // container.selectedIds = [];
-           picker.visible = true;
+            picker.show();
            container.mode = 0;
         }
         onClickedDelete: {
@@ -591,12 +591,12 @@ Item {
     }
     TaskListPicker {
         id: picker
-        parent: container.parent
-        visible:false
+        //parent: container.parent
+        //visible:false
         onSelected: {
-            if (selectedIds.length > 0) {
-                container.model.viewModel.moveTasksToList(selectedIds, listId);
-                selectedIds = [];
+            if (container.selectedIds.length > 0) {
+                container.model.viewModel.moveTasksToList(container.selectedIds, listId);
+                container.selectedIds = [];
             }
         }
     }

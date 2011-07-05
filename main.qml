@@ -927,8 +927,8 @@ Window {
                                          "subTitle" : qsTr("To create a task, start by selecting a task list. Then tap on the new task line.")});
                     }
 
-                    onViewItemButtonClicked: picker.visible = true
-                    onButtonClicked: picker.visible = true
+                    onViewItemButtonClicked: picker.show()
+                    onButtonClicked: picker.show()
                 }
             }
 
