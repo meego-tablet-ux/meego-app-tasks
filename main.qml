@@ -430,8 +430,8 @@ Window {
 
             ModalDialog{
                 id: deleteListDialog
-                acceptButtonImage:"image://themedimage/images/btn_red_up"
-                acceptButtonImagePressed:"image://themedimage/images/btn_red_dn"
+                acceptButtonImage:"image://themedimage/widgets/common/button/button-negative"
+                acceptButtonImagePressed:"image://themedimage/widgets/common/button/button-negative-pressed"
                 title: labelDeleteListDialog
                 acceptButtonText: labelDelete
                 cancelButtonText:labelCancel
@@ -508,9 +508,11 @@ Window {
                         height: rowHeight
                         property string mListId: listId
                         property string mListName: listName
+                        property bool   mPressed: false
 
-                        Rectangle {
-                            color: "white"
+                        Image {
+                            source: mPressed ? "image://themedimage/widgets/common/list/list-active"
+                                             : "image://themedimage/widgets/common/list/list"
                             anchors.fill: parent
                         }
 
@@ -518,12 +520,13 @@ Window {
                             id: separator
                             width: parent.width
                             anchors.bottom: parent.bottom
-                            source: "image://themedimage/images/tasks/ln_grey_l"
+                            source: "image://themedimage/widgets/common/dividers/divider-horizontal-single"
                         }
 
                         Image {
                             id: icon
-                            source: listId == 0? "image://themedimage/images/tasks/icn_defaultlist":""
+                            source: listId == 0 ? "image://themedimage/icons/internal/tasks-group-default"
+                                                : "image://themedimage/icons/internal/tasks-group-generic"
                             anchors.verticalCenter: parent.verticalCenter
                             anchors.left:parent.left
                             anchors.leftMargin: horizontalMargin
@@ -553,7 +556,7 @@ Window {
                             id: separator_top
                             width: parent.width
                             anchors.top: parent.bottom
-                            source: "image://themedimage/images/tasks/ln_grey_l"
+                            source: "image://themedimage/widgets/common/dividers/divider-horizontal-single"
                         }
                         Rectangle {
                             id: icompletedCount
@@ -580,7 +583,8 @@ Window {
                             anchors.right:parent.right
                             anchors.rightMargin: horizontalMargin
                             anchors.verticalCenter:parent.verticalCenter
-                            source: "image://themedimage/images/icn_forward_dn"
+                            source: mPressed ? "image://themedimage/icons/internal/arrow-default-right-active"
+                                             : "image://themedimage/icons/internal/arrow-default-right"
                         }
 
                         TopItem{ id: top }
@@ -601,6 +605,8 @@ Window {
                                     landingScreenContextMenu.show();
                                 }
                             }
+                            onPressed: { mPressed = true; }
+                            onReleased: { mPressed = false; }
                         }
                     }
 
@@ -609,20 +615,11 @@ Window {
                         //parent: landingScreenPage.content
                         width: parent.width
                         height: rowHeight
-                        Image {
-                            id: icon
-                            source: "image://themedimage/images/tasks/icn_header_tasks"
-                            anchors.verticalCenter: parent.verticalCenter
-                            anchors.left:parent.left
-                            anchors.leftMargin: horizontalMargin
-                            height:parent.height - 2* verticalMargin
-                            width: height
-                            smooth:true
-                            fillMode:Image.PreserveAspectFit
-                        }
+                        property bool mPressed: false
 
-                        Rectangle {
-                            color: "white"
+                        Image {
+                            source: mPressed ? "image://themedimage/widgets/common/list/list-active"
+                                             : "image://themedimage/widgets/common/list/list"
                             anchors.fill: parent
                         }
 
@@ -630,7 +627,19 @@ Window {
                             id: separator
                             width: parent.width
                             anchors.bottom: parent.bottom
-                            source: "image://themedimage/images/tasks/ln_grey_l"
+                            source: "image://themedimage/widgets/common/dividers/divider-horizontal-single"
+                        }
+
+                        Image {
+                            id: icon
+                            source: "image://themedimage/icons/internal/tasks-group-alldue"
+                            anchors.verticalCenter: parent.verticalCenter
+                            anchors.left:parent.left
+                            anchors.leftMargin: horizontalMargin
+                            height:parent.height - 2* verticalMargin
+                            width: height
+                            smooth:true
+                            fillMode:Image.PreserveAspectFit
                         }
 
                         Text {
@@ -652,7 +661,7 @@ Window {
                             id: separator_top
                             width: parent.width
                             anchors.top: parent.bottom
-                            source: "image://themedimage/images/tasks/ln_grey_l"
+                            source: "image://themedimage/widgets/common/dividers/divider-horizontal-single"
                         }
                         Rectangle {
                             id: icompletedCount
@@ -681,13 +690,21 @@ Window {
                             anchors.right:parent.right
                             anchors.rightMargin: horizontalMargin
                             anchors.verticalCenter:parent.verticalCenter
-                            source: "image://themedimage/images/icn_forward_dn"
+                            source: mPressed ? "image://themedimage/icons/internal/arrow-default-right-active"
+                                             : "image://themedimage/icons/internal/arrow-default-right"
                         }
 
                         GestureArea {
                             anchors.fill: parent
                             Tap {
-                                onFinished: window.addPage(allDueTasksPageComponent)
+                                onStarted: { mPressed = true; }
+
+                                onFinished: {
+                                    mPressed = false;
+                                    window.addPage(allDueTasksPageComponent);
+                                }
+
+                                onCanceled: { mPressed = false; }
                             }
                         }
 
@@ -931,8 +948,8 @@ Window {
                 acceptButtonText: labelDelete
                 cancelButtonText:labelCancel
                 title: labelDeleteSingleTask
-                acceptButtonImage:"image://themedimage/images/btn_red_up"
-                acceptButtonImagePressed:"image://themedimage/images/btn_red_dn"
+                acceptButtonImage:"image://themedimage/widgets/common/button/button-negative"
+                acceptButtonImagePressed:"image://themedimage/widgets/common/button/button-negative-pressed"
                 property int taskId: -1
 
                 content: Row {
@@ -1298,8 +1315,8 @@ Window {
                 acceptButtonText: labelDelete
                 cancelButtonText:labelCancel
                 title: labelDeleteSingleTask
-                acceptButtonImage:"image://themedimage/images/btn_red_up"
-                acceptButtonImagePressed:"image://themedimage/images/btn_red_dn"
+                acceptButtonImage:"image://themedimage/widgets/common/button/button-negative"
+                acceptButtonImagePressed:"image://themedimage/widgets/common/button/button-negative-pressed"
                 property int taskId: -1
 
                 content: Row {
@@ -1327,8 +1344,8 @@ Window {
 
             ModalDialog{
                 id: deleteListDialog
-                acceptButtonImage:"image://themedimage/images/btn_red_up"
-                acceptButtonImagePressed:"image://themedimage/images/btn_red_dn"
+                acceptButtonImage:"image://themedimage/widgets/common/button/button-negative"
+                acceptButtonImagePressed:"image://themedimage/widgets/common/button/button-negative-pressed"
                 title: labelDeleteListDialog
                 acceptButtonText: labelDelete
                 cancelButtonText:labelCancel
