@@ -1237,29 +1237,6 @@ Window {
                 }
             }
 
-            ModalDialog{
-                id: renameDialog
-                acceptButtonText: labelOk
-                cancelButtonText:labelCancel
-                title: labelRenameList
-                showAcceptButton: renameTextInput.text.length > 0 //this is done because there is no way in the ModalDialog to disable the OK button if the user didn't enter text
-                property int listId: -1
-                property alias originalText: renameTextInput.text;
-                content: TextEntry {
-                    id: renameTextInput;
-                    anchors.verticalCenter: parent.verticalCenter
-                    anchors.left: parent.left
-                    anchors.right: parent.right
-                    anchors.leftMargin: 20
-                    anchors.rightMargin: anchors.leftMargin
-                    defaultText: qsTr("List name")
-                }
-                onAccepted: {
-                    allListsModel.renameList( listId, renameTextInput.text);
-                    customlistModel.listName = renameTextInput.text;
-                }
-            }
-
             TaskListView {
                 id: taskListView
                 parent:customlistPage
