@@ -960,15 +960,12 @@ Window {
 
             ContextMenu {
                 id: taskDetailContextMenu
-                property variant setTask;
-                property variant setListnames;
-                property bool setEditing;
+                property alias setTask: theDetailMenu.task
+                property alias setListnames: theDetailMenu.listNames
+                property alias setEditing: theDetailMenu.editing
 
                 content: TasksDetailMenu {
                     id: theDetailMenu
-                    task: taskDetailContextMenu.setTask;
-                    listNames: taskDetailContextMenu.setListnames;
-                    editing:taskDetailContextMenu.setEditing;
                     onClose: {
                         taskDetailContextMenu.hide();
                         theDetailMenu.editing = false;
@@ -976,6 +973,7 @@ Window {
                     onSave: {
                         taskDetailContextMenu.setTask = taskToSave;
                         saveChanges(taskDetailContextMenu.setTask);
+                        taskDetailContextMenu.hide();
                     }
                     onDeleteTask:  {
                         // delete task
@@ -1124,22 +1122,20 @@ Window {
 
             ContextMenu {
                 id: taskDetailContextMenu
-                property variant setTask;
-                property variant setListnames;
-                property bool setEditing;
+                property alias setTask: theDetailMenu.task
+                property alias setListnames: theDetailMenu.listNames
+                property alias setEditing: theDetailMenu.editing
 
                 content: TasksDetailMenu {
                     id: theDetailMenu
-                    task: taskDetailContextMenu.setTask;
-                    listNames: taskDetailContextMenu.setListnames;
-                    editing:taskDetailContextMenu.setEditing;
                     onClose: {
                         taskDetailContextMenu.hide();
                         editing = false;
                     }
                     onSave: {
                         taskDetailContextMenu.setTask = taskToSave;
-                        (taskDetailContextMenu.setTask);
+                        saveChanges(taskDetailContextMenu.setTask);
+                        taskDetailContextMenu.hide();
                     }
                     onDeleteTask:  {
                         // delete task
@@ -1287,11 +1283,15 @@ Window {
                     editorList.setCompleted(payload.mTaskId,checked);
                 }
                 onPressAndHoldAtRow: {
+                    var mouse = mapToItem(top, x, y)
+                    customListPageContextMenu.mousePos = mouse
                     customListPageContextMenu.payload = payload;
                     customListPageContextMenu.setPosition(x, y)
                     customListPageContextMenu.show();
                 }
             }
+
+            TopItem {id: top}
 
             ModalDialog {
                 id: deleteTaskDialog
