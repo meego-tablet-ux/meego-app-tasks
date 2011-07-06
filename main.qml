@@ -607,6 +607,7 @@ Window {
                             }
                             onPressed: { mPressed = true; }
                             onReleased: { mPressed = false; }
+                            onCanceled: { mPressed = false; }
                         }
                     }
 
