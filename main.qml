@@ -71,7 +71,6 @@ Window {
         }
     }
 
-
     TopItem{ id: topItem }
 
     Connections {
