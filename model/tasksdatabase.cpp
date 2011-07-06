@@ -302,6 +302,7 @@ void TasksDatabase::addTask(int listId, const QString &task, const QString &note
     tsk.setReminderDate(reminderDate);
     tsk.setUrls(urls);
     tsk.setAttachments(attachments);
+    tsk.setCreatedDateTime(QDateTime::currentDateTime());
 
     TasksListModel::TimeGroups tg = TasksListModel::All; // not at any timeview
     int idx = -1;
