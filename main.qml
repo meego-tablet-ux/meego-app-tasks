@@ -71,6 +71,8 @@ Window {
         }
     }
 
+    TopItem{ id: topItem }
+
     Connections {
         target: mainWindow
         onCall: {
@@ -427,8 +429,8 @@ Window {
 
             ModalDialog{
                 id: deleteListDialog
-                acceptButtonImage:"image://themedimage/images/btn_red_up"
-                acceptButtonImagePressed:"image://themedimage/images/btn_red_dn"
+                acceptButtonImage:"image://themedimage/widgets/common/button/button-negative"
+                acceptButtonImagePressed:"image://themedimage/widgets/common/button/button-negative-pressed"
                 title: labelDeleteListDialog
                 acceptButtonText: labelDelete
                 cancelButtonText:labelCancel
@@ -505,9 +507,11 @@ Window {
                         height: rowHeight
                         property string mListId: listId
                         property string mListName: listName
+                        property bool   mPressed: false
 
-                        Rectangle {
-                            color: "white"
+                        Image {
+                            source: mPressed ? "image://themedimage/widgets/common/list/list-active"
+                                             : "image://themedimage/widgets/common/list/list"
                             anchors.fill: parent
                         }
 
@@ -515,12 +519,13 @@ Window {
                             id: separator
                             width: parent.width
                             anchors.bottom: parent.bottom
-                            source: "image://themedimage/images/tasks/ln_grey_l"
+                            source: "image://themedimage/widgets/common/dividers/divider-horizontal-single"
                         }
 
                         Image {
                             id: icon
-                            source: listId == 0? "image://themedimage/images/tasks/icn_defaultlist":""
+                            source: listId == 0 ? "image://themedimage/icons/internal/tasks-group-default"
+                                                : "image://themedimage/icons/internal/tasks-group-generic"
                             anchors.verticalCenter: parent.verticalCenter
                             anchors.left:parent.left
                             anchors.leftMargin: horizontalMargin
@@ -550,7 +555,7 @@ Window {
                             id: separator_top
                             width: parent.width
                             anchors.top: parent.bottom
-                            source: "image://themedimage/images/tasks/ln_grey_l"
+                            source: "image://themedimage/widgets/common/dividers/divider-horizontal-single"
                         }
                         Rectangle {
                             id: icompletedCount
@@ -577,7 +582,8 @@ Window {
                             anchors.right:parent.right
                             anchors.rightMargin: horizontalMargin
                             anchors.verticalCenter:parent.verticalCenter
-                            source: "image://themedimage/images/icn_forward_dn"
+                            source: mPressed ? "image://themedimage/icons/internal/arrow-default-right-active"
+                                             : "image://themedimage/icons/internal/arrow-default-right"
                         }
 
                         TopItem{ id: top }
@@ -591,13 +597,15 @@ Window {
                             }
                             onPressAndHold: {
                                 if (listId != 0) {
-                                    top.calcTopParent()
-                                    var map = mapToItem(top.topItem, mouseX, mouseY);
+                                    top.calcTopParent();
                                     landingScreenContextMenu.payload = dinstance;
+                                    var map = mapToItem(top.topItem, mouseX, mouseY);
                                     landingScreenContextMenu.setPosition(map.x, map.y);
                                     landingScreenContextMenu.show();
                                 }
                             }
+                            onPressed: { mPressed = true; }
+                            onReleased: { mPressed = false; }
                         }
                     }
 
@@ -606,20 +614,11 @@ Window {
                         //parent: landingScreenPage.content
                         width: parent.width
                         height: rowHeight
-                        Image {
-                            id: icon
-                            source: "image://themedimage/images/tasks/icn_header_tasks"
-                            anchors.verticalCenter: parent.verticalCenter
-                            anchors.left:parent.left
-                            anchors.leftMargin: horizontalMargin
-                            height:parent.height - 2* verticalMargin
-                            width: height
-                            smooth:true
-                            fillMode:Image.PreserveAspectFit
-                        }
+                        property bool mPressed: false
 
-                        Rectangle {
-                            color: "white"
+                        Image {
+                            source: mPressed ? "image://themedimage/widgets/common/list/list-active"
+                                             : "image://themedimage/widgets/common/list/list"
                             anchors.fill: parent
                         }
 
@@ -627,7 +626,19 @@ Window {
                             id: separator
                             width: parent.width
                             anchors.bottom: parent.bottom
-                            source: "image://themedimage/images/tasks/ln_grey_l"
+                            source: "image://themedimage/widgets/common/dividers/divider-horizontal-single"
+                        }
+
+                        Image {
+                            id: icon
+                            source: "image://themedimage/icons/internal/tasks-group-alldue"
+                            anchors.verticalCenter: parent.verticalCenter
+                            anchors.left:parent.left
+                            anchors.leftMargin: horizontalMargin
+                            height:parent.height - 2* verticalMargin
+                            width: height
+                            smooth:true
+                            fillMode:Image.PreserveAspectFit
                         }
 
                         Text {
@@ -649,7 +660,7 @@ Window {
                             id: separator_top
                             width: parent.width
                             anchors.top: parent.bottom
-                            source: "image://themedimage/images/tasks/ln_grey_l"
+                            source: "image://themedimage/widgets/common/dividers/divider-horizontal-single"
                         }
                         Rectangle {
                             id: icompletedCount
@@ -678,13 +689,21 @@ Window {
                             anchors.right:parent.right
                             anchors.rightMargin: horizontalMargin
                             anchors.verticalCenter:parent.verticalCenter
-                            source: "image://themedimage/images/icn_forward_dn"
+                            source: mPressed ? "image://themedimage/icons/internal/arrow-default-right-active"
+                                             : "image://themedimage/icons/internal/arrow-default-right"
                         }
 
                         GestureArea {
                             anchors.fill: parent
                             Tap {
-                                onFinished: window.addPage(allDueTasksPageComponent)
+                                onStarted: { mPressed = true; }
+
+                                onFinished: {
+                                    mPressed = false;
+                                    window.addPage(allDueTasksPageComponent);
+                                }
+
+                                onCanceled: { mPressed = false; }
                             }
                         }
 
@@ -859,9 +878,7 @@ Window {
                     closeDetailWindowWithId(taskId);
                 }
                 onPressAndHoldAtRow : {
-                    var map = alldueTasksList.mapToItem(allDueTasksPage, x, y);
                     allDueTasksPageContextMenu.payload = payload;
-                    allDueTasksPageContextMenu.mousePos = map;   // This position may be wrong now since mapping isn't necessary, please test
                     allDueTasksPageContextMenu.setPosition(x, y)
                     allDueTasksPageContextMenu.show();
                 }
@@ -930,8 +947,8 @@ Window {
                 acceptButtonText: labelDelete
                 cancelButtonText:labelCancel
                 title: labelDeleteSingleTask
-                acceptButtonImage:"image://themedimage/images/btn_red_up"
-                acceptButtonImagePressed:"image://themedimage/images/btn_red_dn"
+                acceptButtonImage:"image://themedimage/widgets/common/button/button-negative"
+                acceptButtonImagePressed:"image://themedimage/widgets/common/button/button-negative-pressed"
                 property int taskId: -1
 
                 content: Row {
@@ -959,15 +976,12 @@ Window {
 
             ContextMenu {
                 id: taskDetailContextMenu
-                property variant setTask;
-                property variant setListnames;
-                property bool setEditing;
+                property alias setTask: theDetailMenu.task
+                property alias setListnames: theDetailMenu.listNames
+                property alias setEditing: theDetailMenu.editing
 
                 content: TasksDetailMenu {
                     id: theDetailMenu
-                    task: taskDetailContextMenu.setTask;
-                    listNames: taskDetailContextMenu.setListnames;
-                    editing:taskDetailContextMenu.setEditing;
                     onClose: {
                         taskDetailContextMenu.hide();
                         theDetailMenu.editing = false;
@@ -975,6 +989,7 @@ Window {
                     onSave: {
                         taskDetailContextMenu.setTask = taskToSave;
                         saveChanges(taskDetailContextMenu.setTask);
+                        taskDetailContextMenu.hide();
                     }
                     onDeleteTask:  {
                         // delete task
@@ -1123,22 +1138,20 @@ Window {
 
             ContextMenu {
                 id: taskDetailContextMenu
-                property variant setTask;
-                property variant setListnames;
-                property bool setEditing;
+                property alias setTask: theDetailMenu.task
+                property alias setListnames: theDetailMenu.listNames
+                property alias setEditing: theDetailMenu.editing
 
                 content: TasksDetailMenu {
                     id: theDetailMenu
-                    task: taskDetailContextMenu.setTask;
-                    listNames: taskDetailContextMenu.setListnames;
-                    editing:taskDetailContextMenu.setEditing;
                     onClose: {
                         taskDetailContextMenu.hide();
                         editing = false;
                     }
                     onSave: {
                         taskDetailContextMenu.setTask = taskToSave;
-                        (taskDetailContextMenu.setTask);
+                        saveChanges(taskDetailContextMenu.setTask);
+                        taskDetailContextMenu.hide();
                     }
                     onDeleteTask:  {
                         // delete task
@@ -1236,29 +1249,6 @@ Window {
                 }
             }
 
-            ModalDialog{
-                id: renameDialog
-                acceptButtonText: labelOk
-                cancelButtonText:labelCancel
-                title: labelRenameList
-                showAcceptButton: renameTextInput.text.length > 0 //this is done because there is no way in the ModalDialog to disable the OK button if the user didn't enter text
-                property int listId: -1
-                property alias originalText: renameTextInput.text;
-                content: TextEntry {
-                    id: renameTextInput;
-                    anchors.verticalCenter: parent.verticalCenter
-                    anchors.left: parent.left
-                    anchors.right: parent.right
-                    anchors.leftMargin: 20
-                    anchors.rightMargin: anchors.leftMargin
-                    defaultText: qsTr("List name")
-                }
-                onAccepted: {
-                    allListsModel.renameList( listId, renameTextInput.text);
-                    customlistModel.listName = renameTextInput.text;
-                }
-            }
-
             TaskListView {
                 id: taskListView
                 parent:customlistPage
@@ -1286,21 +1276,23 @@ Window {
                     editorList.setCompleted(payload.mTaskId,checked);
                 }
                 onPressAndHoldAtRow: {
-                    var map = taskListView.mapToItem(customlistPage, x, y);
+                    var mouse = mapToItem(top, x, y)
+                    customListPageContextMenu.mousePos = mouse
                     customListPageContextMenu.payload = payload;
-                    customListPageContextMenu.mousePos = map;   // This position may be wrong now since mapping isn't necessary, please test
                     customListPageContextMenu.setPosition(x, y)
                     customListPageContextMenu.show();
                 }
             }
+
+            TopItem {id: top}
 
             ModalDialog {
                 id: deleteTaskDialog
                 acceptButtonText: labelDelete
                 cancelButtonText:labelCancel
                 title: labelDeleteSingleTask
-                acceptButtonImage:"image://themedimage/images/btn_red_up"
-                acceptButtonImagePressed:"image://themedimage/images/btn_red_dn"
+                acceptButtonImage:"image://themedimage/widgets/common/button/button-negative"
+                acceptButtonImagePressed:"image://themedimage/widgets/common/button/button-negative-pressed"
                 property int taskId: -1
 
                 content: Row {
@@ -1328,8 +1320,8 @@ Window {
 
             ModalDialog{
                 id: deleteListDialog
-                acceptButtonImage:"image://themedimage/images/btn_red_up"
-                acceptButtonImagePressed:"image://themedimage/images/btn_red_dn"
+                acceptButtonImage:"image://themedimage/widgets/common/button/button-negative"
+                acceptButtonImagePressed:"image://themedimage/widgets/common/button/button-negative-pressed"
                 title: labelDeleteListDialog
                 acceptButtonText: labelDelete
                 cancelButtonText:labelCancel

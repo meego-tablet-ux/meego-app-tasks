@@ -54,8 +54,8 @@ BorderImage {
         Button {
             id: saveBt
             text:labelSave
-            bgSourceUp:"image://themedimage/images/btn_blue_up"
-            bgSourceDn:"image://themedimage/images/btn_blue_dn"
+            bgSourceUp:"image://themedimage/widgets/common/button/button-default"
+            bgSourceDn:"image://themedimage/widgets/common/button/button-default-pressed"
             onClicked: {
                 bar.clickedSave();
             }
@@ -64,8 +64,8 @@ BorderImage {
         Button {
             id: moveBt
             text:labelMove.arg(model.length)
-            bgSourceUp:"image://themedimage/images/btn_blue_up"
-            bgSourceDn:"image://themedimage/images/btn_blue_dn"
+            bgSourceUp:"image://themedimage/widgets/common/button/button-default"
+            bgSourceDn:"image://themedimage/widgets/common/button/button-default-pressed"
             active: model.length > 0
             onClicked: {
                 bar.clickedMove();
@@ -74,8 +74,8 @@ BorderImage {
         Button {
             id: deleteBt
             text: labelDelete.arg(model.length)
-            bgSourceUp:"image://themedimage/images/btn_blue_up"
-            bgSourceDn:"image://themedimage/images/btn_blue_dn"
+            bgSourceUp:"image://themedimage/widgets/common/button/button-default"
+            bgSourceDn:"image://themedimage/widgets/common/button/button-default-pressed"
             active: model.length > 0
             onClicked: {
                 bar.clickedDelete();
@@ -84,8 +84,8 @@ BorderImage {
         Button {
             id: okBt
             text: labelOk
-            bgSourceUp:"image://themedimage/images/btn_blue_up"
-            bgSourceDn:"image://themedimage/images/btn_blue_dn"
+            bgSourceUp:"image://themedimage/widgets/common/button/button-default"
+            bgSourceDn:"image://themedimage/widgets/common/button/button-default-pressed"
             onClicked: {
                 bar.clickedOk();
             }

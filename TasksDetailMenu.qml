@@ -10,7 +10,7 @@ Column {
     id: detailMenu
 
     property bool editing: false
-    property variant  task
+    property variant  task: null
     property variant listNames
     property alias deleteButtonVisible: deleteButton.visible
     property alias editButtonVisible: editButton.visible
@@ -122,7 +122,7 @@ Column {
         }
         Text {
             id: listText
-            text: task ? listNames[task.mListId] : ""
+            text: task != null ? listNames[task.mListId] : ""
             visible: !editing
             font.pixelSize: theme.fontPixelSizeLarge
         }
@@ -197,8 +197,8 @@ Column {
         id: deleteButton
         text: qsTr("Delete task")
         anchors.horizontalCenter: parent.horizontalCenter
-        bgSourceUp:"image://themedimage/images/btn_red_up"
-        bgSourceDn:"image://themedimage/images/btn_red_dn"
+        bgSourceUp:"image://themedimage/widgets/common/button/button-negative"
+        bgSourceDn:"image://themedimage/widgets/common/button/button-negative-pressed"
         onClicked: {
             detailMenu.deleteTask(task.mTaskId);
         }
@@ -217,8 +217,8 @@ Column {
         Button {
             id: editButton
             text: qsTr("Edit")
-            bgSourceUp:"image://themedimage/images/btn_blue_up"
-            bgSourceDn:"image://themedimage/images/btn_blue_dn"
+            bgSourceUp:"image://themedimage/widgets/common/button/button-default"
+            bgSourceDn:"image://themedimage/widgets/common/button/button-default-pressed"
             visible: !editing
             onClicked: {
                 detailMenu.editing = true;
@@ -229,11 +229,15 @@ Column {
             id: saveButton
             active: taskName.text != ""
             text: qsTr("Save")
-            bgSourceUp:"image://themedimage/images/btn_blue_up"
-            bgSourceDn:"image://themedimage/images/btn_blue_dn"
+            bgSourceUp:"image://themedimage/widgets/common/button/button-default"
+            bgSourceDn:"image://themedimage/widgets/common/button/button-default-pressed"
             visible: editing
             onClicked: {
-                 task.mDueDate = internal.newDate;
+                task.mHasDueDate = duedateSelector.on
+                if (internal.newDate != null)
+                    task.mDueDate = internal.newDate;
+                else
+                    task.mHasDueDate = false
                 saveTaskFromInput();
                 detailMenu.save(task);
                 detailMenu.editing = false;

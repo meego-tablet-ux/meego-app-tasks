@@ -40,8 +40,8 @@ Item {
         timeMenu.selectedIndex =0;
     }
 
-    Rectangle {
-        color: "white"
+    Image {
+        source: "image://themedimage/widgets/common/list/list"
         anchors.fill: parent
     }
 
@@ -49,7 +49,7 @@ Item {
         id: separator
         width: parent.width
         anchors.bottom: parent.bottom
-        source: "image://themedimage/images/tasks/ln_grey_l"
+        source: "image://themedimage/widgets/common/dividers/divider-horizontal-single"
     }
 
     Checkbox {
@@ -63,9 +63,9 @@ Item {
 
     Image {
         id: vDivider
-        source: "image://themedimage/images/tasks/ln_grey_p"
+        source: "image://themedimage/widgets/common/dividers/divider-vertical-single"
         height: parent.height
-        width: 1
+//        width: 1
         anchors.left: checkbox.right
         anchors.leftMargin: 20
     }

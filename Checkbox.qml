@@ -47,7 +47,7 @@ Image {
             when: checked
             PropertyChanges {
                 target: box
-                source:"image://themedimage/images/tasks/btn_checkbox_on"
+                source:"image://themedimage/widgets/common/checkbox/checkbox-background-active"
             }
         },
         State {
@@ -55,7 +55,7 @@ Image {
             when: !checked
             PropertyChanges {
                 target: box
-                source:"image://themedimage/images/tasks/btn_checkbox_off"
+                source:"image://themedimage/widgets/common/checkbox/checkbox-background"
             }
         }
     ]

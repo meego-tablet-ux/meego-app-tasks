@@ -107,7 +107,17 @@ void TasksDatabase::renameList(int listId, const QString &name)
     // store
     m_dbEngine->saveLists();
     m_dbEngine->updateTasksList(list);
-    int idx = m_lists.indexOf(list);
+
+    int idx = -1;
+    int currentIndex = 0;
+    foreach (const TasksListItem &currentList, m_lists) {
+        if (currentList.id() == listId) {
+            idx = currentIndex;
+            break;
+        }
+        ++currentIndex;
+    }
+
     if (idx == -1)
         return;
     foreach (TasksListModel *model, m_models)
