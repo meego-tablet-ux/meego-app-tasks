@@ -56,6 +56,7 @@ Item {
         if (collapsed)
             //: This line is used for indication amount of incompleted tasks when a list is collapsed.
            tt =  qsTr("%1 (%2)").arg(tt).arg(model.viewModel.icount);
+
         return tt;
     }
 
@@ -120,7 +121,6 @@ Item {
             id: text
             anchors.fill: parent
             anchors.leftMargin: textHMargin
-            text: internal.titleText
             horizontalAlignment: Text.AlignLeft
             verticalAlignment: Text.AlignVCenter
             font.pixelSize: theme.fontPixelSizeLarge
@@ -144,7 +144,6 @@ Item {
             Tap {
                 onFinished: {
                      view.collapsed = !view.collapsed;
-                     text.text = getTitleText();
                      if (!view.collapsed) {
                        //  ensureShowingList(index);
                      }
@@ -597,7 +596,7 @@ Item {
             container.model.viewModel.commitAddedTasks();
             container.selectedIds = [];
             newrow.reset();
-            internal.titleText = getTitleText();
+            text.text = getTitleText();
             container.mode = 0;
 
             if (area.contentHeight > area.height)
@@ -706,10 +705,4 @@ Item {
             }
         }
     ]
-
-    QtObject {
-        //private data
-        id: internal
-        property string titleText: getTitleText()
-    }
 }
