@@ -176,7 +176,7 @@ bool TasksListItem::isValid() const
         return !d->name.isEmpty();
 }
 
-bool TasksListItem::operator ==(const TasksTaskItem &other) const
+bool TasksListItem::operator ==(const TasksListItem &other) const
 {
         return d->id == other.id();
 }

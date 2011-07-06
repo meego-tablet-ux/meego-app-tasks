@@ -24,7 +24,7 @@ public:
         TasksListItem(const TasksListItem &other);
         ~TasksListItem();
         TasksListItem& operator=(const TasksListItem& other);
-        bool operator==(const TasksTaskItem& other) const;
+        bool operator==(const TasksListItem& other) const;
 
         bool isValid() const;
         int id() const;
