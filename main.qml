@@ -879,6 +879,8 @@ Window {
                     closeDetailWindowWithId(taskId);
                 }
                 onPressAndHoldAtRow : {
+                    var mouse = mapToItem(top, x, y)
+                    allDueTasksPageContextMenu.mousePos = mouse
                     allDueTasksPageContextMenu.payload = payload;
                     allDueTasksPageContextMenu.setPosition(x, y)
                     allDueTasksPageContextMenu.show();
@@ -1012,6 +1014,8 @@ Window {
                     taskDetailContextMenu.show();
                 }
             }
+
+            TopItem {id: top}
 
             ContextMenu {
                 id: allDueTasksPageContextMenu
