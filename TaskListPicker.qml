@@ -6,119 +6,104 @@
  * http://www.apache.org/licenses/LICENSE-2.0
  */
 
-import Qt 4.7
+import QtQuick 1.0
 import MeeGo.App.Tasks 0.1
 import MeeGo.Ux.Components.Common 0.1
 import MeeGo.Ux.Gestures 0.1
 import MeeGo.Ux.Components 0.1
 
-Item {
+ModalFog {
     id: container
-    anchors.fill: parent
-    visible: false
+
+    fogClickable: true
+
+    // Move this to center
+    x: window.width / 2 - tasksList.width / 2
+    y: window.height / 2 - tasksList.height / 2
 
     signal selected(variant listId)
 
-    Rectangle {
-        anchors.fill:parent
-        color:"black"
-        opacity: 0.5
-    }
-
-    GestureArea {
-        anchors.fill: parent
-        Tap {
-            onFinished: {
-                container.visible = false;
-            }
-        }
-    }
-
-//    MouseArea {
-//        anchors.fill: parent
-//        onClicked: container.visible = false
-//    }
-
-
-    TasksListModel {
-        id: viewmodel
-        modelType: TasksListModel.AllLists
-    }
-
-    ListView {
-        id: existingList
-        width:400
+    modalSurface: Item {
+        width: 400
         height: 300
-        anchors.centerIn: parent
-        model: viewmodel
-        clip: true
-        delegate: Item {
-            width: 400
-            height: 50
-            Rectangle {
-                color:"White"
-                width: parent.width
-                height: 40
-                anchors.centerIn: parent
-            }
-            Text {
-                id:  text
-                text: listName
-                anchors.centerIn: parent
-                width: parent.width
-                elide: Text.ElideMiddle
-                horizontalAlignment: Text.AlignHCenter
+
+        ListView {
+            id: tasksList
+            clip: true
+
+            anchors.fill:  parent
+
+            model: TasksListModel {
+                modelType: TasksListModel.AllLists
             }
 
-            GestureArea {
-                anchors.fill: parent
-                Tap {
-                    onFinished: {
+            delegate: Item {
+                width: tasksList.width
+                height: 50
+                Rectangle {
+                    color:"White"
+                    width: parent.width
+                    height: 40
+                    anchors.centerIn: parent
+                    Text {
+                        id:  listNameText
+                        text: listName
+                        anchors.centerIn: parent
+                        width: parent.width
+                        elide: Text.ElideMiddle
+                        horizontalAlignment: Text.AlignHCenter
+                    }
+                }
+
+// GestureArea still not working correctly
+//                GestureArea {
+//                    anchors.fill: parent
+//                    Tap {
+//                        onFinished: {
+//                            container.selected(listId);
+//                            container.visible = false;
+//                        }
+//                    }
+//                }
+                MouseArea {
+                    anchors.fill: parent
+                    onClicked: {
                         container.selected(listId);
                         container.visible = false;
                     }
                 }
             }
-
-//            MouseArea {
-//                anchors.fill: parent
-//                onClicked: {
-//                    container.selected(listId);
-//                    container.visible = false;
+            footer: Item {
+                id: createNewList
+                width: tasksList.width
+                height: 50
+                Rectangle {
+                    color:"White"
+                    width: parent.width
+                    height: 40
+                    anchors.centerIn: parent
+                    Text {
+                        id: textElement
+                        text: qsTr("Create a new list")
+                        anchors.centerIn: parent
+                    }
+                }
+//GestureArea still not working correctly
+//                GestureArea {
+//                    anchors.fill: parent
+//                    Tap {
+//                        onFinished: {
+//                            createDialog.show();
+//                        }
+//                    }
 //                }
-//            }
-        }
-
-        footer:  Item {
-            width: 400
-            height: 50
-            Rectangle {
-                color:"White"
-                width: parent.width
-                height: 40
-                anchors.centerIn: parent
-            }
-            Text {
-                id:  text
-                text: qsTr("Create a new list")
-                anchors.centerIn: parent
-                width: existingList.width
-                elide: Text.ElideMiddle
-            }
-
-            GestureArea {
-                anchors.fill: parent
-                Tap {
-                    onFinished: {
+                MouseArea {
+                    anchors.fill: parent
+                    onClicked: {
                         createDialog.show();
                     }
                 }
             }
-
-//            MouseArea {
-//                anchors.fill: parent
-//                onClicked: createDialog.show()
-//            }
         }
     }
 
@@ -134,11 +119,19 @@ Item {
 
         content: TextEntry {
             id: inputText
-            anchors.fill: parent
+            anchors.verticalCenter: parent.verticalCenter
+            anchors.left: parent.left
+            anchors.leftMargin: 10
+            anchors.right: parent.right
+            anchors.rightMargin: 10
             defaultText: qsTr("List name")
         }
         onAccepted: {
-            viewmodel.addList(inputText.text);
+            viewModel.addList(inputText.text);
+            container.show()
+        }
+        onRejected: {
+            container.show()
         }
     }
 }

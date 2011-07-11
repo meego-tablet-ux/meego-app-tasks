@@ -475,12 +475,20 @@ QVariant TasksListModel::taskRole(const TasksTaskItem &task, int role) const
 
 static bool lessThen(const QPair<TasksTaskItem, int> &a, const QPair<TasksTaskItem, int> &b)
 {
-    return a.first.dueDate() < b.first.dueDate();
+    if (a.first.dueDate() != b.first.dueDate())
+        return a.first.dueDate() < b.first.dueDate();
+    if (a.first.createdDateTime() != b.first.createdDateTime())
+        return a.first.createdDateTime() < b.first.createdDateTime();
+    return a.first.task().compare(b.first.task()) < 0;
 }
 
 static bool greaterThen(const QPair<TasksTaskItem, int> &a, const QPair<TasksTaskItem, int> &b)
 {
-    return a.first.dueDate() > b.first.dueDate();
+    if (a.first.dueDate() != b.first.dueDate())
+        return a.first.dueDate() > b.first.dueDate();
+    if (a.first.createdDateTime() != b.first.createdDateTime())
+        return a.first.createdDateTime() > b.first.createdDateTime();
+    return a.first.task().compare(b.first.task()) > 0;
 }
 
 void TasksListModel::sort(int column, Qt::SortOrder order)
