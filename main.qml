@@ -983,6 +983,7 @@ Window {
 
                 content: TasksDetailMenu {
                     id: theDetailMenu
+                    anchors.margins: 10
                     onClose: {
                         taskDetailContextMenu.hide();
                         theDetailMenu.editing = false;
@@ -1145,6 +1146,7 @@ Window {
 
                 content: TasksDetailMenu {
                     id: theDetailMenu
+                    anchors.margins: 10
                     onClose: {
                         taskDetailContextMenu.hide();
                         editing = false;

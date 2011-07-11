@@ -24,7 +24,7 @@ Column {
     property int vSpacing: 10
 
     spacing: vSpacing
-
+    width: 350
     onTaskChanged: {
         compCheckbox.isChecked = task.mCompleted; //For whatever stupid reason, the checkbox doesn't get updated
         //along with the other fields, so I have to manually do this!
@@ -45,6 +45,7 @@ Column {
 
     Row {
         id: nameRow
+        anchors.horizontalCenter: parent.horizontalCenter
         spacing: hSpacing
         CheckBox {
             id: compCheckbox
@@ -56,6 +57,7 @@ Column {
         }
         TextEntry {
             id: taskName
+            width: 250
             readOnly: !detailMenu.editing
             defaultText: qsTr("Insert task name")
             font.strikeout: compCheckbox.isChecked
@@ -64,9 +66,11 @@ Column {
         }
     }
     Row {
+        anchors.horizontalCenter: parent.horizontalCenter
         id: listRow
         spacing: hSpacing
         Text {
+            visible: listText.text != "" || editing
             id: listLabel
             text: qsTr("List:")
             color: theme.fontColorHighlight
@@ -74,8 +78,7 @@ Column {
         }
         ListView {
             height: 200
-            width: detailMenu.width - listLabel.width
-            visible: editing
+            width: detailMenu.width - listLabel.width - 30
             id: listCombobox
             model: TasksListModel {
                 id: viewmodel
@@ -83,6 +86,7 @@ Column {
             }
             spacing: 4
             clip: true
+            visible: editing
             delegate: Rectangle {
                 width: parent.width
                 height: 40
@@ -103,21 +107,21 @@ Column {
                     font.pixelSize: theme.fontPixelSizeLarge
                 }
 
-                GestureArea {
-                    anchors.fill: parent
-                    Tap {
-                        onFinished: {
-                            detailMenu.task.mListId = listId
-                        }
-                    }
-                }
-
-//                MouseArea {
+//                GestureArea {
 //                    anchors.fill: parent
-//                    onClicked: {
-//                        detailMenu.task.mListId = listId
+//                    Tap {
+//                        onFinished: {
+//                            detailMenu.task.mListId = listId
+//                        }
 //                    }
 //                }
+
+                MouseArea {
+                    anchors.fill: parent
+                    onClicked: {
+                        detailMenu.task.mListId = listId
+                    }
+                }
             }
         }
         Text {
@@ -130,6 +134,7 @@ Column {
 
     Row {
         id: dueDateRow
+        anchors.horizontalCenter: parent.horizontalCenter
         spacing: hSpacing
         Text {
             id: dueDateLabel
@@ -177,6 +182,8 @@ Column {
 
     Row {
         id: notesRow
+        anchors.horizontalCenter: parent.horizontalCenter
+
         spacing: hSpacing
         Text {
             id: notesLabel
@@ -187,6 +194,7 @@ Column {
         }
         TextEntry {
             id: notesData
+            width: 250
             readOnly: !detailMenu.editing
             defaultText: detailMenu.editing ?  qsTr("Add a note here")  : ""
             text: task ? task.mNotes : ""
@@ -212,6 +220,7 @@ Column {
 
     Row {
         id: editSaveCloseRow
+
         spacing: hSpacing
         anchors.horizontalCenter: parent.horizontalCenter
         Button {
