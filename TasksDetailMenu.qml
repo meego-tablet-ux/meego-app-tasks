@@ -54,7 +54,7 @@ Column {
             }
             isChecked: task ? task.mCompleted : false
         }
-        TextEntry {
+        TextField {
             id: taskName
             readOnly: !detailMenu.editing
             defaultText: qsTr("Insert task name")
@@ -185,7 +185,7 @@ Column {
             font.pixelSize: theme.fontPixelSizeLarge
             anchors.verticalCenter: parent.verticalCenter
         }
-        TextEntry {
+        TextField {
             id: notesData
             readOnly: !detailMenu.editing
             defaultText: detailMenu.editing ?  qsTr("Add a note here")  : ""
