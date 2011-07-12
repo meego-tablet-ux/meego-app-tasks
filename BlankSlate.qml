@@ -48,10 +48,9 @@ Rectangle {
             }
 
             Column {
-                anchors.left: parent.left
-                anchors.leftMargin: 40
                 anchors.verticalCenter: parent.verticalCenter
                 width: parent.width /2
+                anchors.left: parent.left
 
                 Text {
                     id: headerTitle
@@ -59,6 +58,7 @@ Rectangle {
                     font.pixelSize: theme.fontPixelSizeLargest
                     font.bold: true
                     wrapMode: Text.WordWrap
+                    width: parent.width
                 }
 
                 Text {
@@ -67,23 +67,20 @@ Rectangle {
                     font.pixelSize: theme.fontPixelSizeMedium
                     font.bold: true
                     wrapMode: Text.WordWrap
+                    width: parent.width
 
                 }
             }
 
             Button {
                 id: headerButton
-
-                anchors.right: parent.right
-                anchors.rightMargin: 40
                 anchors.verticalCenter: parent.verticalCenter
-
-                elideText: false
-                height: 60
+                anchors.right: parent.right
                 maxWidth: parent.width /2
-
                 onClicked: slate.buttonClicked()
             }
+
+
 
             Image {
                 anchors.bottom: parent.bottom
