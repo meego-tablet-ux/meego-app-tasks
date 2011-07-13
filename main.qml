@@ -266,11 +266,11 @@ Window {
     Item {
         id: listsGroupItem
         function getAllListsNames() {
-            var t = [];
-            for (var i = 0; i< listsGroupItem.children.length -1 ; i++) {
-                t = t.concat([listsGroupItem.children[i].list]);
+            var listNames = new Array();
+            for (var i = 0; i < listsGroupItem.children.length - 1; ++i) {
+                listNames[listsGroupItem.children[i].idList] = listsGroupItem.children[i].list;
             }
-            return t;
+            return listNames;
         }
 
         Repeater {
@@ -279,7 +279,7 @@ Window {
 
             delegate:Item {
                 property string list :listName
-
+                property int idList :listId
             }
         }
     }
@@ -1009,9 +1009,10 @@ Window {
 
                 function displayContextMenu (mouseX, mouseY, taskData, edit) {
                     taskDetailContextMenu.setPosition(mouseX,mouseY);
-                    taskDetailContextMenu.setTask = taskData;
-                    taskDetailContextMenu.setListnames = listsGroupItem.getAllListsNames();
-                    taskDetailContextMenu.setEditing = edit;
+                    theDetailMenu.task = taskData;
+                    theDetailMenu.listNames = listsGroupItem.getAllListsNames();
+                    theDetailMenu.editing = edit;
+
                     taskDetailContextMenu.show();
                 }
             }
@@ -1174,9 +1175,10 @@ Window {
 
                 function displayContextMenu (mouseX, mouseY, taskData, edit) {
                     taskDetailContextMenu.setPosition(mouseX,mouseY);
-                    taskDetailContextMenu.setTask = taskData;
-                    taskDetailContextMenu.setListnames = listsGroupItem.getAllListsNames();
-                    taskDetailContextMenu.setEditing = edit;
+                    theDetailMenu.task = taskData;
+                    theDetailMenu.listNames = listsGroupItem.getAllListsNames();
+                    theDetailMenu.editing = edit;
+
                     taskDetailContextMenu.show();
                 }
             }

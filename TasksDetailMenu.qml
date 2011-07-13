@@ -10,8 +10,8 @@ Column {
     id: detailMenu
 
     property bool editing: false
-    property variant  task: null
-    property variant listNames
+    property Item  task: null
+    property variant listNames: []
     property alias deleteButtonVisible: deleteButton.visible
     property alias editButtonVisible: editButton.visible
     property alias saveButtonVisible: saveButton.visible
@@ -26,8 +26,18 @@ Column {
     spacing: vSpacing
     width: 350
     onTaskChanged: {
-        compCheckbox.isChecked = task.mCompleted; //For whatever stupid reason, the checkbox doesn't get updated
+        if (task != null) {
+            compCheckbox.isChecked = task.mCompleted;
+            listText.text = listNames[task.mListId].toString()
+        }
+        //For whatever stupid reason, the checkbox doesn't get updated
         //along with the other fields, so I have to manually do this!
+    }
+
+    onListNamesChanged: {
+        if (task != null && listNames.length > 0) {
+            listText.text = listNames[task.mListId].toString()
+        }
     }
 
     function saveTaskFromInput() {
@@ -126,7 +136,7 @@ Column {
         }
         Text {
             id: listText
-            text: task != null ? listNames[task.mListId] : ""
+            text: task != null ? detailMenu.listNames[task.mListId] : ""
             visible: !editing
             font.pixelSize: theme.fontPixelSizeLarge
         }
