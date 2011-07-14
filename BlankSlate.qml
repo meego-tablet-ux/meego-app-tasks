@@ -114,6 +114,7 @@ Rectangle {
 
                         border.width: 1
                         border.color: "gray"
+                        opacity: 0
 
                         Image {
                             anchors.fill: parent
