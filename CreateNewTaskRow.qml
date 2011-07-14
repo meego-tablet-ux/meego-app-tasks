@@ -31,6 +31,7 @@ Item {
 
     signal confirmedInput();
     signal requestForEditing();
+    signal cancelEditing();
 
     function reset() {
         textinput.text = "";
@@ -65,7 +66,6 @@ Item {
         id: vDivider
         source: "image://themedimage/widgets/common/dividers/divider-vertical-single"
         height: parent.height
-//        width: 1
         anchors.left: checkbox.right
         anchors.leftMargin: 20
     }
@@ -91,7 +91,14 @@ Item {
             width: parent.width - timeMenu.width
             height: row.height - 10
             defaultText: labelCreateNewTask
-            onTextChanged:requestForEditing();
+            onTextChanged: {
+                if(text.length > 0) {
+                    requestForEditing();
+                } else {
+                    cancelEditing();
+                }
+            }
+            onAccepted:confirmedInput();
         }
 
         DropDown {
@@ -113,7 +120,7 @@ Item {
                         selectedDate = new Date();
                     } else if(index == 2) {
                         var tempDate = new Date(); //need a temp because this doesn't work otherwise
-                        tempDate.setDate(tempDate.getDate() + 1); //I don't know why
+                        tempDate.setDate(tempDate.getDate() + 1);
                         selectedDate = tempDate;
                     } else if(index == 3) {
                         var tempDate = new Date();

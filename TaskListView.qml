@@ -106,6 +106,22 @@ Item {
             onRequestForEditing: {
                 container.mode = 1;
             }
+            onCancelEditing: {
+                container.mode = 0;
+            }
+            onConfirmedInput: {
+                // actually save the tasks
+                view.model.addTaskAlt(view.model.listId, newrow.textinput.text,
+                                      false, newrow.selectedDueDate,newrow.selectedDate);
+                container.model.viewModel.commitAddedTasks();
+                container.selectedIds = [];
+                newrow.reset();
+                text.text = getTitleText();
+                container.mode = 0;
+
+                if (area.contentHeight > area.height)
+                    area.contentY = (area.contentHeight - area.height);
+            }
         }
     }
     Rectangle {
