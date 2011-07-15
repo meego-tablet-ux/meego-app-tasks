@@ -539,3 +539,11 @@ void TasksListModel::sort(int column, Qt::SortOrder order)
     emit layoutChanged();
     emit modelSorted();
 }
+
+QStringList TasksListModel::nameList() {
+    QStringList returnMe;
+    foreach(TasksListItem listItem, Database->m_lists) {
+        returnMe.append(listItem.name());
+    }
+    return returnMe;
+}

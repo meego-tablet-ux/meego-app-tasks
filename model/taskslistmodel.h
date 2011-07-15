@@ -12,6 +12,7 @@
 #include <QAbstractListModel>
 #include <QList>
 #include "taskslistitem.h"
+#include <QStringList>
 
 class TasksDatabase;
 class TasksTaskItem;
@@ -31,6 +32,7 @@ class TasksListModel : public QAbstractListModel
         Q_PROPERTY(int count READ count NOTIFY countChanged);
         Q_PROPERTY(int icount READ icount NOTIFY icountChanged);
         Q_PROPERTY(SortOrder sortOrder READ sortOrder NOTIFY modelSorted);
+        Q_PROPERTY(QStringList nameList READ nameList NOTIFY nameListChanged);
 public:
         enum ReminderType {
                 NoReminder,
@@ -99,6 +101,8 @@ public:
 
         SortOrder sortOrder() const { return m_sortOrder; }
 
+        QStringList nameList();
+
 public slots:
         void addList(const QString &name);
         void renameList(int listId, const QString &name);
@@ -136,6 +140,7 @@ signals:
         void icountChanged();
         void modelSorted();
         void filterChanged();
+        void nameListChanged();
 
 private slots:
         void onBeginInsertRow(int r);

@@ -401,6 +401,15 @@ Window {
                 deleteListDialog.listId = saveRestore.value("landingDeleteListDialogListId");
             }
 
+            function hasDupeTaskListName(checkName) {
+                for(var i=0;i< allListsModel.nameList.length; i++) {
+                    if(allListsModel.nameList[i] == checkName) {
+                        return true;
+                    }
+                }
+                return false;
+            }
+
             ModalDialog {
                 id: newListDialog
                 content: TextEntry {
@@ -415,7 +424,8 @@ Window {
                 title: labelNewList
                 cancelButtonText: labelCancel
                 acceptButtonText: labelOk
-                showAcceptButton: textinput.text.length > 0 //this is done because there is no way in the ModalDialog to disable the OK button if the user didn't enter text
+                showAcceptButton: (textinput.text.length > 0) && (hasDupeTaskListName(textinput.text) != true)
+                //this is done because there is no way in the ModalDialog to disable the OK button if the user didn't enter text
                 onAccepted: {
                     allListsModel.addList(textinput.text);
                     textinput.text = "";
@@ -425,6 +435,7 @@ Window {
                 onRejected: {
                     textinput.text = "";
                 }
+
             }
 
             ModalDialog{
@@ -445,7 +456,8 @@ Window {
                 acceptButtonText: labelOk
                 cancelButtonText:labelCancel
                 title: labelRenameList
-                showAcceptButton: renameTextInput.text.length > 0 //this is done because there is no way in the ModalDialog to disable the OK button if the user didn't enter text
+                showAcceptButton: (renameTextInput.text.length > 0) && (hasDupeTaskListName(renameTextInput.text) != true)
+                //this is done because there is no way in the ModalDialog to disable the OK button if the user didn't enter text
                 property int listId: -1
                 property alias originalText: renameTextInput.text;
                 content: TextEntry {
