@@ -603,6 +603,13 @@ Item {
             container.mode = 0;
             container.selectedIds = [];
         }
+        onVisibleChanged: {
+            if (visible) {
+                var map = area.mapToItem(parent, newrow.x, newrow.y + newrow.height - area.contentY);
+                if (map.y > y)
+                    area.contentY += map.y - y;             // scroll up the area to eliminate cover of input field (bmc #20193)
+            }
+        }
     }
     TaskListPicker {
         id: picker
