@@ -157,6 +157,7 @@ Item {
 
         GestureArea {
             anchors.fill: parent
+            acceptUnhandledEvents: true
             Tap {
                 onFinished: {
                      view.collapsed = !view.collapsed;
@@ -303,6 +304,7 @@ Item {
             TopItem{ id: top }
 
             GestureArea {
+                acceptUnhandledEvents: true
                 anchors.top: parent.top
                 anchors.bottom: parent.bottom
                 anchors.left: parent.left

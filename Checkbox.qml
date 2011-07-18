@@ -22,6 +22,7 @@ Image {
 
     GestureArea {
         anchors.fill: parent
+        acceptUnhandledEvents: true
         Tap {
             onFinished: {
                 if(box.enabled) {

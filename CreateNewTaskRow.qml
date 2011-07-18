@@ -98,7 +98,11 @@ Item {
                     cancelEditing();
                 }
             }
-            onAccepted:confirmedInput();
+            onAccepted: {
+                if(text.length > 0) {
+                    confirmedInput();
+                }
+            }
         }
 
         DropDown {

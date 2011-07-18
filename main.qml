@@ -708,6 +708,7 @@ Window {
 
                         GestureArea {
                             anchors.fill: parent
+                            acceptUnhandledEvents: true
                             Tap {
                                 onStarted: { mPressed = true; }
 

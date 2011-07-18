@@ -399,6 +399,7 @@ Item {
 
             GestureArea {
                 anchors.fill: parent
+                acceptUnhandledEvents: true
                 Tap {
                     onFinished: {
                         privateData.selectedCategory = view.categoryIndex;
