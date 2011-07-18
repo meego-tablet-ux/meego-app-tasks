@@ -603,6 +603,11 @@ Window {
                         MouseArea {
                             anchors.fill: parent
                             onClicked: {
+				//Hitting a task list multiple times will cause
+				// the task to be added to the page stack multiple times 
+				if (window.pageStack.busy)
+                                       return;
+
                                 customlistModel.listId = listId;
                                 customlistModel.listName = text.text;
                                 window.addPage(customlistPageComponent);
