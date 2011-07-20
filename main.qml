@@ -930,7 +930,8 @@ Window {
 
                     title: model.title
                     subTitle: !qmlSettings.isRunningFirstTime ? qsTr("To create a task, start by selecting a task list.") : ""
-                    buttonVisible: !qmlSettings.isRunningFirstTime
+                    buttonVisible:true 
+//!qmlSettings.isRunningFirstTime
                     buttonText: qsTr("Select a task list")
 
                     visible: model.visible
@@ -1223,6 +1224,9 @@ Window {
                 var res = [];
                 for (var i = 0; i < list.length; ++i)
                     res[i] = i;
+
+		customlistPage.actionMenuModel=list
+
                 return res;
             }
 
