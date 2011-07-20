@@ -54,8 +54,10 @@ Item {
         var collapsed = view.collapsed;
         var tt = model.title;
         if (collapsed)
+        {
             //: This line is used for indication amount of incompleted tasks when a list is collapsed.
            tt =  qsTr("%1 (%2)").arg(tt).arg(model.viewModel.icount);
+        }
 
         return tt;
     }
@@ -141,6 +143,7 @@ Item {
             verticalAlignment: Text.AlignVCenter
             font.pixelSize: theme.fontPixelSizeLarge
             elide: Text.ElideRight
+            text: getTitleText();
         }
         Image {
             id: separator_top
@@ -174,20 +177,6 @@ Item {
             }
         }
 
-//        MouseArea {
-//            anchors.fill: parent
-//            onClicked: {
-//                view.collapsed = !view.collapsed;
-//                internal.titleText = getTitleText();
-//                if (!view.collapsed) {
-//                  //  ensureShowingList(index);
-//                }
-//            }
-//            onPressAndHold: {
-//                    // test code, to be delted
-//                    mode = 2;
-//            }
-//        }
     }
 
     QtObject {

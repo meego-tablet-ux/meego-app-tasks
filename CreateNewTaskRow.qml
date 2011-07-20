@@ -117,6 +117,7 @@ Item {
             Component.onCompleted: {
                 selectedIndex = 0
             }
+
             onTriggered: {
                 if(index > 0) {
                     selectedDueDate = true;
