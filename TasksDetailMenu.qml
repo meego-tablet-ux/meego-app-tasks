@@ -176,6 +176,7 @@ Column {
                 selectedDate: task.mDueDate
                 onDateSelected: {
                     internal.newDate = datePicker.selectedDate;
+                    duedateText.text = getFormattedDate(internal.newDate);
                 }
             }
             onClicked: {
