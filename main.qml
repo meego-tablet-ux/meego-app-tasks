@@ -1265,6 +1265,15 @@ Window {
                 customlistPage.actionMenuModel = makeActionMenuModel();
             }
 
+            function hasDupeTaskListName(checkName) {
+                for(var i=0;i< allListsModel.nameList.length; i++) {
+                    if(allListsModel.nameList[i] == checkName) {
+                        return true;
+                    }
+                }
+                return false;
+            }
+
             actionMenuModel: makeActionMenuModel()
             actionMenuPayload: makeActionMenuPayload()
 
@@ -1316,6 +1325,30 @@ Window {
             }
 
             TopItem {id: top}
+
+            ModalDialog{
+                id: renameDialog
+                acceptButtonText: labelOk
+                cancelButtonText:labelCancel
+                title: labelRenameList
+                showAcceptButton: (renameTextInput.text.length > 0) && (hasDupeTaskListName(renameTextInput.text) != true)
+                //this is done because there is no way in the ModalDialog to disable the OK button if the user didn't enter text
+                property int listId: -1
+                property alias originalText: renameTextInput.text;
+                content: TextEntry {
+                    id: renameTextInput;
+                    anchors.verticalCenter: parent.verticalCenter
+                    anchors.left: parent.left
+                    anchors.right: parent.right
+                    anchors.leftMargin: 20
+                    anchors.rightMargin: anchors.leftMargin
+                    defaultText: qsTr("List name")
+                }
+                onAccepted: {
+                    allListsModel.renameList( listId, renameTextInput.text);
+                    customlistModel.listName = renameTextInput.text;
+                }
+            }
 
             ModalDialog {
                 id: deleteTaskDialog
