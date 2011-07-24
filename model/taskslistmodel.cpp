@@ -78,6 +78,8 @@ void TasksListModel::setFilter(const QString &filter)
     doFiltering();
     endResetModel();
     emit filterChanged();
+    emit countChanged();
+    emit icountChanged();
 }
 
 void TasksListModel::doFiltering()

@@ -353,7 +353,7 @@ Window {
                     newListDialog.show();
             }
 
-            onActivating: {
+            onDeactivated: {
                 if (allListsModel.filter != "")
                     allListsModel.filter = "";
             }
@@ -763,7 +763,7 @@ Window {
             objectName: "allDueTasksPage"
             pageTitle: labelAllDueTasks
 
-            onActivating: {
+            onDeactivated: {
                 if (overdueModel.filter != "")
                     overdueModel.filter = "";
                 if (upcomingModel.filter != "")
@@ -1082,7 +1082,7 @@ Window {
             objectName: "customlistPage"
             pageTitle: labelTasks
 
-            onActivating: {
+            onDeactivated: {
                 if (customlistModel.filter != "")
                     customlistModel.filter = "";
             }
