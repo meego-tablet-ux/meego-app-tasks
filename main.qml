@@ -353,6 +353,10 @@ Window {
                     newListDialog.show();
             }
 
+            onDeactivated: {
+                if (allListsModel.filter != "")
+                    allListsModel.filter = "";
+            }
             function save(saveRestore)
             {
                 //newListDialog
@@ -777,6 +781,15 @@ Window {
             objectName: "allDueTasksPage"
             pageTitle: labelAllDueTasks
 
+            onDeactivated: {
+                if (overdueModel.filter != "")
+                    overdueModel.filter = "";
+                if (upcomingModel.filter != "")
+                    upcomingModel.filter = "";
+                if (somedayModel.filter != "")
+                    somedayModel.filter = "";
+            }
+
             function save(saveRestore)
             {
                 saveRestore.setValue("alldueTasksListSortOrder", overdueModel.sortOrder);
@@ -1088,6 +1101,11 @@ Window {
             id: customlistPage
             objectName: "customlistPage"
             pageTitle: labelTasks
+
+            onDeactivated: {
+                if (customlistModel.filter != "")
+                    customlistModel.filter = "";
+            }
 
             function save(saveRestore)
             {
