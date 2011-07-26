@@ -1076,8 +1076,7 @@ Window {
                             // view in list
                             customlistModel.listId = allDueTasksPageContextMenu.payload.mListId;
                             customlistModel.listName = allDueTasksPageContextMenu.payload.mListName;
-                            window.popPage()
-                            window.addPage(customlistPageComponent);
+                            window.replacePage(customlistPageComponent)
                         }else if (index == 3) {
                             // delete task
                             if(qmlSettings.get("task_auto_delete")){
