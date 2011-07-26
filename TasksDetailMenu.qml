@@ -67,7 +67,7 @@ Column {
         }
         TextField {
             id: taskName
-            width: 250
+            width:  detailMenu.width - compCheckbox.width
             readOnly: !detailMenu.editing
             defaultText: qsTr("Insert task name")
             font.strikeout: compCheckbox.isChecked
@@ -205,7 +205,7 @@ Column {
         }
         TextField {
             id: notesData
-            width: 250
+            width: detailMenu.width - notesLabel.width
             readOnly: !detailMenu.editing
             defaultText: detailMenu.editing ?  qsTr("Add a note here")  : ""
             text: task ? task.mNotes : ""
